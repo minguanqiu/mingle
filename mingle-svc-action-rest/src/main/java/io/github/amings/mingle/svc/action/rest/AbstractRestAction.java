@@ -62,13 +62,15 @@ public abstract class AbstractRestAction<Req extends ActionReqModel, Res extends
 
     /**
      * Build action request header for cache
+     *
+     * @return Map
      */
     protected abstract Map<String,String> buildRequestCacheHeaderValue();
 
     /**
      * Build action success http code for cache,if not contains code,this action will set error code and not success
      *
-     * @return ArrayList<Integer>
+     * @return Set
      */
     protected abstract Set<Integer> buildCacheSuccessHttpCode();
 
@@ -109,7 +111,7 @@ public abstract class AbstractRestAction<Req extends ActionReqModel, Res extends
     /**
      * Defined target API common response body to check success result,default by no restResModel
      *
-     * @return Class<? extends ActionRestResModel>
+     * @return Class
      */
     protected Class<? extends RestActionResModel> getActionRestResModelClass() {
         return null;
@@ -239,6 +241,7 @@ public abstract class AbstractRestAction<Req extends ActionReqModel, Res extends
      * Build request body
      *
      * @param reqModel Action request model
+     * @return RequestBody
      */
     protected RequestBody buildRequestBody(Req reqModel) throws BreakActionException {
         if (!restAction.mediaType().equals("")) {
