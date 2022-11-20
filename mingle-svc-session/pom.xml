@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.github.amings</groupId>
+        <artifactId>mingle</artifactId>
+        <version>1.0.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <artifactId>mingle-svc-session</artifactId>
+    <version>1.0.0</version>
+    <name>mingle-svc-session</name>
+    <description>mingle module for session feature</description>
+    <dependencies>
+        <dependency>
+            <groupId>io.github.amings</groupId>
+            <artifactId>mingle-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.amings</groupId>
+            <artifactId>mingle-svc-redis</artifactId>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt -->
+        <dependency>
+            <groupId>com.nimbusds</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+            <version>9.25.6</version>
+        </dependency>
+    </dependencies>
+</project>
