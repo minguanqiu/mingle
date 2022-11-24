@@ -10,7 +10,7 @@
     </parent>
     <groupId>io.github.amings</groupId>
     <artifactId>mingle</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <packaging>pom</packaging>
     <name>mingle</name>
     <description>mingle parent</description>
@@ -50,7 +50,7 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mingle.core.version>1.0.0</mingle.core.version>
-        <mingle.svc.session.version>1.0.0</mingle.svc.session.version>
+        <mingle.svc.session.version>1.0.1</mingle.svc.session.version>
         <mingle.svc.redis.version>1.0.0</mingle.svc.redis.version>
         <mingle.svc.data.version>1.0.0</mingle.svc.data.version>
         <mingle.svc.action.rest.version>1.0.0</mingle.svc.action.rest.version>
