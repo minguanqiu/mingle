@@ -32,9 +32,9 @@ public class SvcResUtils {
         SvcResModelHandler svcResModelHandlerImpl = ReflectionUtils.newInstance(svcResModelHandler.getClass());
         svcResModelHandlerImpl.setCode(code);
         svcResModelHandlerImpl.setDesc(desc);
-        Optional<JsonNode> jsonNodeOptional = jacksonUtils.readTree(svcResModel);
-        if(jsonNodeOptional.isPresent()) {
-            svcResModelHandlerImpl.setResBody(jsonNodeOptional.get());
+        if(svcResModel != null) {
+            Optional<JsonNode> jsonNodeOptional = jacksonUtils.readTree(svcResModel);
+            jsonNodeOptional.ifPresent(svcResModelHandlerImpl::setResBody);
         } else {
             svcResModelHandlerImpl.setResBody(jacksonUtils.getObjectNode());
         }
