@@ -49,7 +49,7 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <mingle.core.version>1.0.0</mingle.core.version>
+        <mingle.core.version>1.0.1</mingle.core.version>
         <mingle.svc.session.version>1.0.1</mingle.svc.session.version>
         <mingle.svc.redis.version>1.0.0</mingle.svc.redis.version>
         <mingle.svc.data.version>1.0.0</mingle.svc.data.version>
