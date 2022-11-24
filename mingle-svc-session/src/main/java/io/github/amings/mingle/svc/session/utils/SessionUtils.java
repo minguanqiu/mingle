@@ -81,11 +81,20 @@ public class SessionUtils {
 
     public void setSessionValue(String key, Object value) {
         session.getSessionEntity().getSessionValue().put(key,value);
-        sessionDao.set(RedisKey.of(session.getSessionInfo().getKey()), session.getSessionEntity(), Duration.parse(session.getSessionInfo().getTimeToLive()));
+        updateSession();
+    }
+
+    public void removeSessionValue(String key) {
+        session.getSessionEntity().getSessionValue().remove(key);
+        updateSession();
     }
 
     public void removeSessionValue(String key, Object value) {
         session.getSessionEntity().getSessionValue().remove(key,value);
+        updateSession();
+    }
+
+    private void updateSession() {
         sessionDao.set(RedisKey.of(session.getSessionInfo().getKey()), session.getSessionEntity(), Duration.parse(session.getSessionInfo().getTimeToLive()));
     }
 
