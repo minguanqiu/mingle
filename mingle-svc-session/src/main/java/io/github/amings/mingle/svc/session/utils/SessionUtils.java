@@ -52,6 +52,7 @@ public class SessionUtils {
 
     public String createSession(List<String> keyParams, String sessionType, Duration timeToLive, Map<String, Object> sessionValue, ArrayList<String> authorities, boolean single) {
         RedisKey redisKey = new RedisKey(SessionEntity.class);
+        redisKey.addParam(sessionType);
         redisKey.addParams(keyParams);
         String sessionId = UUIDUtils.generateUuid();
         if (!single) {
