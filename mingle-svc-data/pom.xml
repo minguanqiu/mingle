@@ -6,11 +6,10 @@
     <parent>
         <groupId>io.github.amings</groupId>
         <artifactId>mingle</artifactId>
-        <version>1.0.0</version>
-        <relativePath>../pom.xml</relativePath>
+        <version>1.1.0</version>
     </parent>
     <artifactId>mingle-svc-data</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <name>mingle-svc-data</name>
     <description>mingle module for database architecture</description>
     <dependencies>
