@@ -51,7 +51,7 @@ add dependencies:
 <parent>
     <groupId>io.github.amings</groupId>
     <artifactId>mingle</artifactId>
-    <version>1.0.0</version>
+    <version>${latest.version}</version>
 </parent>
 
 <dependencies>
