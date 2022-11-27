@@ -112,7 +112,7 @@ mingle:
 Uri rule two part
 
 * `mingle.svc.action.rest.{action type}.uri` context path
-* `mingle.svc.action.rest.{action type}.uri.impl.uri.{action class name}` api path
+* `mingle.svc.action.rest.{action type}.impl.uri.{action class name}` api path
 
 That's why `getType()` must not be null reason
 

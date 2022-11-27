@@ -112,9 +112,9 @@ value :
 
 ## Properties
 
-| Name                       | Required | Default Value |       Description       |
-|:---------------------------|:--------:|:-------------:|:-----------------------:|
-| `mingle.svc.logging.redis` |          |   `disable`   | will logging set enable |
+| Name                       | Required | Default Value |           Description            |
+|:---------------------------|:--------:|:-------------:|:--------------------------------:|
+| `mingle.svc.redis.logging` |          |   `disable`   | aop logging for redis set enable |
 
 please watch `spring.redis` properties
 

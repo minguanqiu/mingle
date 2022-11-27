@@ -151,9 +151,9 @@ public class UserLogin extends AbstractSvcLogic<UserLoginReq, LoginRes> {
 
 ## Properties
 
-| Name                     | Required | Default Value |       Description       |
-|:-------------------------|:--------:|:-------------:|:-----------------------:|
-| `mingle.svc.logging.dao` |          |   `disable`   | will logging set enable |
+| Name                     | Required | Default Value |          Description           |
+|:-------------------------|:--------:|:-------------:|:------------------------------:|
+| `mingle.svc.dao.logging` |          |   `disable`   | aop logging for dao set enable |
 
 please watch .A.5. Data Properties `spring.datasource` properties
 

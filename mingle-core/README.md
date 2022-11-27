@@ -829,7 +829,7 @@ you can override system code description by `SvcMsgListHandler`
 |:---------------------------------|:--------:|:-------------:|:------------------------------------------------------------------------------:|
 | `mingle.svc.path`                |          |    `/svc`     |                                    svc path                                    |
 | `mingle.svc.security.ip.openapi` |          |               |                      protected spring open api path by ip                      |
-| `mingle.svc.logging.action`      |          |   `disable`   |                            will logging set enable                             |
+| `mingle.svc.action.logging`      |          |   `disable`   |                    aop logging for action module set enable                    |
 | `mingle.svc.successCode`         |          |      `0`      |                                  success code                                  |
 | `mingle.svc.successDesc`         |          | `successful`  |                                  success desc                                  |
 | `mingle.svc.action.autoBreak`    |          |    `false`    | if action module not success code will auto throw exception to break Svc logic |
