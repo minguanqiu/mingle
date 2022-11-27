@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Configuration;
 public class DataBeanConfig {
 
     @Bean
-    @ConditionalOnProperty(prefix = "mingle.svc.logging", name = "dao", havingValue = "enable")
+    @ConditionalOnProperty(prefix = "mingle.svc.dao", name = "logging", havingValue = "enable")
     public DaoLogAspect daoLogAspect() {
         return new DaoLogAspect();
     }

@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Configuration;
 public class RedisBeanConfig {
 
     @Bean
-    @ConditionalOnProperty(prefix = "mingle.svc.logging", name = "redis", havingValue = "enable")
+    @ConditionalOnProperty(prefix = "mingle.svc.redis", name = "logging", havingValue = "enable")
     public RedisLogAspect redisLogAspect() {
         return new RedisLogAspect();
     }

@@ -95,7 +95,7 @@ public class SvcBeanConfig {
      * action logging aspect bean
      */
     @Bean
-    @ConditionalOnProperty(prefix = "mingle.svc.logging", name = "action", havingValue = "enable")
+    @ConditionalOnProperty(prefix = "mingle.svc.action", name = "logging", havingValue = "enable")
     public ActionLogAspect actionLogAspect() {
         return new ActionLogAspect();
     }
