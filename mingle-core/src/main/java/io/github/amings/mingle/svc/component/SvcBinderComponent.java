@@ -8,6 +8,7 @@ import io.github.amings.mingle.svc.config.WebConfig;
 import io.github.amings.mingle.svc.exception.MingleRuntimeException;
 import io.github.amings.mingle.utils.JacksonUtils;
 import io.github.amings.mingle.utils.ReflectionUtils;
+import io.github.amings.mingle.utils.UUIDUtils;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -184,8 +185,13 @@ public class SvcBinderComponent {
             if (!v.getSvc().custom()) {
                 svcValidBeanPathList.add(v.getSvcPath());
             }
-
         });
+        if(svcLogPathList.isEmpty()) {
+            svcLogPathList.add("/" + UUIDUtils.generateUuid());
+        }
+        if(svcValidBeanPathList.isEmpty()) {
+            svcValidBeanPathList.add("/" + UUIDUtils.generateUuid());
+        }
         this.svcPathList = Collections.unmodifiableList(svcPathList);
         this.svcValidBeanPathList = Collections.unmodifiableList(svcValidBeanPathList);
         this.svcLogPathList = Collections.unmodifiableList(svcLogPathList);

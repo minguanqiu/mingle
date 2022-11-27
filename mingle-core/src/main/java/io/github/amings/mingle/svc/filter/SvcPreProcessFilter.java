@@ -157,10 +157,12 @@ public class SvcPreProcessFilter extends AbstractSvcFilter {
             String responseBody = new String(httpServletResponse.getContentAsByteArray(), StandardCharsets.UTF_8);
             httpServletResponse.copyBodyToResponse();
             try {
-                if (svcInfo.isWriteBackReq()) {
-                    svcLogHandler.writeBeginLog(buildSvcBeginModel());
+                if (svcInfo.getSvcBinderModel().getSvc().log()) {
+                    if (svcInfo.isWriteBackReq()) {
+                        svcLogHandler.writeBeginLog(buildSvcBeginModel());
+                    }
+                    svcLogHandler.writeEndLog(buildSvcEndModel(responseBody));
                 }
-                svcLogHandler.writeEndLog(buildSvcEndModel(responseBody));
             } catch (Exception ignored) {
 
             }
@@ -183,10 +185,13 @@ public class SvcPreProcessFilter extends AbstractSvcFilter {
         model.setUuid(svcInfo.getUuid());
         model.setEndDateTime(endDateTime);
         SvcResModelHandler svcResModelHandler = svcInfo.getSvcResModelHandler4Log();
-        if(svcResModelHandler == null) {
-            svcResModelHandler = jacksonUtils.readValue(body, this.svcResModelHandler.getClass()).get();
+        if (svcResModelHandler == null) {
+            Optional<? extends SvcResModelHandler> optionalSvcResModelHandler = jacksonUtils.readValue(body, this.svcResModelHandler.getClass());
+            if (optionalSvcResModelHandler.isPresent()) {
+                svcResModelHandler = optionalSvcResModelHandler.get();
+            }
         }
-        if(svcResModelHandler != null) {
+        if (svcResModelHandler != null) {
             jacksonUtils.readTree(svcResModelHandler).ifPresent(jsonNode -> model.setResponseBody(jsonNode.toString()));
             model.setCode(svcResModelHandler.getCode());
             model.setDesc(svcResModelHandler.getDesc());
