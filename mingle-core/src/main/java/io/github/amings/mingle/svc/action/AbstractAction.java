@@ -5,6 +5,8 @@ import io.github.amings.mingle.svc.action.annotation.AutoBreak;
 import io.github.amings.mingle.svc.action.exception.BreakActionException;
 import io.github.amings.mingle.svc.exception.ActionAutoBreakException;
 import io.github.amings.mingle.utils.ReflectionUtils;
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 
 
@@ -31,9 +33,12 @@ public abstract class AbstractAction<Req extends ActionReqModel, Res extends Act
     @Value("${mingle.svc.action.autoBreak:false}")
     private boolean globalAutoBreak;
 
-    protected Class<ReqData> reqDataClass;
-    protected Class<ResData> resDataClass;
-    protected Class<Res> resModelClass;
+    @Getter(AccessLevel.PROTECTED)
+    private final Class<ReqData> reqDataClass;
+    @Getter(AccessLevel.PROTECTED)
+    private final Class<ResData> resDataClass;
+    @Getter(AccessLevel.PROTECTED)
+    private final Class<Res> resModelClass;
 
     /**
      * constructor
@@ -57,7 +62,7 @@ public abstract class AbstractAction<Req extends ActionReqModel, Res extends Act
      * @param reqModel Action request model
      * @return ResData
      */
-    public final ResData doAction(Req reqModel) {
+    public ResData doAction(Req reqModel) {
         return doAction(reqModel, ReflectionUtils.newInstance(reqDataClass));
     }
 
@@ -68,7 +73,7 @@ public abstract class AbstractAction<Req extends ActionReqModel, Res extends Act
      * @param reqData  Action request data
      * @return ResData
      */
-    public final ResData doAction(Req reqModel, ReqData reqData) {
+    public ResData doAction(Req reqModel, ReqData reqData) {
         ResData resData = ReflectionUtils.newInstance(resDataClass);
         if (resData == null) {
             throw new BreakActionException("MGA02", "Request data newInstance fail");
@@ -82,7 +87,7 @@ public abstract class AbstractAction<Req extends ActionReqModel, Res extends Act
             resData.setDesc(e.getDesc());
         } catch (Exception e) {
             resData.setCode("MGA01");
-            resData.setDesc("Exception : " + e.getCause());
+            resData.setDesc("Exception : " + e);
         }
         resData.setMsgType(getMsgType());
         checkSuccess(reqData.getAutoBreak(), resData);

@@ -323,8 +323,8 @@ public abstract class AbstractRestAction<Req extends ActionReqModel, Res extends
     }
 
     private Res processResModel(JsonNode resultNode) throws BreakActionException {
-        if (!resModelClass.equals(ActionResModel.class)) {
-            Optional<Res> resModelOptional = jacksonUtils.readValue(processResponseBody(resultNode).toString(), resModelClass);
+        if (!getResModelClass().equals(ActionResModel.class)) {
+            Optional<Res> resModelOptional = jacksonUtils.readValue(processResponseBody(resultNode).toString(), getResModelClass());
             if (resModelOptional.isPresent()) {
                 return resModelOptional.get();
             } else {
