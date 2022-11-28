@@ -92,7 +92,7 @@ properties :
 
 ```properties
 mingle.svc.action.rest.RestDemo.uri=http://localhost:8081/restdemo
-mingle.svc.action.rest.RestDemo.uri.impl.uri.GetName=/getName
+mingle.svc.action.rest.RestDemo.impl.uri.GetName=/getName
 ```
 
 yaml :
