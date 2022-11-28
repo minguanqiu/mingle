@@ -149,6 +149,9 @@ public class UserLogin extends AbstractSvcLogic<UserLoginReq, LoginRes> {
 }
 ```
 
+> **Note** <br>
+> Above practice AbstractDataDao is only by one database use,if you need use multiple database,must implements spring data jpa configuration by yourself and dao or new parent extends AbstractDao
+
 ## Properties
 
 | Name                     | Required | Default Value |          Description           |
