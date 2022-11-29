@@ -1,9 +1,11 @@
 package io.github.amings.mingle.svc;
 
+import com.google.common.reflect.TypeToken;
 import io.github.amings.mingle.svc.action.ActionResData;
 import io.github.amings.mingle.svc.exception.BreakSvcProcessException;
 import io.github.amings.mingle.svc.filter.SvcInfo;
 import io.github.amings.mingle.svc.handler.SvcMsgHandler;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -18,6 +20,19 @@ public abstract class AbstractSvcLogic<Req extends SvcReqModel, Res extends SvcR
     protected SvcInfo svcInfo;
     @Autowired
     private SvcMsgHandler svcMsgHandler;
+    @Getter
+    private final Class<Req> reqClass;
+    @Getter
+    private final Class<Res> resClass;
+    @SuppressWarnings("unchecked")
+    public AbstractSvcLogic() {
+        TypeToken<Req> reqTypeToken = new TypeToken<Req>(getClass()) {
+        };
+        TypeToken<Res> resTypeToken = new TypeToken<Res>(getClass()) {
+        };
+        reqClass = (Class<Req>) reqTypeToken.getRawType();
+        resClass = (Class<Res>) resTypeToken.getRawType();
+    }
 
     public abstract Res doService(Req reqModel, Res resModel);
 

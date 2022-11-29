@@ -49,6 +49,7 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <com.google.guava.version>31.1-jre</com.google.guava.version>
     </properties>
     <modules>
         <module>mingle-core</module>
@@ -99,6 +100,12 @@
                 <groupId>io.github.amings</groupId>
                 <artifactId>mingle-utils</artifactId>
                 <version>1.1.1</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${com.google.guava.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

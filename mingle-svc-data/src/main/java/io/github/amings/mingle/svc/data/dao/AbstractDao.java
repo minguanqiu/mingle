@@ -1,7 +1,7 @@
 package io.github.amings.mingle.svc.data.dao;
 
+import com.google.common.reflect.TypeToken;
 import io.github.amings.mingle.svc.data.annotation.DaoService;
-import io.github.amings.mingle.utils.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.repository.Repository;
@@ -15,16 +15,22 @@ import javax.annotation.PostConstruct;
  */
 
 @DaoService
-public abstract class AbstractDao<T extends Repository> {
+public abstract class AbstractDao<R extends Repository> {
     @Autowired
     ApplicationContext context;
-
-    protected T repository;
+    protected R repository;
+    private final Class<R> repositoryClass;
 
     @SuppressWarnings("unchecked")
+    public AbstractDao() {
+        TypeToken<R> repositoryTypeToken = new TypeToken<R>((getClass())) {
+        };
+        repositoryClass = (Class<R>) repositoryTypeToken.getRawType();
+    }
+
     @PostConstruct
     private void init() {
-        repository = (T) context.getBean(ReflectionUtils.getGenericClass(this.getClass(), 0));
+        repository = context.getBean(repositoryClass);
     }
 
 }

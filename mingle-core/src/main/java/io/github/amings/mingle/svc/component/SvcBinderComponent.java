@@ -7,15 +7,11 @@ import io.github.amings.mingle.svc.annotation.Svc;
 import io.github.amings.mingle.svc.config.WebConfig;
 import io.github.amings.mingle.svc.exception.MingleRuntimeException;
 import io.github.amings.mingle.utils.JacksonUtils;
-import io.github.amings.mingle.utils.ReflectionUtils;
 import io.github.amings.mingle.utils.UUIDUtils;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.reflections.Reflections;
-import org.reflections.scanners.Scanners;
-import org.reflections.util.ConfigurationBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigurationPackages;
 import org.springframework.context.ApplicationContext;
@@ -33,7 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Svc Binder Configuration
@@ -49,6 +44,8 @@ public class SvcBinderComponent {
     WebConfig webConfig;
     @Autowired
     JacksonUtils jacksonUtils;
+    @Autowired
+    List<AbstractSvcLogic> abstractSvcLogics;
     private Map<Class<?>, SvcBinderModel> svcBinderModelMap = new HashMap<>();
     private Map<String, String> ipAddressMap = new HashMap<>();
     private List<String> svcPathList;
@@ -87,19 +84,19 @@ public class SvcBinderComponent {
         return svcLogPathList;
     }
 
-    private void scanSvc(Reflections reflection) {
+    private void scanSvc() {
         HashMap<String, ArrayList<String>> svcMissingMap = new HashMap<>();
-        Set<Class<? extends AbstractSvcLogic>> subTypesOf = reflection.getSubTypesOf(AbstractSvcLogic.class);
-        if (subTypesOf.size() == 0) {
+        if (abstractSvcLogics.size() == 0) {
             throw new MingleRuntimeException("must create at least one service");
         }
-        subTypesOf.forEach(clazz -> {
+        abstractSvcLogics.forEach(svcLogic -> {
+            Class<? extends AbstractSvcLogic> clazz = svcLogic.getClass();
             SvcBinderModel svcBinderModel = new SvcBinderModel();
             ArrayList<String> svcMissingList = new ArrayList<>();
             Svc svc = clazz.getAnnotation(Svc.class);
             if (svc != null) {
-                Class<?> reqClass = ReflectionUtils.getGenericClass(clazz, 0);
-                Class<?> resClass = ReflectionUtils.getGenericClass(clazz, 1);
+                Class<?> reqClass = svcLogic.getReqClass();
+                Class<?> resClass = svcLogic.getResClass();
                 svcBinderModel.setSvc(svc);
                 svcBinderModel.setSvcName(clazz.getSimpleName());
                 svcBinderModel.setReqModelClass(reqClass);
@@ -111,7 +108,7 @@ public class SvcBinderComponent {
                 } catch (NoSuchMethodException ignored) {
                 }
                 String svcPathPrefix = webConfig.getSvcPath();
-                if(!svc.path().equals("")) {
+                if (!svc.path().equals("")) {
                     svcPathPrefix = svc.path();
                 }
                 String svcPath = svcPathPrefix + "/" + clazz.getSimpleName();
@@ -186,10 +183,10 @@ public class SvcBinderComponent {
                 svcValidBeanPathList.add(v.getSvcPath());
             }
         });
-        if(svcLogPathList.isEmpty()) {
+        if (svcLogPathList.isEmpty()) {
             svcLogPathList.add("/" + UUIDUtils.generateUuid());
         }
-        if(svcValidBeanPathList.isEmpty()) {
+        if (svcValidBeanPathList.isEmpty()) {
             svcValidBeanPathList.add("/" + UUIDUtils.generateUuid());
         }
         this.svcPathList = Collections.unmodifiableList(svcPathList);
@@ -199,10 +196,7 @@ public class SvcBinderComponent {
 
     @PostConstruct
     private void init() {
-        Reflections reflection = ReflectionUtils.getReflections(new ConfigurationBuilder()
-                .forPackages(getMainPackage())
-                .setScanners(Scanners.SubTypes));
-        scanSvc(reflection);
+        scanSvc();
         buildSvcPathList();
         log.info("SvcPathList : " + svcPathList);
         log.info("IpAddressSecurityMap : " + ipAddressMap);
