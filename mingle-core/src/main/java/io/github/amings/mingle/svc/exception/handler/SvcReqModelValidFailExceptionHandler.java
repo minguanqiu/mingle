@@ -1,12 +1,12 @@
 package io.github.amings.mingle.svc.exception.handler;
 
+import io.github.amings.mingle.svc.annotation.ExceptionHandler;
 import io.github.amings.mingle.svc.exception.SvcReqModelValidFailException;
 import io.github.amings.mingle.svc.exception.handler.abs.AbstractExceptionHandler;
 import io.github.amings.mingle.svc.exception.handler.model.ConstraintViolationModel;
 import io.github.amings.mingle.svc.handler.SvcResModelHandler;
 import io.github.amings.mingle.svc.utils.SvcCodeFiled;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -18,7 +18,7 @@ import java.util.ArrayList;
  *
  * @author Ming
  */
-@Component
+@ExceptionHandler
 public class SvcReqModelValidFailExceptionHandler extends AbstractExceptionHandler<SvcReqModelValidFailException> {
 
     @Override

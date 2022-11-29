@@ -1,11 +1,11 @@
 package io.github.amings.mingle.svc.session.exception.handler;
 
+import io.github.amings.mingle.svc.annotation.ExceptionHandler;
 import io.github.amings.mingle.svc.exception.handler.abs.AbstractExceptionHandler;
 import io.github.amings.mingle.svc.handler.SvcResModelHandler;
 import io.github.amings.mingle.svc.session.exception.SvcAuthenticationFailException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 
 /**
  * Authentication handler
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
  */
 
 @Slf4j
-@Component
+@ExceptionHandler
 public class SvcAuthenticationFailExceptionHandler extends AbstractExceptionHandler<SvcAuthenticationFailException> {
 
     @Override

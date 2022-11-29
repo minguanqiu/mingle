@@ -57,7 +57,7 @@ public class SvcMsgHandlerDefaultImpl implements SvcMsgHandler {
                     msgMap.get(node.getMsgType()).put(node.getCode(), node.getDesc());
                 } else {
                     Map<String, String> tmp = new HashMap<>();
-                    tmp.put(node.getCode(),node.getDesc());
+                    tmp.put(node.getCode(), node.getDesc());
                     msgMap.put(node.getMsgType(), tmp);
                 }
             });
@@ -67,7 +67,7 @@ public class SvcMsgHandlerDefaultImpl implements SvcMsgHandler {
     @PostConstruct
     private void init() {
         List<SvcMsgListHandler> mingleSvcMsgHandlers = svcMsgListHandlers.stream().filter(handler -> handler.getClass().getAnnotation(MingleSvcMsg.class) != null).collect(Collectors.toList());
-        List<SvcMsgListHandler> svcMsgHandlers = svcMsgListHandlers.stream().filter(handler -> handler.getClass().getAnnotation(MingleSvcMsg.class )== null).collect(Collectors.toList());
+        List<SvcMsgListHandler> svcMsgHandlers = svcMsgListHandlers.stream().filter(handler -> handler.getClass().getAnnotation(MingleSvcMsg.class) == null).collect(Collectors.toList());
         buildMsg(mingleSvcMsgHandlers);
         buildMsg(svcMsgHandlers);
     }

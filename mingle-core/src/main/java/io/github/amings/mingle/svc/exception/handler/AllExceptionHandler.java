@@ -1,12 +1,12 @@
 package io.github.amings.mingle.svc.exception.handler;
 
+import io.github.amings.mingle.svc.annotation.ExceptionHandler;
 import io.github.amings.mingle.svc.exception.handler.abs.AbstractExceptionHandler;
 import io.github.amings.mingle.svc.exception.handler.model.ExceptionModel;
 import io.github.amings.mingle.svc.handler.SvcResModelHandler;
 import io.github.amings.mingle.svc.utils.SvcCodeFiled;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 
 /**
  * Exception or unknown Exception will be caught
@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
  */
 
 @Slf4j
-@Component
-public class ExceptionHandler extends AbstractExceptionHandler<Exception> {
+@ExceptionHandler
+public class AllExceptionHandler extends AbstractExceptionHandler<Exception> {
 
     @Override
     public ResponseEntity<SvcResModelHandler> handle(Exception e) {

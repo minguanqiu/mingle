@@ -1,11 +1,12 @@
 package io.github.amings.mingle.svc.exception.handler.resolver;
 
+import io.github.amings.mingle.svc.annotation.ExceptionHandler;
 import io.github.amings.mingle.svc.exception.handler.abs.AbstractExceptionHandler;
 import io.github.amings.mingle.svc.handler.SvcResModelHandler;
-import io.github.amings.mingle.utils.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.NestedServletException;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
@@ -22,21 +23,24 @@ public class ExceptionHandlerResolver {
 
     private final HashMap<Class<?>, AbstractExceptionHandler<Exception>> exceptionHandlerMap = new HashMap<>();
     @Autowired
-    List<AbstractExceptionHandler<?>> abstractExceptionHandlerList;
+    List<AbstractExceptionHandler<?>> abstractExceptionHandlers;
 
     public ResponseEntity<SvcResModelHandler> resolver(Exception e) {
-        if (exceptionHandlerMap.containsKey(e.getClass())) {
-            return exceptionHandlerMap.get(e.getClass()).handle(e);
+        Exception exception = e;
+        if(exception.getClass().equals(NestedServletException.class)) {
+            exception = (Exception) e.getCause();
         }
-        return exceptionHandlerMap.get(Exception.class).handle(e);
+        if (exceptionHandlerMap.containsKey(exception.getClass())) {
+            return exceptionHandlerMap.get(exception.getClass()).handle(exception);
+        }
+        return exceptionHandlerMap.get(Exception.class).handle(exception);
     }
 
+    @SuppressWarnings("unchecked")
     @PostConstruct
     private void init() {
-        abstractExceptionHandlerList.forEach(e -> {
-            Class<?> genericClass = ReflectionUtils.getGenericClass(e.getClass(), 0);
-            exceptionHandlerMap.put(genericClass, (AbstractExceptionHandler) e);
-        });
+        abstractExceptionHandlers.stream().filter(e -> e.getClass().getAnnotation(ExceptionHandler.class) != null).forEach(e -> exceptionHandlerMap.put(e.getEClass(), (AbstractExceptionHandler<Exception>) e));
+        abstractExceptionHandlers.stream().filter(e -> e.getClass().getAnnotation(ExceptionHandler.class) == null).forEach(e -> exceptionHandlerMap.put(e.getEClass(), (AbstractExceptionHandler<Exception>) e));
     }
 
 

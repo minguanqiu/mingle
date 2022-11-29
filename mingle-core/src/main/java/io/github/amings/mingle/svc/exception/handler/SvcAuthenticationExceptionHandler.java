@@ -1,12 +1,12 @@
 package io.github.amings.mingle.svc.exception.handler;
 
+import io.github.amings.mingle.svc.annotation.ExceptionHandler;
 import io.github.amings.mingle.svc.exception.SvcAuthenticationException;
 import io.github.amings.mingle.svc.exception.handler.abs.AbstractExceptionHandler;
 import io.github.amings.mingle.svc.handler.SvcResModelHandler;
 import io.github.amings.mingle.svc.utils.SvcCodeFiled;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 
 /**
  * when not authority will be caught
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
  */
 
 @Slf4j
-@Component
+@ExceptionHandler
 public class SvcAuthenticationExceptionHandler extends AbstractExceptionHandler<SvcAuthenticationException> {
 
     @Override

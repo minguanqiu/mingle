@@ -1,10 +1,10 @@
 package io.github.amings.mingle.svc.exception.handler;
 
+import io.github.amings.mingle.svc.annotation.ExceptionHandler;
 import io.github.amings.mingle.svc.exception.BreakFilterProcessException;
 import io.github.amings.mingle.svc.exception.handler.abs.AbstractExceptionHandler;
 import io.github.amings.mingle.svc.handler.SvcResModelHandler;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 
 /**
  * when Svc Filter throw this Exception will be caught
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  * @author Ming
  */
 
-@Component
+@ExceptionHandler
 public class BreakFilterProcessExceptionHandler extends AbstractExceptionHandler<BreakFilterProcessException> {
 
     @Override
