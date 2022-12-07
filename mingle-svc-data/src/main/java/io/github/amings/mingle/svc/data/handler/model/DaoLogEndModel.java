@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 @Data
 public class DaoLogEndModel {
 
+    private String svcUuid;
+
     private String uuid;
 
     private LocalDateTime endDateTime;

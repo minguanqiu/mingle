@@ -4,9 +4,12 @@ import io.github.amings.mingle.svc.action.AbstractAction;
 import io.github.amings.mingle.svc.action.ActionReqModel;
 import io.github.amings.mingle.svc.action.ActionResData;
 import io.github.amings.mingle.svc.exception.ActionAutoBreakException;
+import io.github.amings.mingle.svc.filter.SvcInfo;
 import io.github.amings.mingle.svc.handler.ActionLogHandler;
 import io.github.amings.mingle.svc.handler.model.ActionBeginModel;
 import io.github.amings.mingle.svc.handler.model.ActionEndModel;
+import io.github.amings.mingle.svc.log.LogUtils;
+import io.github.amings.mingle.svc.log.SvcLogModel;
 import io.github.amings.mingle.utils.DateUtils;
 import io.github.amings.mingle.utils.JacksonUtils;
 import io.github.amings.mingle.utils.UUIDUtils;
@@ -32,8 +35,9 @@ import java.time.temporal.ChronoUnit;
 public class ActionLogAspect {
 
     @Autowired
+    SvcInfo svcInfo;
+    @Autowired
     ActionLogHandler actionLogHandler;
-
     @Autowired
     @Qualifier("actionLogJacksonUtils")
     JacksonUtils jacksonUtils;
@@ -50,30 +54,40 @@ public class ActionLogAspect {
     private Object processAround(ProceedingJoinPoint joinPoint, ActionReqModel reqModel) {
         String uuid = UUIDUtils.generateUuidRandom();
         LocalDateTime startDateTime = DateUtils.getNowLocalDateTime();
+        SvcLogModel svcLogModel = LogUtils.getSvcLogModel(svcInfo);
         try {
             try {
-                actionLogHandler.writeBeginLog(buildActionBeginModel(joinPoint, uuid, startDateTime, reqModel));
+                if (svcLogModel != null) {
+                    actionLogHandler.writeBeginLog(buildActionBeginModel(joinPoint, svcLogModel, uuid, startDateTime, reqModel));
+                }
             } catch (Exception e) {
                 log.error("", e);
             }
             Object proceed = joinPoint.proceed();
             try {
-                actionLogHandler.writeEndLog(buildActionEndModel(uuid, startDateTime, (ActionResData<?>) proceed));
+                if (svcLogModel != null) {
+                    actionLogHandler.writeEndLog(buildActionEndModel(svcLogModel, uuid, startDateTime, (ActionResData<?>) proceed));
+                }
             } catch (Exception e) {
                 log.error("", e);
             }
             return proceed;
         } catch (ActionAutoBreakException e) {
+            if (svcLogModel != null) {
+                actionLogHandler.writeEndLog(buildActionEndModel(svcLogModel, uuid, startDateTime, e.getActionResData()));
+            }
             throw e;
         } catch (Throwable t) {
-            LocalDateTime endDateTime = DateUtils.getNowLocalDateTime();
-            actionLogHandler.afterThrowing(t, uuid, endDateTime, String.valueOf(DateUtils.between(ChronoUnit.MILLIS, startDateTime, endDateTime)));
+            if (svcLogModel != null) {
+                actionLogHandler.afterThrowing(t, buildActionEndModel(svcLogModel, uuid, startDateTime, null));
+            }
             throw new RuntimeException(t);
         }
     }
 
-    private ActionBeginModel buildActionBeginModel(ProceedingJoinPoint joinPoint, String uuid, LocalDateTime startDateTime, ActionReqModel reqModel) {
+    private ActionBeginModel buildActionBeginModel(ProceedingJoinPoint joinPoint, SvcLogModel svcLogModel, String uuid, LocalDateTime startDateTime, ActionReqModel reqModel) {
         ActionBeginModel model = new ActionBeginModel();
+        model.setSvcUuid(svcLogModel.getSvcUuid());
         model.setUuid(uuid);
         model.setName(this.getClass().getSimpleName());
         model.setStartDateTime(startDateTime);
@@ -83,14 +97,17 @@ public class ActionLogAspect {
         return model;
     }
 
-    private ActionEndModel buildActionEndModel(String uuid, LocalDateTime startDateTime, ActionResData<?> actionResData) {
+    private ActionEndModel buildActionEndModel(SvcLogModel svcLogModel, String uuid, LocalDateTime startDateTime, ActionResData<?> actionResData) {
         LocalDateTime endDateTime = DateUtils.getNowLocalDateTime();
         ActionEndModel model = new ActionEndModel();
+        model.setSvcUuid(svcLogModel.getSvcUuid());
         model.setUuid(uuid);
         model.setEndDateTime(endDateTime);
-        jacksonUtils.readTree(actionResData.getResModel()).ifPresent(node -> model.setResponseBody(node.toString()));
-        model.setCode(actionResData.getCode());
-        model.setDesc(actionResData.getDesc());
+        if (actionResData != null) {
+            jacksonUtils.readTree(actionResData.getResModel()).ifPresent(node -> model.setResponseBody(node.toString()));
+            model.setCode(actionResData.getCode());
+            model.setDesc(actionResData.getDesc());
+        }
         model.setRunTime(String.valueOf(DateUtils.between(ChronoUnit.MILLIS, startDateTime, endDateTime)));
         return model;
     }

@@ -48,6 +48,7 @@ public class JacksonConfig {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         objectMapper.setConfig(objectMapper.getSerializationConfig().withView(Views.class));
+        objectMapper.findAndRegisterModules();
         return new JacksonUtils(objectMapper);
     }
 
@@ -59,6 +60,7 @@ public class JacksonConfig {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         objectMapper.setConfig(objectMapper.getSerializationConfig().withView(Views.class));
+        objectMapper.findAndRegisterModules();
         return new JacksonUtils(objectMapper);
     }
 

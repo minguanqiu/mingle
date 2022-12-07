@@ -1,9 +1,13 @@
 package io.github.amings.mingle.svc.data.aspect;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github.amings.mingle.svc.data.handler.DaoLogHandler;
 import io.github.amings.mingle.svc.data.handler.model.DaoLogBeginModel;
 import io.github.amings.mingle.svc.data.handler.model.DaoLogEndModel;
+import io.github.amings.mingle.svc.filter.SvcInfo;
+import io.github.amings.mingle.svc.log.LogUtils;
+import io.github.amings.mingle.svc.log.SvcLogModel;
 import io.github.amings.mingle.utils.DateUtils;
 import io.github.amings.mingle.utils.JacksonUtils;
 import io.github.amings.mingle.utils.UUIDUtils;
@@ -33,8 +37,9 @@ import java.util.Optional;
 public class DaoLogAspect {
 
     @Autowired
+    SvcInfo svcInfo;
+    @Autowired
     DaoLogHandler daoLogHandler;
-
     @Autowired
     @Qualifier("dataLogJacksonUtils")
     JacksonUtils jacksonUtils;
@@ -51,28 +56,34 @@ public class DaoLogAspect {
     private Object processAround(ProceedingJoinPoint joinPoint) {
         String uuid = UUIDUtils.generateUuid();
         LocalDateTime start = DateUtils.getNowLocalDateTime();
+        SvcLogModel svcLogModel = LogUtils.getSvcLogModel(svcInfo);
         try {
             try {
-                daoLogHandler.writeBeginLog(processBeginLog(uuid, start, joinPoint));
+                if (svcLogModel != null) {
+                    daoLogHandler.writeBeginLog(processBeginLog(svcLogModel, uuid, start, joinPoint));
+                }
             } catch (Exception e) {
                 log.error("", e);
             }
             Object proceed = joinPoint.proceed();
             try {
-                daoLogHandler.writeEndLog(processEndLog(uuid, start, proceed));
+                if (svcLogModel != null) {
+                    daoLogHandler.writeEndLog(processEndLog(svcLogModel, uuid, start, proceed));
+                }
             } catch (Exception e) {
                 log.error("", e);
             }
             return proceed;
         } catch (Throwable t) {
-            LocalDateTime end = DateUtils.getNowLocalDateTime();
-            daoLogHandler.afterThrowing(t, uuid, end, String.valueOf(Duration.between(start, end).toMillis()));
+            if (svcLogModel != null) {
+                daoLogHandler.afterThrowing(t, processEndLog(svcLogModel, uuid, start, null));
+            }
             throw new RuntimeException(t);
         }
     }
 
     @SuppressWarnings("unchecked")
-    private DaoLogBeginModel processBeginLog(String uuid, LocalDateTime start, ProceedingJoinPoint joinPoint) {
+    private DaoLogBeginModel processBeginLog(SvcLogModel svcLogModel, String uuid, LocalDateTime start, ProceedingJoinPoint joinPoint) {
         DaoLogBeginModel model = new DaoLogBeginModel();
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
@@ -85,13 +96,14 @@ public class DaoLogAspect {
                 if (objectOptional.isPresent()) {
                     object = objectOptional.get();
                 }
-                reqModel.set(parameter.getName(), jacksonUtils.readTree(object).get());
+                parseObject(reqModel, parameter, object);
             } else if (joinPoint.getArgs()[i] instanceof String) {
                 reqModel.put(parameter.getName(), object.toString());
             } else {
-                reqModel.set(parameter.getName(), jacksonUtils.readTree(object).get());
+                parseObject(reqModel, parameter, object);
             }
         }
+        model.setSvcUuid(svcLogModel.getSvcUuid());
         model.setUuid(uuid);
         model.setName(joinPoint.getTarget().getClass().getSimpleName() + "_" + method.getName());
         model.setStartDateTime(start);
@@ -99,13 +111,18 @@ public class DaoLogAspect {
         return model;
     }
 
-    private DaoLogEndModel processEndLog(String uuid, LocalDateTime start, Object proceed) {
+    private DaoLogEndModel processEndLog(SvcLogModel svcLogModel, String uuid, LocalDateTime start, Object proceed) {
         DaoLogEndModel model = new DaoLogEndModel();
         LocalDateTime end = DateUtils.getNowLocalDateTime();
+        model.setSvcUuid(svcLogModel.getSvcUuid());
         model.setUuid(uuid);
         model.setEndDateTime(end);
-        Object object = checkOptional(proceed);
-        jacksonUtils.readTree(object).ifPresent(node -> model.setResponseBody(node.toString()));
+        if (proceed != null) {
+            Object object = checkOptional(proceed);
+            jacksonUtils.readTree(object).ifPresent(node -> model.setResponseBody(node.toString()));
+        } else {
+            model.setResponseBody(jacksonUtils.getObjectNode().toString());
+        }
         model.setRunTime(String.valueOf(Duration.between(start, end).toMillis()));
         return model;
     }
@@ -117,6 +134,15 @@ public class DaoLogAspect {
             return option.orElse(null);
         }
         return resModel;
+    }
+
+    private void parseObject(ObjectNode reqModel, Parameter parameter, Object object) {
+        Optional<JsonNode> jsonNodeOptional = jacksonUtils.readTree(object);
+        if (jsonNodeOptional.isPresent()) {
+            reqModel.set(parameter.getName(), jsonNodeOptional.get());
+        } else {
+            reqModel.set(parameter.getName(), null);
+        }
     }
 
 }

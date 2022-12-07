@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @JacksonAnnotationsInside
-@JsonView({Views.ExcludeRequestBody.class,io.github.amings.mingle.svc.json.view.Views.class})
-public @interface ExcludeRequestBody {
+@JsonView({Views.ExcludeRequestBody.class, io.github.amings.mingle.svc.json.view.Views.ExcludeLog.class})
+public @interface ExcludeRequestBodyAndLog {
 
 }

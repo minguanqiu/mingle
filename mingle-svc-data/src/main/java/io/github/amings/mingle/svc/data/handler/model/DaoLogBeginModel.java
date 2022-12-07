@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 @Data
 public class DaoLogBeginModel {
 
+    private String svcUuid;
+
     private String uuid;
 
     private String name;

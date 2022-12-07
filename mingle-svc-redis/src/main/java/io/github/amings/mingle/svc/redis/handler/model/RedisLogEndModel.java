@@ -1,6 +1,8 @@
 package io.github.amings.mingle.svc.redis.handler.model;
 
-import lombok.Data;
+import io.github.amings.mingle.svc.log.SvcLogModel;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -10,8 +12,11 @@ import java.time.LocalDateTime;
  * @author Ming
  */
 
-@Data
-public class RedisLogEndModel {
+@Getter
+@Setter
+public class RedisLogEndModel extends SvcLogModel {
+
+    private String svcUuid;
 
     private String uuid;
 

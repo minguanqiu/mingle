@@ -17,6 +17,11 @@ public interface ActionLogHandler {
 
     void writeEndLog(ActionEndModel model);
 
+    @Deprecated
     void afterThrowing(Throwable t, String uuid, LocalDateTime endDateTime, String runTime);
+
+    default void afterThrowing(Throwable t, ActionEndModel model) {
+
+    }
 
 }

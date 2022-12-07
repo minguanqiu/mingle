@@ -17,6 +17,12 @@ public interface RedisLogHandler {
 
     void writeEndLog(RedisLogEndModel model);
 
+    @Deprecated
     void afterThrowing(Throwable t, String uuid, LocalDateTime endDateTime, String runTime);
+
+    default void afterThrowing(Throwable t, RedisLogEndModel model) {
+
+    }
+
 
 }
