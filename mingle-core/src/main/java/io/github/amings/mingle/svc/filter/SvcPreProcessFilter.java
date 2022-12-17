@@ -147,23 +147,23 @@ public class SvcPreProcessFilter extends AbstractSvcFilter {
     }
 
     private void end() throws IOException {
-        if (!svcInfo.isException()) {
-            if (!svcInfo.getSvcBinderModel().isResCustom()) {
-                if (svcInfo.getHttpServletResponse().getClass().equals(ContentCachingResponseWrapper.class)) {
-                    ContentCachingResponseWrapper httpServletResponse = (ContentCachingResponseWrapper) svcInfo.getHttpServletResponse();
-                    String responseBody = new String(httpServletResponse.getContentAsByteArray(), StandardCharsets.UTF_8);
-                    JsonNode jsonNode = jacksonUtils.readTree(responseBody).get();
-                    SvcResModelHandler svcResModelHandlerImpl = ReflectionUtils.newInstance(svcResModelHandler.getClass());
-                    svcResModelHandlerImpl.setCode(svcInfo.getCode());
-                    svcResModelHandlerImpl.setDesc(svcInfo.getDesc());
-                    svcResModelHandlerImpl.setResBody(jsonNode);
-                    svcInfo.setSvcResModelHandler(svcResModelHandlerImpl);
-                    httpServletResponse.resetBuffer();
-                    httpServletResponse.getWriter().write(jacksonUtils.readTree(svcResModelHandlerImpl).get().toString());
-                    httpServletResponse.copyBodyToResponse();
-                }
+
+        if (svcInfo.getHttpServletResponse().getClass().equals(ContentCachingResponseWrapper.class)) {
+            ContentCachingResponseWrapper httpServletResponse = (ContentCachingResponseWrapper) svcInfo.getHttpServletResponse();
+            if(!svcInfo.isException()) {
+                String responseBody = new String(httpServletResponse.getContentAsByteArray(), StandardCharsets.UTF_8);
+                JsonNode jsonNode = jacksonUtils.readTree(responseBody).get();
+                SvcResModelHandler svcResModelHandlerImpl = ReflectionUtils.newInstance(svcResModelHandler.getClass());
+                svcResModelHandlerImpl.setCode(svcInfo.getCode());
+                svcResModelHandlerImpl.setDesc(svcInfo.getDesc());
+                svcResModelHandlerImpl.setResBody(jsonNode);
+                svcInfo.setSvcResModelHandler(svcResModelHandlerImpl);
+                httpServletResponse.resetBuffer();
+                httpServletResponse.getWriter().write(jacksonUtils.readTree(svcResModelHandlerImpl).get().toString());
             }
+            httpServletResponse.copyBodyToResponse();
         }
+
         if (svcInfo.getSvcBinderModel().getSvc().log()) {
             if (svcInfo.getSvcBinderModel().isReqCustom()) {
                 svcLogHandler.writeBeginLog(buildSvcBeginModel());
