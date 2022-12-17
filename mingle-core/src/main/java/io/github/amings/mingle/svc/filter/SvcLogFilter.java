@@ -29,7 +29,7 @@ public class SvcLogFilter extends AbstractSvcFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (!svcInfo.isWriteBackReq()) {
+        if (!svcInfo.getSvcBinderModel().isReqCustom()) {
             try {
                 svcLogHandler.writeBeginLog(buildSvcBeginModel());
             } catch (Exception ignored) {

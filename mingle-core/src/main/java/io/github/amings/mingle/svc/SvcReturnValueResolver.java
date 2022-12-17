@@ -19,6 +19,7 @@ import java.util.List;
  * @author Ming
  */
 
+@Deprecated
 public class SvcReturnValueResolver extends RequestResponseBodyMethodProcessor {
 
     @Autowired

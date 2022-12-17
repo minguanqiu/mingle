@@ -12,7 +12,6 @@ import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
-import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
@@ -22,12 +21,11 @@ import io.swagger.v3.oas.models.responses.ApiResponses;
 import org.springdoc.core.GroupedOpenApi;
 import org.springdoc.core.customizers.OpenApiCustomiser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigurationPackages;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -38,9 +36,6 @@ import java.util.Map;
 
 @Configuration
 public class SvcDocConfig {
-
-    @Autowired
-    ApplicationContext context;
     @Autowired
     SvcBinderComponent svcBinderComponent;
     @Autowired
@@ -49,48 +44,82 @@ public class SvcDocConfig {
     @Bean
     public GroupedOpenApi svcGroup() {
         return GroupedOpenApi.builder()
-                .group("svc")
+                .group("Service")
                 .addOpenApiCustomiser(svcOpenApiCustomiser())
-                .packagesToScan(AutoConfigurationPackages.get(context.getAutowireCapableBeanFactory()).get(0))
                 .build();
     }
 
     @Bean
     public OpenApiCustomiser svcOpenApiCustomiser() {
         return openApi -> {
-            openApi.info(new Info().title("OpenAPI definition").version("v1"));
+            ModelConverters instance = buildConverter();
             svcBinderComponent.getSvcBinderModelMap().forEach((k, v) -> {
-                ModelConverters instance = ModelConverters.getInstance();
-                ModelConverter modelConverter = null;
-                for (ModelConverter converter : instance.getConverters()) {
-                    modelConverter = converter;
+                PathItem pathItem = openApi.getPaths().get(v.getSvcPath());
+                if (pathItem != null) {
+                    Operation operation = null;
+                    if (pathItem.getGet() != null) {
+                        operation = pathItem.getGet();
+                    } else if (pathItem.getPut() != null) {
+                        operation = pathItem.getPut();
+                    } else if (pathItem.getPost() != null) {
+                        operation = pathItem.getPost();
+                    } else if (pathItem.getDelete() != null) {
+                        operation = pathItem.getDelete();
+                    } else if (pathItem.getOptions() != null) {
+                        operation = pathItem.getOptions();
+                    } else if (pathItem.getHead() != null) {
+                        operation = pathItem.getHead();
+                    } else if (pathItem.getPatch() != null) {
+                        operation = pathItem.getPatch();
+                    } else if (pathItem.getTrace() != null) {
+                        operation = pathItem.getTrace();
+                    }
+                    if (operation != null) {
+                        buildPathItem(instance, openApi, operation, v);
+                    }
                 }
-                instance.removeConverter(modelConverter);
-                instance.addConverter(new ModelResolver(Json.mapper(), new SvcDocTypeNameResolver(true)));
-                ResolvedSchema reqModelSchema = instance.readAllAsResolvedSchema(v.getReqModelClass());
-                ResolvedSchema resModelSchema = instance.readAllAsResolvedSchema(v.getResModelClass());
-                ResolvedSchema mainSvcResSchema = buildMainSvcResSchema(instance, v.getResModelClass());
-                openApi.path(v.getSvcPath(),
-                        new PathItem()
-                                .post(new Operation()
-                                        .summary(v.getSvc().desc())
-                                        .addTagsItem("Svc")
-                                        .operationId(v.getSvcPath())
-                                        .requestBody(new RequestBody()
-                                                .content(new Content()
-                                                        .addMediaType("application/json", new MediaType().schema(reqModelSchema.schema))))
-                                        .responses(new ApiResponses()
-                                                .addApiResponse("200", new ApiResponse()
-                                                        .description("successful operation")
-                                                        .content(new Content()
-                                                                .addMediaType("application/json", new MediaType().schema(mainSvcResSchema.schema)))))));
-                openApi.schema(reqModelSchema.schema.getName(), reqModelSchema.schema);
-                openApi.schema(reqModelSchema.schema.getName(), resModelSchema.schema);
-                buildSchema(openApi, mainSvcResSchema.referencedSchemas);
-                buildSchema(openApi, reqModelSchema.referencedSchemas);
-                buildSchema(openApi, resModelSchema.referencedSchemas);
             });
         };
+    }
+
+    private void buildPathItem(ModelConverters instance, OpenAPI openApi, Operation operation, SvcBinderComponent.SvcBinderModel v) {
+        operation.setTags(Arrays.asList(v.getSvc().tags()));
+        operation.setSummary(v.getSvc().desc());
+        operation.setDescription(v.getSvc().desc());
+        if (!v.isReqCustom()) {
+            ResolvedSchema reqModelSchema = instance.readAllAsResolvedSchema(v.getReqModelClass());
+            operation.setRequestBody(new RequestBody()
+                    .content(new Content()
+                            .addMediaType("application/json", new MediaType().schema(reqModelSchema.schema))));
+            if (operation.getParameters() != null) {
+                operation.getParameters().clear();
+            }
+            openApi.schema(reqModelSchema.schema.getName(), reqModelSchema.schema);
+            buildSchema(openApi, reqModelSchema.referencedSchemas);
+        }
+        if (!v.isResCustom()) {
+            ResolvedSchema resModelSchema = instance.readAllAsResolvedSchema(v.getResModelClass());
+            ResolvedSchema mainSvcResSchema = buildMainSvcResSchema(instance, v.getResModelClass());
+            operation.setResponses(new ApiResponses()
+                    .addApiResponse("200", new ApiResponse()
+                            .description("successful operation")
+                            .content(new Content()
+                                    .addMediaType("application/json", new MediaType().schema(mainSvcResSchema.schema)))));
+            openApi.schema(resModelSchema.schema.getName(), resModelSchema.schema);
+            buildSchema(openApi, mainSvcResSchema.referencedSchemas);
+            buildSchema(openApi, resModelSchema.referencedSchemas);
+        }
+    }
+
+    private ModelConverters buildConverter() {
+        ModelConverters instance = ModelConverters.getInstance();
+        ModelConverter modelConverter = null;
+        for (ModelConverter converter : instance.getConverters()) {
+            modelConverter = converter;
+        }
+        instance.removeConverter(modelConverter);
+        instance.addConverter(new ModelResolver(Json.mapper(), new SvcDocTypeNameResolver(true)));
+        return instance;
     }
 
     private void buildSchema(OpenAPI openAPI, Map<String, Schema> schemaMap) {
@@ -103,7 +132,7 @@ public class SvcDocConfig {
         schema.name(clazz.getName());
         schema.$ref("#/components/schemas/" + clazz.getName());
         for (Method method : svcResModelHandler.getClass().getMethods()) {
-            if(method.getName().equals("getResBody")) {
+            if (method.getName().equals("getResBody")) {
                 String filedName = method.getAnnotation(JsonProperty.class).value();
                 mainSvcResModel.schema.getProperties().remove("resBody");
                 mainSvcResModel.schema.addProperty(filedName, schema);

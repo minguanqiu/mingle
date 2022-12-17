@@ -13,6 +13,7 @@ import io.github.amings.mingle.svc.handler.model.SvcBeginModel;
 import io.github.amings.mingle.svc.handler.model.SvcEndModel;
 import io.github.amings.mingle.utils.DateUtils;
 import io.github.amings.mingle.utils.JacksonUtils;
+import io.github.amings.mingle.utils.ReflectionUtils;
 import io.github.amings.mingle.utils.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -75,6 +76,8 @@ public class SvcPreProcessFilter extends AbstractSvcFilter {
                 svcInfo.getHttpServletResponse().setStatus(responseEntity.getStatusCodeValue());
                 svcInfo.getHttpServletResponse().setCharacterEncoding("UTF-8");
                 svcInfo.getHttpServletResponse().setHeader("Content-Type", "application/json");
+                svcInfo.setSvcResModelHandler(responseEntity.getBody());
+                svcInfo.getHttpServletResponse().resetBuffer();
                 svcInfo.getHttpServletResponse().getWriter().write(jacksonUtils.readTree(responseEntity.getBody()).get().toString());
             }
         }
@@ -107,22 +110,14 @@ public class SvcPreProcessFilter extends AbstractSvcFilter {
             svcInfo.setSvcBinderModel(svcBinderModel);
             svcInfo.setSvcUuid(UUIDUtils.generateUuid());
             svcInfo.setSvcName(svcBinderModel.getSvcName());
-            if (isJsonSvc(svcBinderModel)) {
+            if (!svcBinderModel.isReqCustom()) {
                 ContentCachingRequestWrapper reqWrapper = new ContentCachingRequestWrapper(svcInfo.getHttpServletRequest());
                 processSvcRequest(reqWrapper, svc);
                 svcInfo.setHttpServletRequest(reqWrapper);
+            }
+            if (!svcBinderModel.isResCustom()) {
                 svcInfo.setHttpServletResponse(new ContentCachingResponseWrapper(svcInfo.getHttpServletResponse()));
             }
-        }
-    }
-
-    private boolean isJsonSvc(SvcBinderComponent.SvcBinderModel svcBinderModel) {
-        if (!svcBinderModel.isCustom()) {
-            svcInfo.setReqModelNeedValid(true);
-            return true;
-        } else {
-            svcInfo.setWriteBackReq(true);
-            return false;
         }
     }
 
@@ -152,20 +147,28 @@ public class SvcPreProcessFilter extends AbstractSvcFilter {
     }
 
     private void end() throws IOException {
-        if (svcInfo.getHttpServletResponse().getClass().equals(ContentCachingResponseWrapper.class)) {
-            ContentCachingResponseWrapper httpServletResponse = (ContentCachingResponseWrapper) svcInfo.getHttpServletResponse();
-            String responseBody = new String(httpServletResponse.getContentAsByteArray(), StandardCharsets.UTF_8);
-            httpServletResponse.copyBodyToResponse();
-            try {
-                if (svcInfo.getSvcBinderModel().getSvc().log()) {
-                    if (svcInfo.isWriteBackReq()) {
-                        svcLogHandler.writeBeginLog(buildSvcBeginModel());
-                    }
-                    svcLogHandler.writeEndLog(buildSvcEndModel(responseBody));
+        if (!svcInfo.isException()) {
+            if (!svcInfo.getSvcBinderModel().isResCustom()) {
+                if (svcInfo.getHttpServletResponse().getClass().equals(ContentCachingResponseWrapper.class)) {
+                    ContentCachingResponseWrapper httpServletResponse = (ContentCachingResponseWrapper) svcInfo.getHttpServletResponse();
+                    String responseBody = new String(httpServletResponse.getContentAsByteArray(), StandardCharsets.UTF_8);
+                    JsonNode jsonNode = jacksonUtils.readTree(responseBody).get();
+                    SvcResModelHandler svcResModelHandlerImpl = ReflectionUtils.newInstance(svcResModelHandler.getClass());
+                    svcResModelHandlerImpl.setCode(svcInfo.getCode());
+                    svcResModelHandlerImpl.setDesc(svcInfo.getDesc());
+                    svcResModelHandlerImpl.setResBody(jsonNode);
+                    svcInfo.setSvcResModelHandler(svcResModelHandlerImpl);
+                    httpServletResponse.resetBuffer();
+                    httpServletResponse.getWriter().write(jacksonUtils.readTree(svcResModelHandlerImpl).get().toString());
+                    httpServletResponse.copyBodyToResponse();
                 }
-            } catch (Exception ignored) {
-
             }
+        }
+        if (svcInfo.getSvcBinderModel().getSvc().log()) {
+            if (svcInfo.getSvcBinderModel().isReqCustom()) {
+                svcLogHandler.writeBeginLog(buildSvcBeginModel());
+            }
+            svcLogHandler.writeEndLog(buildSvcEndModel());
         }
     }
 
@@ -179,18 +182,14 @@ public class SvcPreProcessFilter extends AbstractSvcFilter {
         return model;
     }
 
-    private SvcEndModel buildSvcEndModel(String body) {
+    private SvcEndModel buildSvcEndModel() {
         LocalDateTime endDateTime = DateUtils.getNowLocalDateTime();
         SvcEndModel model = new SvcEndModel();
         model.setUuid(svcInfo.getUuid());
         model.setEndDateTime(endDateTime);
-        SvcResModelHandler svcResModelHandler = svcInfo.getSvcResModelHandler4Log();
-        if (svcResModelHandler == null) {
-            Optional<? extends SvcResModelHandler> optionalSvcResModelHandler = jacksonUtils.readValue(body, this.svcResModelHandler.getClass());
-            if (optionalSvcResModelHandler.isPresent()) {
-                svcResModelHandler = optionalSvcResModelHandler.get();
-            }
-        }
+        model.setCode(svcInfo.getCode());
+        model.setDesc(svcInfo.getDesc());
+        SvcResModelHandler svcResModelHandler = svcInfo.getSvcResModelHandler4Log() == null ? svcInfo.getSvcResModelHandler() : svcInfo.getSvcResModelHandler4Log();
         if (svcResModelHandler != null) {
             jacksonUtils.readTree(svcResModelHandler).ifPresent(jsonNode -> model.setResponseBody(jsonNode.toString()));
             model.setCode(svcResModelHandler.getCode());

@@ -78,6 +78,10 @@ public class SvcInfo {
 
     private SvcReqModel backReqModel;
 
+    @Getter(AccessLevel.PACKAGE)
+    @Setter(AccessLevel.PACKAGE)
+    private SvcResModelHandler svcResModelHandler;
+
     private SvcResModelHandler svcResModelHandler4Log;
 
     @Setter(AccessLevel.PACKAGE)

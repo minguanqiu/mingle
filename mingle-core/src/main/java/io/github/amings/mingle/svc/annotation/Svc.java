@@ -1,7 +1,7 @@
 package io.github.amings.mingle.svc.annotation;
 
 import io.github.amings.mingle.svc.handler.PayLoadDecryptionHandler;
-import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -10,26 +10,38 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * main annotation for configuration Svc feature
+ * Main annotation for configuration Svc feature
  *
  * @author Ming
  */
 
 @Documented
-@Service
-@Target(ElementType.TYPE)
+@RestController
+@Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Svc {
 
     /**
-     * @return String
-     * Svc description
+     * @return String[]
+     * Tag
      **/
-    String desc();
+    String[] tags() default {};
 
     /**
      * @return String
-     * Svc path
+     * Summary
+     **/
+    String summary() default "";
+
+    /**
+     * @return String
+     * Description
+     **/
+    String desc() default "";
+
+    /**
+     * @return String
+     * Path
      **/
     String path() default "";
 
@@ -55,5 +67,6 @@ public @interface Svc {
      * @return boolean
      * Defined custom controller to escape Svc limit
      **/
+    @Deprecated
     boolean custom() default false;
 }

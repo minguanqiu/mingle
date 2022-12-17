@@ -1,5 +1,7 @@
 package io.github.amings.mingle.svc;
 
+import io.github.amings.mingle.svc.filter.SvcInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -13,6 +15,9 @@ import org.springframework.web.method.support.ModelAndViewContainer;
  */
 
 public class SvcResArgumentResolver implements HandlerMethodArgumentResolver {
+
+    @Autowired
+    SvcInfo svcInfo;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
