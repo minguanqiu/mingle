@@ -6,11 +6,11 @@
     <parent>
         <groupId>io.github.amings</groupId>
         <artifactId>mingle</artifactId>
-        <version>1.1.1</version>
+        <version>1.2.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>mingle-svc-session</artifactId>
-    <version>1.1.1</version>
+    <version>1.2.1</version>
     <name>mingle-svc-session</name>
     <description>mingle module for session feature</description>
     <dependencies>
