@@ -139,11 +139,16 @@ public abstract class AbstractRestAction<Req extends ActionReqModel, Res extends
         RestClientUtils restClientUtils = new RestClientUtils(getOkHttpClient(reqData));
         restClientUtils.setHttpMethod(restAction.method());
         buildHeader(restClientUtils, reqData);
+        MediaType mediaType = MediaType.parse(restAction.mediaType());
+        if (mediaType == null) {
+            throw new MediaTypeParseFailException("mediaType parse fail,please check mediaType");
+        }
+        reqData.headerValueMap.put("Content-Type", mediaType.toString());
         before(reqModel);
         if (restClientUtils.getHttpMethod().equals(HttpMethod.GET)) {
             processGetMethodParam(restClientUtils, reqModel);
         } else {
-            restClientUtils.setRequestBody((buildRequestBody(reqModel)));
+            restClientUtils.setRequestBody((buildRequestBody(mediaType, reqModel)));
         }
         buildUri(restClientUtils, reqModel);
         resData.setUri(restClientUtils.getHttpUrl().toString());
@@ -242,40 +247,35 @@ public abstract class AbstractRestAction<Req extends ActionReqModel, Res extends
     /**
      * Build request body
      *
-     * @param reqModel Action request model
+     * @param mediaType media type
+     * @param reqModel  Action request model
      * @return RequestBody
      */
-    protected RequestBody buildRequestBody(Req reqModel) {
-        if (!restAction.mediaType().equals("")) {
-            MediaType mediaType = MediaType.parse(restAction.mediaType());
-            if (mediaType == null) {
-                throw new MediaTypeParseFailException("mediaType parse fail,please check mediaType");
+    protected RequestBody buildRequestBody(MediaType mediaType, Req reqModel) {
+        if (mediaType.type().equals("multipart")) {
+            if (mediaType.subtype().equals("form-data")) {
+                MultipartBody.Builder builder = new MultipartBody.Builder();
+                builder.setType(mediaType);
+                HashMap<String, Object> map = buildRequestBodyMap(reqModel);
+                map.forEach((k, v) -> {
+                    if (v instanceof byte[]) {
+                        builder.addFormDataPart(k, "", RequestBody.create((byte[]) v));
+                    } else if (v instanceof String) {
+                        builder.addFormDataPart(k, (String) v);
+                    }
+                });
+                return builder.build();
             }
-            if (mediaType.type().equals("multipart")) {
-                if (mediaType.subtype().equals("form-data")) {
-                    MultipartBody.Builder builder = new MultipartBody.Builder();
-                    builder.setType(mediaType);
-                    HashMap<String, Object> map = buildRequestBodyMap(reqModel);
-                    map.forEach((k, v) -> {
-                        if (v instanceof byte[]) {
-                            builder.addFormDataPart(k, "", RequestBody.create((byte[]) v));
-                        } else if (v instanceof String) {
-                            builder.addFormDataPart(k, (String) v);
-                        }
-                    });
-                    return builder.build();
-                }
-            } else if (mediaType.type().equals("application")) {
-                if (mediaType.subtype().equals("x-www-form-urlencoded")) {
-                    HashMap<String, String> map = buildRequestBodyMap(reqModel);
-                    FormBody.Builder builder = new FormBody.Builder();
-                    map.forEach(builder::add);
-                    return builder.build();
-                } else if (mediaType.subtype().equals("json")) {
-                    Optional<JsonNode> jsonNodeOptional = jacksonUtils.readTree(reqModel);
-                    jsonNodeOptional.orElseThrow(() -> new ActionReqModelSerializeFailException("request model serialize fail"));
-                    return RequestBody.create(jsonNodeOptional.get().toString().getBytes(StandardCharsets.UTF_8), mediaType);
-                }
+        } else if (mediaType.type().equals("application")) {
+            if (mediaType.subtype().equals("x-www-form-urlencoded")) {
+                HashMap<String, String> map = buildRequestBodyMap(reqModel);
+                FormBody.Builder builder = new FormBody.Builder();
+                map.forEach(builder::add);
+                return builder.build();
+            } else if (mediaType.subtype().equals("json")) {
+                Optional<JsonNode> jsonNodeOptional = jacksonUtils.readTree(reqModel);
+                jsonNodeOptional.orElseThrow(() -> new ActionReqModelSerializeFailException("request model serialize fail"));
+                return RequestBody.create(jsonNodeOptional.get().toString().getBytes(StandardCharsets.UTF_8), mediaType);
             }
         }
         return null;

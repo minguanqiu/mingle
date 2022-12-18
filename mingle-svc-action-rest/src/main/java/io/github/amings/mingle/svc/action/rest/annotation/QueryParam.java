@@ -11,6 +11,7 @@ import java.lang.annotation.Target;
  * @author Ming
  */
 
+@Deprecated
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface QueryParam {
