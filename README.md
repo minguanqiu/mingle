@@ -1,32 +1,34 @@
-# Mingle
+# mingle
 
-Mingle is a web architecture based on spring boot framework
+基於Spring boot framework的Java Web架構
 
-### Primary goal:
+## 主要目標
 
-* focus on business logic
-* easily maintain
-* fast develop
+* 專注於商業邏輯
 
-### Environment:
+* 好維護
+
+* 快速開發
+
+## 環境需求
 
 * Java 8
+
 * Maven
 
-### Prepare skills:
+## 技術要求
 
-* Spring Boot 2 (https://spring.io/projects/spring-boot)
-* Jackson (https://github.com/FasterXML/jackson)
+* Spring boot 2 ([Spring Boot](https://spring.io/projects/spring-boot))
 
-## Modules
+* Jackson ([GitHub - FasterXML/jackson: Main Portal page for the Jackson project](https://github.com/FasterXML/jackson))
 
-| module                                           | description                      |
-|--------------------------------------------------|----------------------------------|
-| [mingle-core](mingle-core)                       | Core                             |
-| [mingle-svc-action-rest](mingle-svc-action-rest) | Action implements by rest client |
-| [mingle-svc-session](mingle-svc-session)         | Session implement                |
-| [mingle-svc-data](mingle-svc-data)               | Dao implement                    |
-| [mingle-svc-redis](mingle-svc-redis)             | Redis implement                  |
-| [mingle-utils](mingle-utils)                     | Base utils                       |
+## 模組
 
-
+| module                                           | description     |
+| ------------------------------------------------ | --------------- |
+| [mingle-core](mingle-core)                       | 核心              |
+| [mingle-svc-action-rest](mingle-svc-action-rest) | Action模組-Client |
+| [mingle-svc-session](mingle-svc-session)         | Session模組       |
+| [mingle-svc-data](mingle-svc-data)               | Dao模組           |
+| [mingle-svc-redis](mingle-svc-redis)             | Redis模組         |
+| [mingle-utils](mingle-utils)                     | 基礎工具            |

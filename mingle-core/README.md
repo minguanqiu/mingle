@@ -1,53 +1,46 @@
 # mingle-core
 
-Core of Mingle,using [Service](#Service) and [Action](#Action) concept,easily building business logic
+mingle核心，使用`Service`和`Action`設計概念，簡單的去打造自己的商業邏輯
 
-#### slogan
+## Service
 
-Multiple `Action` to build one `Service`
+別名`Svc`，是Restful API的入口，也是編寫商業邏輯的地方，每個`Service`都是獨立並且不互相依賴
 
-### Service
+##### Feature
 
-Service (alias Svc) is restful api entrance,coding business logic place,every Service
-is single will not interdependent
+* 使用回傳代碼決定成功或失敗，比起http code判斷範圍更彈性
 
-#### Feature
+* 自動註冊Restful API入口
 
-* Using return code to decide successful or fail
-* Auto register api entrance
-* Auto register swagger open API
-* Request and response using pojo model design
-* Easy setting status by `@Svc`
-* Aop logging
+* 自動註冊Spring open API Spec
 
-##### Spring open api
+* Request和Response皆使用pojo model設計
 
-default path
+* 透過`@Svc`簡單設定Service狀態
 
-* springdoc.swagger-ui.path : /swagger-ui.html
-* springdoc.api-docs.path : /v3/api-docs
+* 日誌紀錄
 
-### Action
+## Action
 
-Is a module or component,every type can be Action
+抽象類，可以當作模組或零件，所有類型的事物都可以變成`Action`
 
-refer to [mingle-svc-action-rest](mingle-svc-action-rest) - implement by client feature
+參考mingle-svc-action-rest模組 - 提供Http client功能，實現`Action`概念之一
 
-#### Feature
+##### Feature
 
-* Using return code to decide successful or fail
-* Request and response using pojo model design
-* Aop logging
-* Thread safe
+* 使用回傳代碼決定成功或失敗
+
+* Request和Response皆使用pojo model設計
+
+* AOP日誌紀錄
+
+* 線程安全
 
 ## Getting Started
 
-#### Create maven project and setting pom.xml
-
-add dependencies:
+**設定 pom.xml :**
 
 ```xml
-
 <parent>
     <groupId>io.github.amings</groupId>
     <artifactId>mingle</artifactId>
@@ -62,10 +55,9 @@ add dependencies:
 </dependencies>
 ```
 
-for spring packaging:
+**spring boot 打包 :**
 
 ```xml
-
 <build>
     <plugins>
         <plugin>
@@ -76,14 +68,9 @@ for spring packaging:
 </build>
 ```
 
-#### Create spring boot application
+**建立spring boot application**
 
 ```java
-package com.example.demo;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
 @SpringBootApplication
 public class Demo1Application {
 
@@ -94,47 +81,43 @@ public class Demo1Application {
 }
 ```
 
-now startup server,but you will get this exception message
+### Build Svc
 
-```text
-MingleRuntimeException: must create at least one service
-```
+#### 目錄規則 (建議)
 
-so you must go first [Build Svc](#Build-Svc)
-
-## Build Svc
-
-#### Package Rule (Recommended)
-
-```text
+```tex
 |-svc <- put logic java
 |----request <- put request model java
 |----response  <- put response model java
 ```
 
-#### Java File Naming (Recommended)
+#### Java File 命名規則 (建議)
 
 * {SvcName}.java
+
 * {SvcName}Req.java
+
 * {SvcName}Res.java
 
-#### Notice
+##### 規則
 
-* Default prefix path by /svc example: `http://localhost/{contextPath}/svc/{SvcName}` ,change
-  by [Properties](#Properties)
-* Default http method by POST
-* Default produces and consumes by application/json
-* Singleton scope bean
-* Generic type must be set
+* 預設路徑為/svc  例: http://localhost/{contextPath}/svc/{SvcName}
 
-#### Practice 1
+* 預設Http Method為POST
 
-Practice for empty request response body
+* 預設produces和consumes為application/json
 
-**Svc Logic**
+* Singleton bean
+
+* Generic type 必須設置
+
+##### 實作
+
+###### 實作 1 - Request & Response Body為空
+
+**Logic**
 
 ```java
-
 @Svc(desc = "Simple for Svc")
 public class Simple extends AbstractSvcLogic<SvcReqModel, SvcResModel> {
 
@@ -144,10 +127,9 @@ public class Simple extends AbstractSvcLogic<SvcReqModel, SvcResModel> {
     }
 
 }
-
 ```
 
-after you can run application,and send request,you will get this response like this
+執行 spring application，並且發送請求，你將會得到以下回應 :
 
 ```json
 {
@@ -157,14 +139,11 @@ after you can run application,and send request,you will get this response like t
 }
 ```
 
-#### Practice 2
+###### 實作 2 - Request & Response Body不為空
 
-Example for not empty request response body
-
-**Svc Logic**
+**Logic**
 
 ```java
-
 @Svc(desc = "Simple for Svc")
 public class Simple extends AbstractSvcLogic<SimpleReq, SimpleRes> {
 
@@ -179,12 +158,15 @@ public class Simple extends AbstractSvcLogic<SimpleReq, SimpleRes> {
 
 **Request Model**
 
-* `@JsonProperty` defined field deserialize key name (Recommend)
-* Using java validation feature (Recommend)
-* `@Schema` defined field description (Recommend)
+建議定義以下註釋 : 
+
+* `@JsonProperty`定義欄位反序列化鍵名
+
+* 使用java validation功能
+
+* `@Schema`定義欄位說明
 
 ```java
-
 @Getter
 public class SimpleReq extends SvcReqModel {
 
@@ -200,154 +182,154 @@ public class SimpleReq extends SvcReqModel {
 
 **Response Model**
 
-* `@JsonProperty` defined field serialize key name (Recommend)
-* `@Schema` defined field description (Recommend)
+- @JsonProperty`定義欄位反序列化鍵名
+
+- `@Schema`定義欄位說明
 
 ```java
-
 @Setter
+@Getter
 public class SimpleRes extends SvcResModel {
 
-    @Schema(description = "Message")
-    @JsonProperty("Message")
-    private String Message;
+    @Schema(description = "message")
+    @JsonProperty("message")
+    private String message;
 
 }
-
 ```
 
-you will get this response like this:
+你將會得到以下回應 : 
 
 ```json
 {
   "code": "0",
   "desc": "successful",
   "resBody": {
-    "Name": "Hello : mingle"
+    "message": "Hello : mingle"
   }
 }
 ```
 
-#### `@Svc` attribute
+**`@Svc` 屬性**
 
-* `desc()` - Description for Svc
-* `path()` - Custom Svc path
-* `log()` - Enable logging will call `SvcLogHandler` logic
-* `encryption()` - Request body need encryption will call `PayLoadDecryptionHandler` decryption logic
-* `ipAddressSecure()` - Ip address protected [ipAddressSecure](#ipAddressSecure)
-* `custom()` - Custom own controller to break away Svc rule
+* `tags()`- `Svc` tag
 
-```java
+* `summry()`- 概述
 
-@Service
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Svc {
+* `desc()`- 說明
 
-    String desc();
+* `path()`- 自定義路徑 (僅影響SvcName以前路徑)
 
-    String path() default "";
+* `log()`- 啟用後會呼叫`SvcLogHandler`邏輯
 
-    boolean log() default true;
+* `encryption()`- 啟用後會呼叫`PayLoadDecryptionHandler`解密邏輯
 
-    boolean encryption() default false;
+* `ipAddressSecure()`- IP白名單，設定後只允許此IP
 
-    boolean ipAddressSecure() default false;
+**ipAddressSecure**
 
-    boolean custom() default false;
-
-}
-```
-
-##### ipAddressSecure
-
-if set ture,must set `mingle.svc.security.ip.{SvcName}` in spring properties or yaml
+必須在spring properties or yaml設定`mingle.svc.security.ip.{SvcName}`屬性
 
 ```properties
 mingle.svc.security.ip.TestSimple=127.0.0.1,127.0.0.2
 ```
 
-multiple ip using `,` separate
+多個IP使用`,`分隔
 
-Congratulations you can start building yourself logic
+##### Custom Svc
 
-#### Interrupt Svc Logic
+如果預設`Svc`無法滿足你的需求，透過`@RequestMapping`相關註釋等，你可以自訂`Svc`的`request`、`response` body的格式
 
-you can decide logic process flow,if you want interrupt logic, call `returnSvcLogic` or `breakSvcLogic` method in Svc
-Logic
+###### 規則
 
-* `returnSvcLogic` normal return logic to interrupt
-* `breakSvcLogic` throw exception to interrupt logic,but will be caught by Svc logic process
+* `Svc`只允許存在一個API入口
+
+* `doService`方法不得使用`@RequestMapping`
+
+* `@RequestMapping` `path` & `method` 不允許多個
+
+###### 實作
+
+只需要新增自訂方法，並且使用`@RequestMapping`相關註釋，就會自動啟用自訂
 
 ```java
+@Svc(desc = "Simple for Svc")
+public class Simple extends AbstractSvcLogic<SimpleReq, SimpleRes> {
 
-@Svc(desc = "Service Demo")
-public class DemoSvc extends AbstractSvcLogic<DemoReq, SvcResModel> {
+    @PostMapping("customService")
+    public byte[] customService() {
+        return "mingle".getBytes();
+    }
 
     @Override
-    public SvcResModel doService(DemoReq reqModel, SvcResModel resModel) {
-
-        if (reqModel.getName().equals("")) {
-            return returnSvcLogic("X001"); // will return Svc logic
-        }
-
-        if (reqModel.getName().equals("")) {
-            breakSvcLogic("X002");  // will throw exception to interrupt Svc logic
-        }
-
+    public SimpleRes doService(SimpleReq reqModel, SimpleRes resModel) {
+        resModel.setMessage("Hello : " + reqModel.getName());
         return resModel;
     }
+
 }
 ```
 
-## Build Action
+**自訂`Svc`會導致一些功能失效**
 
-#### Package Rule (Recommended)
+* 自動註冊Restful API入口 - 會被自訂方法取代
 
-```text
+* 日誌紀錄 - 不會自動寫入日誌，但是可以透過`svcInfo` 的`setBackReqModel`或 `setSvcResModelHandler4Log` 分別紀錄`request`、`response`
+
+### Spring Open API
+
+結合Spring Open API，可以使用`@Operation`、`@Schema`等註釋說明API規格
+
+如果不需要非常詳細的描述API，我會選擇省略`@Operation`，透過`@Svc`簡單設置
+
+左 `@Svc`右 `@Operation`
+
+`tags()` = `tags()`
+
+`summary()` = `summary()`
+
+`desc()` = `description()`
+
+**預設路徑**
+
+- springdoc.swagger-ui.path : /swagger-ui.html
+
+- springdoc.api-docs.path : /v3/api-docs
+
+### SvcBinderComponent 取得Svc資訊
+
+可以透過`getSvcBinderModelMap()` 取得目前所有的`Svc`資訊
+
+### Build Action
+
+#### 目錄規則 (建議)
+
+```tex
 |-action
 |----${system name or kind} <- put logic java
 |-------request <- put request model java
 |-------response  <- put response model java
 ```
 
-#### Java File Naming (Recommended)
+#### Java File 命名規則 (建議)
 
-* {ActionName}.java
-* {ActionName}Req.java
-* {ActionName}Res.java
+- {ActionName}.java
 
-> **Note** `@Action` must add on Action become to spring bean
+- {ActionName}Req.java
 
-#### How to build Action module ?
+- {ActionName}Res.java
 
-`Action` module usually create middle parent abstract class to implements `AbstractAction`,through parent to design some
-common method or variable up to your logic or type
+#### 如何建立Action
 
-`processAction` is a callback method,through `doAction` method trigger
+必須繼承`AbstractAction`，並且定義`Action`類型及實作範圍，所以不推薦單獨`class`直接繼承，而是透過`parent class`去處理統一邏輯
 
-#### AbstractAction
+`proccessAction`是個callback方法，透過`doAction`
 
-Every Action must need extends
+##### 實作
 
-```java
-public abstract class AbstractAction<Req extends ActionReqModel, Res extends ActionResModel, ReqData extends ActionReqData, ResData extends ActionResData<Res>> {
-}
+###### 實作1 - 直接實作`proccessAction`方法
 
-```
-
-**Generic Type**
-
-* Req - Action request model,using like body
-* Res - Action response model,using like body
-* ReqData - Action request data,using like header
-* ResData - Action response data,using like header
-
-**Practice 1**
-
-Parent Class
-
-this practice didn't need custom `ReqData` and `ResData` ,so defined default `ActionReqData` and `ActionResData<Res>`
+**Parent Class**
 
 ```java
 public abstract class AbstractDemoAction<Req extends ActionReqModel, Res extends ActionResModel> extends AbstractAction<Req, Res, ActionReqData, ActionResData<Res>> {
@@ -359,12 +341,9 @@ public abstract class AbstractDemoAction<Req extends ActionReqModel, Res extends
 }
 ```
 
-Sub Class
-
-subclass extend this parent class to do logic
+**Sub Class**
 
 ```java
-
 @Action(desc = "combine name")
 public class NameCombineDemo extends AbstractDemoAction<NameCombineDemoReq, NameCombineDemoRes> {
 
@@ -384,10 +363,9 @@ public class NameCombineDemo extends AbstractDemoAction<NameCombineDemoReq, Name
 }
 ```
 
-**Practice 2 (Recommend)**
+###### 實作 2 - 透過Parent Class實作callback方法
 
-Let parent class override `processAction` and new abstract `callBack` method,so you can process common logic
-in `processAction` like aop
+**Parent Class**
 
 ```java
 public abstract class AbstractDemoAction<Req extends ActionReqModel, Res extends ActionResModel> extends AbstractAction<Req, Res, ActionReqData, ActionResData<Res>> {
@@ -406,8 +384,9 @@ public abstract class AbstractDemoAction<Req extends ActionReqModel, Res extends
 }
 ```
 
-```java
+**Sub Class**
 
+```java
 @Action(desc = "combine name")
 public class NameCombineDemo extends AbstractDemoAction<NameCombineDemoReq, NameCombineDemoRes> {
 
@@ -471,12 +450,11 @@ public class NameCombineDemoRes extends ActionResModel {
 }
 ```
 
-#### Execute Action
+##### 執行Action
 
-must use @Autowired to inject action module,and call doAction method
+透過`@Autowired`注入`Action`，並呼叫`doAction`方法
 
 ```java
-
 @Svc(desc = "Demo for Svc")
 public class Demo extends AbstractSvcLogic<DemoReq, DemoRes> {
 
@@ -503,41 +481,32 @@ public class Demo extends AbstractSvcLogic<DemoReq, DemoRes> {
 }
 ```
 
-Success example :
+透過`ActionResData`取得結果，通常都會判斷是否成功，再取得`ResModel`
 
-request :
+**Request :**
 
 ```json
-{
-  "firstName": "ming",
-  "lastName": "le"
+{  
+    "firstName": "ming",  
+    "lastName": "le"
 }
 ```
 
-response :
+**Response :**
+
+Success :
 
 ```json
 {
   "code": "0",
   "desc": "successful",
   "resBody": {
-    "FullName": "mingle"
+    "fullName": "mingle"
   }
 }
 ```
 
-Fail example :
-
-request :
-
-```json
-{
-  "firstName": "",
-  "lastName": "le"
-}
-```
-
-response :
+Fail :
 
 ```json
 {
@@ -547,25 +516,13 @@ response :
 }
 ```
 
-`ActionResData`
+##### AutoBreak
 
-action response data
+如果此功能開啟，將會自動拋出`ActionAutoBreakException`中斷`Svc`邏輯，並且把`Action`return `code`、`desc`帶入到`Svc`response裡
 
-* `getCode()` - get return code
-* `getDesc()` - get return desc
-* `getResModel()` - get response model
-* `isSuccess()` - action status (if code != success code always fail)
-
-`autoBreak`
-
-this feature will auto throw `ActionAutoBreakException` to break Svc logic,and auto take action code and desc to Svc
-response
-
-if you don't want process fail action,you can through action request data autoBreak ture or set global
-by [Properties](#Properties),default using global properties value
+如果不需要處理失敗的`Action`，你可以考慮開啟此功能，可以透過`ActionReqData`或全域的Properties設置
 
 ```java
-
 @Svc(desc = "Demo for Svc")
 public class Demo extends AbstractSvcLogic<DemoReq, DemoRes> {
 
@@ -595,20 +552,18 @@ public class Demo extends AbstractSvcLogic<DemoReq, DemoRes> {
 }
 ```
 
-this example let code write less,because action will auto break Svc logic,so you can direct call `getResModel()`
+會讓代碼寫得更少，因為`Action`啟用`AutoBreak`將會中斷`Svc`邏輯，所以不用判斷是否成功，甚至可以直接取得`ResModel`
 
-Fail example :
-
-request :
+**Request :**
 
 ```json
-{
-  "firstName": "",
-  "lastName": "le"
+{  
+    "firstName": "",  
+    "lastName": "le"
 }
 ```
 
-response :
+**Response:**
 
 ```json
 {
@@ -618,26 +573,32 @@ response :
 }
 ```
 
-> **Note** <br>
-> if action code not suitable for direct show to Svc response,you should disable autoBreak feature,and custom Svc code
-> to wrapper
+> **Note:**
+> 
+> 如果`Action code`不適合直接顯示在`Svc response body`，你應該關閉此功能，並且自訂`Svc code`去包裝`Action code`顯示
 
-## Handler
+### 日誌紀錄
 
-These handler can be implements and custom by yourself,must using @Component|@Service become spring bean to override
+對於`Svc`、`Action`是重要的功能之一，能夠紀錄`name`、`request`、`response`、`code`、`desc`、`runTime`等，你透過`svcUuid`把`Action`關聯建立起來，可以明確知道`Svc`執行了那些`Action`，甚至成功或失敗都會有相關的資訊
 
-- `SvcLogHandler` - process `Svc` log handler
-- `ActionLogHandler` - process `Action` log handler
-- `PayLoadDecryptionHandler` - process request body for decryption
-- `IPHandler` - process get ip logic
-- `SvcMsgListHandler` - build `Svc` response code and desc mapping
-- `SvcResModelHandler` - custom response body
+### Handler
 
-#### SvcMsgListHandler
+以下`Handler`的預設邏輯都可以被覆蓋，只要你`implements`對應`Handler`，並且成為`spring bean`
 
-example for data from database:
+- `SvcLogHandler` -  `Svc` logging
+- `ActionLogHandler` - `Action` logging
+- `PayLoadDecryptionHandler` - `request body`解密
+- `IPHandler` - 取得IP
+- `SvcMsgListHandler` -  `Svc` `response` `code`、`desc`定義
+- `SvcResModelHandler` - `response body` template
 
-create Msg mapping table
+#### SvcLogHandler
+
+##### 實作
+
+資料存放於Database
+
+**建立Table :**
 
 ```sql
 create table MSGMAPPING
@@ -651,13 +612,16 @@ create table MSGMAPPING
 )
 ```
 
+**資料表內容 :**
+
 | MSGTYPE | CODE | DESC        | MEMO       |
-|---------|------|-------------|------------|
+| ------- | ---- | ----------- | ---------- |
 | svc     | X001 | test error1 | test error |
 | svc     | X002 | test error2 | test error |
 
-```java
+**覆蓋預設邏輯**
 
+```java
 @Component
 public class SvcMsgListHandlerImpl implements SvcMsgListHandler {
 
@@ -682,7 +646,7 @@ public class SvcMsgListHandlerImpl implements SvcMsgListHandler {
 
 **MsgModel**
 
-* msgType - group by type
+- `msgType` - group msg by type
 
 ```java
 public class MsgModel {
@@ -696,11 +660,9 @@ public class MsgModel {
 }
 ```
 
-will auto process code and desc mapping
+覆蓋完成後，將會自動對應`Svc code`並顯示`desc`
 
-response example :
-
-before :
+覆蓋前 :
 
 ```json
 {
@@ -708,10 +670,9 @@ before :
   "desc": null,
   "resBody": {}
 }
-
 ```
 
-after:
+覆蓋後 :
 
 ```json
 {
@@ -721,21 +682,17 @@ after:
 }
 ```
 
-> **Note** : <br>
-> Svc default msgType is svc <br>
-> Action default msgType is action
+>  **Note** : 
+> 
+> `Svc msgType`必須設置為svc，`Action msgType`預設為action
 
 #### SvcResModelHandler
 
-change default response body format
+覆蓋預設`response body` template
 
-> **Note** <br>
-> `resBody` is fixed only change name,but `code` and `desc` can change location or name,must use @JsonIgnore on override method,prevent json serialize bug happened
-
-Example for change default format
+**實作**
 
 ```java
-
 @Component
 public class SvcResponseModelHandlerImpl extends SvcResModelHandler {
 
@@ -778,7 +735,7 @@ public class SvcResponseModelHandlerImpl extends SvcResModelHandler {
 }
 ```
 
-before :
+覆蓋前 :
 
 ```json
 {
@@ -790,7 +747,7 @@ before :
 }
 ```
 
-after : 
+覆蓋後 :
 
 ```json
 {
@@ -804,32 +761,73 @@ after :
 }
 ```
 
-### Svc code keyword
+> **Note :**
+> 
+> `resBody` 是固定的位置，只允許修改名稱，但是`code`、`desc`可以變更位置及名稱，但是必須使用`@JsonIgnore`在覆寫方法上，避免重複產生
 
-you can override system code description by `SvcMsgListHandler`
+## Exception Handler
 
-|  Code  |         Description          |
-|:------:|:----------------------------:|
-| `MG01` |      Unknown exception       |
-| `MG02` |   Request deserialize fail   |
-| `MG03` |   Request body valid error   |
-| `MG04` |        Access Denied         |
-| `MG05` | Request body not json format |
+當`Svc`、`Action`拋出的`Exception`，可以透過`handler`自訂`return code`，如果沒有自訂則會使用預設`handler`
 
-### Action code keyword
+* `AbstractExceptionHandler` - for `Svc` scope handler，預設`return code`為`MG01`
 
-|  Code   |          Description          |
-|:-------:|:-----------------------------:|
-| `MGA01` | Exception : " + e.getCause()  |
-| `MGA02` | Request data newInstance fail |
+* `AbstractActionExceptionHandler` - for `Action` scope handler，預設`return code`為`MGA01`
+
+如果不想使用`MG01`、`MGA01`邏輯，請實作`AbstractExceptionHandler<Exception>`、`AbstractActionExceptionHandler<Exception>`
+
+### Svc Exception
+
+Svc scope
+
+* `ReqBodyNotJsonFormatException` 
+
+* `ReqModelDeserializeFailException`
+
+* `SvcAuthenticationException`
+
+* `SvcReqModelValidFailException`
+
+**實作 :**
+
+當拋出`ReqBodyNotJsonFormatException`會得到 :
+
+```json
+{
+    "code": "MG01",
+    "desc": "Unknown exception",
+    "resBody": {}
+```
+
+ 實作`AbstractExceptionHandler`
+
+```java
+@Component
+public class ReqBodyNotJsonFormatExceptionHandler extends AbstractExceptionHandler<ReqBodyNotJsonFormatException> {
+
+    @Override
+    public ResponseEntity<SvcResModelHandler> handle(ReqBodyNotJsonFormatException ex) {
+        return build("X001","not a json");
+    }
+}
+```
+
+再次拋出將會得到 : 
+
+```json
+{
+    "code": "X001",
+    "desc": "not a json",
+    "resBody": {}
+}
+```
 
 ## Properties
 
-| Name                             | Required | Default Value |                                  Description                                   |
-|:---------------------------------|:--------:|:-------------:|:------------------------------------------------------------------------------:|
-| `mingle.svc.path`                |          |    `/svc`     |                                    svc path                                    |
-| `mingle.svc.security.ip.openapi` |          |               |                      protected spring open api path by ip                      |
-| `mingle.svc.action.logging`      |          |   `disable`   |                    aop logging for action module set enable                    |
-| `mingle.svc.successCode`         |          |      `0`      |                                  success code                                  |
-| `mingle.svc.successDesc`         |          | `successful`  |                                  success desc                                  |
-| `mingle.svc.action.autoBreak`    |          |    `false`    | if action module not success code will auto throw exception to break Svc logic |
+| Name                             | Required | Default Value | Description                           |
+| -------------------------------- | -------- | ------------- | ------------------------------------- |
+| `mingle.svc.path`                |          | `/svc`        | `Svc`路徑                               |
+| `mingle.svc.security.ip.openapi` |          |               | `spring open api`IP白名單設置              |
+| `mingle.svc.action.logging`      |          | `disable`     | 設置為enable，啟用日誌紀錄                      |
+| `mingle.svc.successCode`         |          | `0`           | 成功代碼                                  |
+| `mingle.svc.successDesc`         |          | `successful`  | 成功訊息                                  |
+| `mingle.svc.action.autoBreak`    |          | `false`       | 設置為`true`，如果`Action`不成功，將會自動中斷`Svc`邏輯 |

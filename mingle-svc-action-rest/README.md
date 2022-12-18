@@ -1,28 +1,21 @@
-# mingle-action-rest
+# mingle-action-rest-action
 
-This module will provide action implements for rest client feature
+此模組透過`Action`實現，提供`Restful`client功能
 
-## Building
+## Getting Started
 
-### Setting pom.xml
-
-add pom.xml :
+add pom.xml : 
 
 ```xml
-
 <dependency>
     <groupId>io.github.amings</groupId>
     <artifactId>mingle-action-rest</artifactId>
 </dependency>
 ```
 
-### Build Rest Action
+#### Build Rest Action
 
-create parent abstract class
-
-* `buildRequestCacheHeaderValue()` - build request header by cache
-* `buildCacheSuccessHttpCode()` - allow http code
-* `getType()` - defined Action type (not null)
+首先建立`parent class`，目標`Server`為依據命名
 
 ```java
 public abstract class AbstractRestDemoAction<Req extends ActionReqModel, Res extends ActionResModel> extends AbstractRestAction<Req, Res> {
@@ -58,27 +51,21 @@ public abstract class AbstractRestDemoAction<Req extends ActionReqModel, Res ext
 }
 ```
 
-`buildCacheSuccessHttpCode()` - allow http code
+`buildCacheSuccessHttpCode()`
 
-return null will disable action http code auto break
-,if set only 200 will auto break by except 200 http code
+如果只新增`http code`200，其餘`http code`則會讓`Action`不成功
 
-create subClass extends parent class
+`buildRequestCacheHeaderValue()`
 
-`buildRequestCacheHeaderValue()` - build request header by cache
+每次皆會把`cache`的值帶入`request header`中
 
-if return map will set request header by every times
+`getType()`
 
-`before(Req reqModel)` - send request before will call
+定義目標`server`名稱
 
-`after(Res resModel)` - send request after will call
-
-`getType()` - defined Action type (not null)
-
-* @RestAction must add on rest Action class
+`再建立`sub class`繼承`parent class
 
 ```java
-
 @RestAction(desc = "Get Name", method = HttpMethod.GET)
 public class GetName extends AbstractRestDemoAction<GetNameReq, GetNameRes> {
 
@@ -86,18 +73,18 @@ public class GetName extends AbstractRestDemoAction<GetNameReq, GetNameRes> {
 }
 ```
 
-#### Defined Action uri
+#### Configruation URI
 
-properties :
+**properties :**
 
 ```properties
 mingle.svc.action.rest.RestDemo.uri=http://localhost:8081/restdemo
 mingle.svc.action.rest.RestDemo.impl.uri.GetName=/getName
 ```
 
-yaml :
+**yaml :**
 
-```yaml
+```yml
 mingle:
   svc:
     action:
@@ -109,23 +96,22 @@ mingle:
               GetName: /getName
 ```
 
-Uri rule two part
+**URI 規則**
 
-* `mingle.svc.action.rest.{action type}.uri` context path
-* `mingle.svc.action.rest.{action type}.impl.uri.{action class name}` api path
+- `mingle.svc.action.rest.{action type}.uri` context path
+- `mingle.svc.action.rest.{action type}.impl.uri.{action class name}` api path
 
-That's why `getType()` must not be null reason
+這就是為甚麼`getType()`不能為null的原因
 
-#### Feature for request type
+#### Request Model Convert Body
 
-#### Get Method
+##### Get Method
 
-When http method is GET,will use request model field to build uri
+透過`request model`的變數`name`、`value`自動建立`query parameter`
 
-target API :
+**Target API :**
 
 ```java
-
 @RestController
 public class GetNameController {
 
@@ -141,10 +127,9 @@ public class GetNameController {
 }
 ```
 
-logic :
+**Logic :**
 
 ```java
-
 @RestAction(desc = "Get Name", method = HttpMethod.GET)
 public class GetName extends AbstractRestDemoAction<GetNameReq, GetNameRes> {
 
@@ -152,10 +137,9 @@ public class GetName extends AbstractRestDemoAction<GetNameReq, GetNameRes> {
 }
 ```
 
-request model :
+**Request Model :**
 
 ```java
-
 @Setter
 public class GetNameReq extends ActionReqModel {
 
@@ -164,10 +148,9 @@ public class GetNameReq extends ActionReqModel {
 }
 ```
 
-response model :
+**Response Model :**
 
 ```java
-
 @Getter
 public class GetNameRes extends ActionResModel {
 
@@ -176,10 +159,9 @@ public class GetNameRes extends ActionResModel {
 }
 ```
 
-Svc logic :
+**Svc Logic :**
 
 ```java
-
 @Svc(desc = "Rest action demo")
 public class GetNameDemo extends AbstractSvcLogic<SvcReqModel, SvcResModel> {
 
@@ -203,23 +185,22 @@ public class GetNameDemo extends AbstractSvcLogic<SvcReqModel, SvcResModel> {
 }
 ```
 
-call `doAction` after will see by print
+執行`doAction`將會打印出以下訊息
 
-```text
+```tex
 http://localhost:8081/restdemo/getName?name=Mingle
 Mingle
 ```
 
-#### PathVariable
+###### PathVariable
 
-`@PathVariable` - defined path variable field  
+* `PathVariable` - 定義`path`變數欄位
 
-`@ExcludeRequestBody` - exclude field with body
+* `ExcludeRequestBody` - 排除`body`欄位
 
-target API :
+**Target API :**
 
 ```java
-
 @RestController
 public class GetName1Controller {
 
@@ -235,10 +216,9 @@ public class GetName1Controller {
 }
 ```
 
-logic :
+**Logic :**
 
 ```java
-
 @RestAction(desc = "Get Name", method = HttpMethod.GET)
 public class GetName1 extends AbstractRestDemoAction<GetName1Req, GetName1Res> {
 
@@ -246,10 +226,11 @@ public class GetName1 extends AbstractRestDemoAction<GetName1Req, GetName1Res> {
 }
 ```
 
-request model :
+**Request Model :**
+
+因為是`Get Method`所以必須透過`@ExcludeRequest`排除`query paramter`
 
 ```java
-
 @Setter
 public class GetName1Req extends ActionReqModel {
 
@@ -260,40 +241,150 @@ public class GetName1Req extends ActionReqModel {
 }
 ```
 
-response model :
+**Response Model :**
 
 ```java
-
 @Getter
-public class GetNameRes extends ActionResModel {
+public class GetName1Res extends ActionResModel {
 
     private String name;
 
 }
-
 ```
 
-call `doAction` after will see by print
+執行`doAction`將會打印出以下訊息
 
-```text
+```
 http://localhost:8081/restdemo/getName1/Mingle
 Mingle
 ```
 
-if no add `@ExcludeRequestBody` uri will become 
+如果沒加入 `@ExcludeRequestBody` `URI` 將會帶入`query parameter`
 
-```text
+```
 http://localhost:8081/restdemo/getName?name=Mingle
 ```
 
-#### Mock Action
+##### Post Method
 
-Provide action mock feature
+`request model`自動轉換以下`media type`的`request body`
 
-Defined `mingle.svc.action.rest.mock.path` and drop `${action class name}.json` file
+###### multipart/form-data
 
-* `sleep` - unit is millisecond
-* `data` - mock API response body
+**Target API :**
+
+```java
+@PostMapping(path = "setFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String setFile(@RequestParam("fileName") String fileName, @RequestParam("file") MultipartFile file) throws IOException {
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("FileName", fileName);
+        objectNode.put("FileBase64", Base64.encodeBase64String(file.getBytes()));
+        return objectNode.toString();
+    }
+```
+
+**Request Model :**
+
+```java
+@Setter
+public class SetFileReq extends ActionReqModel {
+
+    private String fileName;
+
+    private byte[] file;
+
+}
+```
+
+###### application/x-www-form-urlencoded
+
+**Target API :**
+
+```java
+@PostMapping(path = "getName2", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getName2(@RequestParam MultiValueMap<String, String> paramMap) {
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("Name", paramMap.getFirst("name"));
+        objectNode.put("Age", paramMap.getFirst("age"));
+        return objectNode.toString();
+    }
+```
+
+**Request Model :**
+
+```java
+@Setter
+public class GetName2Req extends ActionReqModel {
+
+    private String name;
+
+    private String age;
+
+}
+```
+
+###### application/json
+
+**Target API :**
+
+```java
+@PostMapping(path = "jsonTest", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String jsonTest(@RequestBody String user) throws IOException {
+        System.out.println(user);
+        return user;
+    }
+```
+
+**Request Model :**
+
+```java
+@Setter
+public class JsonTestReq extends ActionReqModel {
+
+    @JsonProperty("name")
+    private String name;
+    @JsonProperty("age")
+    private String age;
+    @JsonProperty("data")
+    private Data data;
+    @JsonProperty("authorities")
+    private List<Authority> authorities;
+    @JsonProperty("datas")
+    private List<String> datas;
+    @ExcludeRequestBody
+    private String ttttt = "tttt";
+
+    @Setter
+    public static class Data {
+
+        @JsonProperty("email")
+        private String email;
+        @JsonProperty("mobile")
+        private String mobile;
+    }
+
+    @Setter
+    public static class Authority {
+
+        @JsonProperty("name")
+        private String name;
+
+    }
+
+}
+```
+
+一樣可以使用`@ExcludeRequestBody`忽略
+
+#### Response Mock
+
+定義`mingle.svc.action.rest.mock.path`及新增`${action class name}.json`檔案
+
+* `sleep` - 等待時間(毫秒)
+
+* `data` -  response body
+
+**範例 :**
 
 ```json
 {
@@ -308,26 +399,31 @@ Defined `mingle.svc.action.rest.mock.path` and drop `${action class name}.json` 
 }
 ```
 
-run after won't send request to target server,will using this mock data to do action logic
+設置成功後，執行`Action`就不會發送`request`到目標`API`，而是使用`mock data`回應
 
-## Action Code Keyword
+## Exception
 
-|   Code   |                   Description                    |
-|:--------:|:------------------------------------------------:|
-| `MGRA01` |             build request body fail              |
-| `MGRA02` |         client error :  + e.getMessage()         |
-| `MGRA03` | mediaType parse fail,please check mediaType type |
-| `MGRA04` |           request model serialize fail           |
-| `MGRA05` |           client code error : " + code           |
-| `MGRA06` |                 mock data error                  |
-| `MGRA07` |              resModel format error               |
-| `MGRA08` |                data format error                 |
+Action scope，請參考[mingle-core](#mingle-core) 實作Exception Handler
+
+- `ActionReqModelSerializeFailException`
+
+- `ActionResModelFormatErrorException`
+
+- `ActionRestResModelFormatFailException`
+
+- `ClientErrorException`
+
+- `HttpCodeErrorException`
+
+- `MediaTypeParseFailException`
+
+- `MockDataParseFailException`
 
 ## Properties
 
-| Name                                           | Required | Default Value |       Description       |
-|:-----------------------------------------------|:--------:|:-------------:|:-----------------------:|
-| `mingle.svc.action.rest.mock.path`             |          |               |    action mock path     |
-| `mingle.svc.action.rest.client.connectTimeOut` |          |   `3000 ms`   | client connect time out |
-| `mingle.svc.action.rest.client.readTimeOut`    |          |  `70000 ms`   |  client read time out   |
-| `mingle.svc.action.rest.client.ignoreSSL`      |          |    `false`    |    client ignore SSL    |
+| Name                                           | Required | Default Value | Description             |
+| ---------------------------------------------- | -------- | ------------- | ----------------------- |
+| `mingle.svc.action.rest.mock.path`             |          |               | action mock path        |
+| `mingle.svc.action.rest.client.connectTimeOut` |          | `3000 ms`     | client connect time out |
+| `mingle.svc.action.rest.client.readTimeOut`    |          | `70000 ms`    | client read time out    |
+| `mingle.svc.action.rest.client.ignoreSSL`      |          | `false`       | client ignore SSL       |

@@ -1,35 +1,27 @@
 # mingle-svc-session
 
-Provides session feature and JWT authentication security,and using redis to keep session info
-
-## Dependency
-
-* `mingle-svc-redis`
+透過`redis`提供`session`持久管理，並使用`jwt token`實現`stateless`，達到`authentication`、`authority`功能
 
 ## Building
 
-#### 1. install redis
+### Install Redis
 
-https://redis.io/
+https://redis.io/  
 
-#### 2. setting pom.xml
-
-add pom.xml
+add pom.xml  
 
 ```xml
-
 <dependency>
     <groupId>io.github.amings</groupId>
     <artifactId>mingle-svc-session</artifactId>
 </dependency>
 ```
 
-#### 3. create session
+### Create Session
 
-using `SessionUtils` generate JWT token and save custom session value
+使用 `SessionUtils` 產生`jwt token` 
 
 ```java
-
 @Svc(desc = "test create session")
 public class Test extends AbstractSvcLogic<TestReq, SvcNoRes> {
 
@@ -48,13 +40,12 @@ public class Test extends AbstractSvcLogic<TestReq, SvcNoRes> {
 }
 ```
 
-this example save JWT to response header
+### Authentication Session
 
-#### 4. valid session
+`@Session` 會去驗證`jwt token`是否正確及有效時間
 
 ```java
-
-@Session("login")
+@Session("Login")
 @Svc(desc = "test valid session")
 public class Test1 extends AbstractSvcLogic<SvcNoReq, SvcNoRes> {
 
@@ -70,14 +61,33 @@ public class Test1 extends AbstractSvcLogic<SvcNoReq, SvcNoRes> {
 }
 ```
 
-`@Session` will auto valid session
+透過 `SessionUtils` 取得及儲存`session value`
 
-using `SessionUtils` can get custom session value and save session value
+### Authority Session
 
-if authority is true,you must create authority session like :
+設置`authority` 為`ture`後，代表`session`必須要有`Test1`的`authority`，則可以呼叫此`Svc`
 
 ```java
+@Session(value = "Login", authority = ture)
+@Svc(desc = "test valid session")
+public class Test1 extends AbstractSvcLogic<SvcNoReq, SvcNoRes> {
 
+    @Autowired
+    SessionUtils sessionUtils;
+
+    @Override
+    public SvcNoRes doService(SvcNoReq reqModel, SvcNoRes resModel) {
+        Optional<String> userNameOptional = sessionUtils.getSessionValue("userName"); // get session value
+        sessionUtils.setSessionValue("UserName1","Mingle1"); // add session value
+        return resModel;
+    }
+
+}
+```
+
+建立`authority`並且加入`Test1`
+
+```java
 @Svc(desc = "test create session with authority")
 public class Test extends AbstractSvcLogic<TestReq, SvcNoRes> {
 
@@ -100,79 +110,38 @@ public class Test extends AbstractSvcLogic<TestReq, SvcNoRes> {
 }
 ```
 
-using `SessionUtils` get and set session value object
-```java
-@Session(value = "login", authority = ture)
-@Svc(desc = "test valid session")
-public class Test1 extends AbstractSvcLogic<SvcNoReq, SvcNoRes> {
-
-    @Autowired
-    SessionUtils sessionUtils;
-
-    @Override
-    public SvcNoRes doService(SvcNoReq reqModel, SvcNoRes resModel) {
-        Optional<String> userNameOptional = sessionUtils.getSessionValue("userName"); // get session value
-        sessionUtils.setSessionValue("UserName1","Mingle1"); // add session value
-        return resModel;
-    }
-
-}
-```
-
 ## Handler
 
-* JwtKeyHandler - generate JWT key
+* JwtKeyHandler - 產生`jwt`加密方法
 
 #### JwtKeyHandler
 
-default by server startup,always generate new AES-256 key,if you want change this mode,please override it
+當`server`啟動，預設將會產生一組新的`aes-256 key`，如要更改請覆蓋此`handler`
 
+## Provide Svc
 
-## Feature
+- RefreshSession - 刷新`session`存活時間
 
-#### `@Session` - must to configuration will get valid feature
+## Exception
 
-```java
+Svc scope，請參考[mingle-core](#mingle-core) 實作Exception Handler
 
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Session {
+- `JwtDecryptionFailException`
 
-    /**
-     * valid Session type
-     **/
-    String value();
+- `JwtHeaderMissingException`
 
-    /**
-     * valid authority
-     **/
-    boolean authority() default false;
+- `SessionAccessDeniedException`
 
-}
-```
+- `SessionInfoDeserializeFailException`
 
-#### Provide Svc
+- `SessionKickException`
 
-- RefreshSession - you can call this Svc to refresh session 
+- `SessionNotFoundException`
+
+- `SessionTypeIncorrectException`
 
 ## Properties
 
-please watch .A.5. Data Properties `spring.redis` properties
+please watch .A.5. Data Properties `spring.redis` properties  
 
-https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#appendix.application-properties.data
-
-
-## Default System Code Keyword
-
-you can override system code description by `SvcMsgListHandler`
-
-|  Code   |                Description                 |
-|:-------:|:------------------------------------------:|
-| `MGS20` |               Access denied                |
-| `MGS21` |        Missing Authorization Header        |
-| `MGS22` |            Decryption JWT fail             |
-| `MGS23` |        SessionInfo read value fail         |
-| `MGS24` |           Session type incorrect           |
-| `MGS25` |             Session not found              |
-| `MGS26` | Session has been logout by another session |
-
+https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#appendix.application-properties.data  
