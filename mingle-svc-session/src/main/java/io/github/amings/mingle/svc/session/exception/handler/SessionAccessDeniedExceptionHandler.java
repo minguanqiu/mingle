@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
  * @author Ming
  */
 
+@Deprecated
 @Slf4j
 @ExceptionHandler
 public class SessionAccessDeniedExceptionHandler extends AbstractExceptionHandler<SessionAccessDeniedException> {

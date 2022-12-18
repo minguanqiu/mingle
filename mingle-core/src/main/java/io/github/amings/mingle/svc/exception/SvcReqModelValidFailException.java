@@ -12,7 +12,8 @@ public class SvcReqModelValidFailException extends RuntimeException {
     @Getter
     private final ConstraintViolationException constraintViolationException;
 
-    public SvcReqModelValidFailException(ConstraintViolationException constraintViolationException) {
+    public SvcReqModelValidFailException(String message,ConstraintViolationException constraintViolationException) {
+        super(message);
         this.constraintViolationException = constraintViolationException;
     }
 

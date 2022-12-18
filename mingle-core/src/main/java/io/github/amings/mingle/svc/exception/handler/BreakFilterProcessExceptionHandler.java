@@ -12,12 +12,12 @@ import org.springframework.http.ResponseEntity;
  * @author Ming
  */
 
-@ExceptionHandler
+@ExceptionHandler(primary = true)
 public class BreakFilterProcessExceptionHandler extends AbstractExceptionHandler<BreakFilterProcessException> {
 
     @Override
     public ResponseEntity<SvcResModelHandler> handle(BreakFilterProcessException e) {
-        return build(e.getCode());
+        return build(e.getCode(),e.getDesc());
     }
 
 }

@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
  * @author Ming
  */
 
+@Deprecated
 @ExceptionHandler
 public class ReqModelDeserializeFailHandler extends AbstractExceptionHandler<ReqModelDeserializeFailException> {
 

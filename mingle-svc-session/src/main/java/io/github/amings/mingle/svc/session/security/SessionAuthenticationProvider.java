@@ -6,9 +6,10 @@ import io.github.amings.mingle.svc.redis.RedisKey;
 import io.github.amings.mingle.svc.session.component.SessionBinderComponent;
 import io.github.amings.mingle.svc.session.dao.SessionDao;
 import io.github.amings.mingle.svc.session.dao.entity.SessionEntity;
-import io.github.amings.mingle.svc.session.exception.SvcAuthenticationFailException;
+import io.github.amings.mingle.svc.session.exception.SessionKickException;
+import io.github.amings.mingle.svc.session.exception.SessionNotFoundException;
+import io.github.amings.mingle.svc.session.exception.SessionTypeIncorrectException;
 import io.github.amings.mingle.svc.session.security.model.SessionInfo;
-import io.github.amings.mingle.svc.session.utils.SessionCodeFiled;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
@@ -45,18 +46,18 @@ public class SessionAuthenticationProvider implements AuthenticationProvider {
         RedisKey redisKey = RedisKey.of(sessionInfo.getKey());
         String type = sessionBinderComponent.getSessionMap().get(svcInfo.getSvcName());
         if (!type.equals(sessionInfo.getType())) {
-            throw new SvcAuthenticationFailException(SessionCodeFiled.MGS24);
+            throw new SessionTypeIncorrectException("Session type incorrect");
         }
         Optional<SessionEntity> sessionEntityOptional = sessionDao.get(RedisKey.of(sessionInfo.getKey()));
         if (!sessionEntityOptional.isPresent()) {
-            throw new SvcAuthenticationFailException(SessionCodeFiled.MGS25);
+            throw new SessionNotFoundException("Session not found");
         }
         String sessionType = sessionInfo.getType();
         SessionEntity sessionEntity = sessionEntityOptional.get();
         if (!sessionType.equals("refresh")) {
             if (sessionInfo.isSingle()) { // if single enable
                 if (!sessionEntity.getId().equals(sessionInfo.getId())) { // check two sessionId and kick
-                    throw new SvcAuthenticationFailException(SessionCodeFiled.MGS26);
+                    throw new SessionKickException("Session has been logout by another session");
                 }
             }
         }

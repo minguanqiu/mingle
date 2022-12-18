@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.NestedServletException;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class ExceptionHandlerResolver {
 
     public ResponseEntity<SvcResModelHandler> resolver(Exception e) {
         Exception exception = e;
-        if(exception.getClass().equals(NestedServletException.class)) {
+        if (exception.getClass().equals(NestedServletException.class)) {
             exception = (Exception) e.getCause();
         }
         if (exceptionHandlerMap.containsKey(exception.getClass())) {
@@ -39,8 +40,18 @@ public class ExceptionHandlerResolver {
     @SuppressWarnings("unchecked")
     @PostConstruct
     private void init() {
-        abstractExceptionHandlers.stream().filter(e -> e.getClass().getAnnotation(ExceptionHandler.class) != null).forEach(e -> exceptionHandlerMap.put(e.getEClass(), (AbstractExceptionHandler<Exception>) e));
-        abstractExceptionHandlers.stream().filter(e -> e.getClass().getAnnotation(ExceptionHandler.class) == null).forEach(e -> exceptionHandlerMap.put(e.getEClass(), (AbstractExceptionHandler<Exception>) e));
+        ArrayList<Class<?>> primaryClasses = new ArrayList<>();
+        abstractExceptionHandlers.stream().filter(e -> e.getClass().getAnnotation(Deprecated.class) == null).filter(e -> e.getClass().getAnnotation(ExceptionHandler.class) != null).forEach(e -> {
+            exceptionHandlerMap.put(e.getEClass(), (AbstractExceptionHandler<Exception>) e);
+            if (e.getClass().getAnnotation(ExceptionHandler.class).primary()) {
+                primaryClasses.add(e.getEClass());
+            }
+        });
+        abstractExceptionHandlers.stream().filter(e -> e.getClass().getAnnotation(ExceptionHandler.class) == null).forEach(e -> {
+            if (!primaryClasses.contains(e.getEClass())) {
+                exceptionHandlerMap.put(e.getEClass(), (AbstractExceptionHandler<Exception>) e);
+            }
+        });
     }
 
 

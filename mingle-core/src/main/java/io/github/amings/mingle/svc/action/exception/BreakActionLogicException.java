@@ -7,9 +7,8 @@ import lombok.Getter;
  * @author Ming
  */
 
-@Deprecated
 @Getter
-public class BreakActionException extends RuntimeException {
+public class BreakActionLogicException extends RuntimeException {
 
     private final String code;
 
@@ -17,13 +16,13 @@ public class BreakActionException extends RuntimeException {
 
     private final ActionResModel resModel;
 
-    public BreakActionException(String code, String desc) {
+    public BreakActionLogicException(String code, String desc) {
         this.code = code;
         this.desc = desc;
         this.resModel = null;
     }
 
-    public BreakActionException(String code, String desc, ActionResModel resModel) {
+    public BreakActionLogicException(String code, String desc, ActionResModel resModel) {
         this.code = code;
         this.desc = desc;
         this.resModel = resModel;

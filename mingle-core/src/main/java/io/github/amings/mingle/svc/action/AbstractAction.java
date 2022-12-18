@@ -2,12 +2,16 @@ package io.github.amings.mingle.svc.action;
 
 import com.google.common.reflect.TypeToken;
 import io.github.amings.mingle.svc.action.annotation.AutoBreak;
-import io.github.amings.mingle.svc.action.exception.BreakActionException;
+import io.github.amings.mingle.svc.action.exception.BreakActionLogicException;
+import io.github.amings.mingle.svc.action.exception.resolver.ActionExceptionHandlerResolver;
 import io.github.amings.mingle.svc.exception.ActionAutoBreakException;
 import io.github.amings.mingle.utils.ReflectionUtils;
 import lombok.AccessLevel;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+
+import java.util.Objects;
 
 
 /**
@@ -32,7 +36,8 @@ public abstract class AbstractAction<Req extends ActionReqModel, Res extends Act
 
     @Value("${mingle.svc.action.autoBreak:false}")
     private boolean globalAutoBreak;
-
+    @Autowired
+    ActionExceptionHandlerResolver actionExceptionHandlerResolver;
     @Getter(AccessLevel.PROTECTED)
     private final Class<ReqData> reqDataClass;
     @Getter(AccessLevel.PROTECTED)
@@ -75,19 +80,21 @@ public abstract class AbstractAction<Req extends ActionReqModel, Res extends Act
      */
     public ResData doAction(Req reqModel, ReqData reqData) {
         ResData resData = ReflectionUtils.newInstance(resDataClass);
-        if (resData == null) {
-            throw new BreakActionException("MGA02", "Request data newInstance fail");
-        }
-        resData.setCode(ACTION_SUCCESS_CODE);
-        resData.setDesc(ACTION_SUCCESS_MSG);
+        Objects.requireNonNull(resData, "request data newInstance fail");
         try {
+            resData.setCode(ACTION_SUCCESS_CODE);
+            resData.setDesc(ACTION_SUCCESS_MSG);
             resData.setResModel(processAction(reqModel, reqData, resData));
-        } catch (BreakActionException e) {
-            resData.setCode(e.getCode());
-            resData.setDesc(e.getDesc());
+        } catch (BreakActionLogicException e1) {
+            resData.setCode(e1.getCode());
+            resData.setDesc(e1.getDesc());
+            if(e1.getResModel() != null) {
+                resData.setResModel((Res) e1.getResModel());
+            }
         } catch (Exception e) {
-            resData.setCode("MGA01");
-            resData.setDesc("Exception : " + e);
+            ActionExceptionModel actionExceptionModel = actionExceptionHandlerResolver.resolver(e);
+            resData.setCode(actionExceptionModel.getCode());
+            resData.setDesc(actionExceptionModel.getDesc());
         }
         resData.setMsgType(getMsgType());
         checkSuccess(reqData.getAutoBreak(), resData);
@@ -149,7 +156,7 @@ public abstract class AbstractAction<Req extends ActionReqModel, Res extends Act
      * @param desc msg desc
      */
     protected void breakActionLogic(String code, String desc) {
-        throw new BreakActionException(code, desc);
+        breakActionLogic(code, desc, null);
     }
 
     /**
@@ -160,7 +167,7 @@ public abstract class AbstractAction<Req extends ActionReqModel, Res extends Act
      * @param resModel Res
      */
     protected void breakActionLogic(String code, String desc, Res resModel) {
-        throw new BreakActionException(code, desc, resModel);
+        throw new BreakActionLogicException(code, desc, resModel);
     }
 
 }

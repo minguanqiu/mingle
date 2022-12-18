@@ -8,8 +8,6 @@ package io.github.amings.mingle.svc.exception;
 
 public class MingleRuntimeException extends RuntimeException {
 
-	private static final long serialVersionUID = 1L;
-
 	/**
 	 * @param msg exception msg
 	 */

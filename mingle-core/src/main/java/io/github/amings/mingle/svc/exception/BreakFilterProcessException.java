@@ -8,7 +8,6 @@ import lombok.Getter;
  *
  * @author Ming
  */
-
 public class BreakFilterProcessException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;

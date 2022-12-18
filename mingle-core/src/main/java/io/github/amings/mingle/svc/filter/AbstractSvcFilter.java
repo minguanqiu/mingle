@@ -20,10 +20,19 @@ public abstract class AbstractSvcFilter extends OncePerRequestFilter {
 
     /**
      * @param code system code
-     * break filter method
+     *             break filter method
      */
-    protected void breakFilterProcess(String code) throws BreakFilterProcessException {
+    protected void breakFilterProcess(String code) {
         throw new BreakFilterProcessException(code, svcMsgHandler.getMsg(code));
+    }
+
+    /**
+     * @param code system code
+     * @param desc desc
+     *             break filter method
+     */
+    protected void breakFilterProcess(String code, String desc) {
+        throw new BreakFilterProcessException(code, desc);
     }
 
 }

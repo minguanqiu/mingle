@@ -37,16 +37,16 @@ public class JwtAuthenticationFilter extends AbstractSvcFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String jweHeader = request.getHeader("Authorization");
         if (jweHeader == null) {
-            throw new JwtHeaderMissingException();
+            throw new JwtHeaderMissingException("JWT header missing");
         }
         Optional<String> jweOptional = sessionUtils.decryptionJWEToken(jweHeader.replace("Bearer ", ""));
         if (!jweOptional.isPresent()) {
-            throw new JwtDecryptionFailException();
+            throw new JwtDecryptionFailException("JWT decryption fail");
         }
         String jwe = jweOptional.get();
         Optional<SessionInfo> sessionInfoOptional = jacksonUtils.readValue(jwe, SessionInfo.class);
         if (!sessionInfoOptional.isPresent()) {
-            throw new SessionInfoDeserializeFailException();
+            throw new SessionInfoDeserializeFailException("SessionInfo deserialize fail");
         }
         SecurityContextHolder.getContext().setAuthentication(new SessionAuthentication(null, sessionInfoOptional.get()));
         filterChain.doFilter(request, response);

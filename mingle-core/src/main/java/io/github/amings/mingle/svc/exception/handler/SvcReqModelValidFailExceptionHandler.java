@@ -18,6 +18,8 @@ import java.util.ArrayList;
  *
  * @author Ming
  */
+
+@Deprecated
 @ExceptionHandler
 public class SvcReqModelValidFailExceptionHandler extends AbstractExceptionHandler<SvcReqModelValidFailException> {
 

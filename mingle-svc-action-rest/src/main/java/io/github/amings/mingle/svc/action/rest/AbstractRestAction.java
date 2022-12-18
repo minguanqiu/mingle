@@ -5,10 +5,18 @@ import io.github.amings.mingle.svc.action.AbstractAction;
 import io.github.amings.mingle.svc.action.ActionReqModel;
 import io.github.amings.mingle.svc.action.ActionResModel;
 import io.github.amings.mingle.svc.action.exception.BreakActionException;
+import io.github.amings.mingle.svc.action.exception.BreakActionLogicException;
 import io.github.amings.mingle.svc.action.rest.annotation.DataProperty;
 import io.github.amings.mingle.svc.action.rest.annotation.ExcludeRequestBody;
 import io.github.amings.mingle.svc.action.rest.annotation.PathVariable;
 import io.github.amings.mingle.svc.action.rest.annotation.RestAction;
+import io.github.amings.mingle.svc.action.rest.exception.ActionReqModelSerializeFailException;
+import io.github.amings.mingle.svc.action.rest.exception.ActionResModelFormatErrorException;
+import io.github.amings.mingle.svc.action.rest.exception.ActionRestResModelFormatFailException;
+import io.github.amings.mingle.svc.action.rest.exception.ClientErrorException;
+import io.github.amings.mingle.svc.action.rest.exception.HttpCodeErrorException;
+import io.github.amings.mingle.svc.action.rest.exception.MediaTypeParseFailException;
+import io.github.amings.mingle.svc.action.rest.exception.MockDataParseFailException;
 import io.github.amings.mingle.svc.action.rest.handler.RestClientHandler;
 import io.github.amings.mingle.utils.FileUtils;
 import io.github.amings.mingle.utils.JacksonUtils;
@@ -65,7 +73,7 @@ public abstract class AbstractRestAction<Req extends ActionReqModel, Res extends
      *
      * @return Map
      */
-    protected abstract Map<String,String> buildRequestCacheHeaderValue();
+    protected abstract Map<String, String> buildRequestCacheHeaderValue();
 
     /**
      * Build action success http code for cache,if not contains code,this action will set error code and not success
@@ -135,13 +143,7 @@ public abstract class AbstractRestAction<Req extends ActionReqModel, Res extends
         if (restClientUtils.getHttpMethod().equals(HttpMethod.GET)) {
             processGetMethodParam(restClientUtils, reqModel);
         } else {
-            try {
-                restClientUtils.setRequestBody((buildRequestBody(reqModel)));
-            } catch (BreakActionException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new BreakActionException("MGRA01", "build request body fail");
-            }
+            restClientUtils.setRequestBody((buildRequestBody(reqModel)));
         }
         buildUri(restClientUtils, reqModel);
         resData.setUri(restClientUtils.getHttpUrl().toString());
@@ -153,7 +155,7 @@ public abstract class AbstractRestAction<Req extends ActionReqModel, Res extends
                 checkHttpCode(response.code());
                 resModel = processResBody(resData, response.body().bytes());
             } catch (IOException e) {
-                throw new BreakActionException("MGRA02", "client error : " + e.getMessage());
+                throw new ClientErrorException("client error : " + e.getMessage(), e);
             }
         } else {
             processMockData(resData);
@@ -175,7 +177,7 @@ public abstract class AbstractRestAction<Req extends ActionReqModel, Res extends
         if (reqData.headerValueMap != null) {
             reqData.headerValueMap.forEach(restClientUtils::setHeader);
         } else {
-            if(cacheHeaderValueMap != null) {
+            if (cacheHeaderValueMap != null) {
                 cacheHeaderValueMap.forEach(restClientUtils::setHeader);
             }
         }
@@ -191,7 +193,7 @@ public abstract class AbstractRestAction<Req extends ActionReqModel, Res extends
                     stringHashMap = new HashMap<>();
                 }
                 try {
-                    if(!annotation.value().equals("")) {
+                    if (!annotation.value().equals("")) {
                         stringHashMap.put(annotation.value(), (String) field.get(reqModel));
                     } else {
                         stringHashMap.put(field.getName(), (String) field.get(reqModel));
@@ -243,11 +245,11 @@ public abstract class AbstractRestAction<Req extends ActionReqModel, Res extends
      * @param reqModel Action request model
      * @return RequestBody
      */
-    protected RequestBody buildRequestBody(Req reqModel) throws BreakActionException {
+    protected RequestBody buildRequestBody(Req reqModel) {
         if (!restAction.mediaType().equals("")) {
             MediaType mediaType = MediaType.parse(restAction.mediaType());
             if (mediaType == null) {
-                throw new BreakActionException("MGRA03", "mediaType parse fail,please check mediaType type");
+                throw new MediaTypeParseFailException("mediaType parse fail,please check mediaType");
             }
             if (mediaType.type().equals("multipart")) {
                 if (mediaType.subtype().equals("form-data")) {
@@ -271,7 +273,7 @@ public abstract class AbstractRestAction<Req extends ActionReqModel, Res extends
                     return builder.build();
                 } else if (mediaType.subtype().equals("json")) {
                     Optional<JsonNode> jsonNodeOptional = jacksonUtils.readTree(reqModel);
-                    jsonNodeOptional.orElseThrow(() -> new BreakActionException("MGRA04", "request model serialize fail"));
+                    jsonNodeOptional.orElseThrow(() -> new ActionReqModelSerializeFailException("request model serialize fail"));
                     return RequestBody.create(jsonNodeOptional.get().toString().getBytes(StandardCharsets.UTF_8), mediaType);
                 }
             }
@@ -286,15 +288,15 @@ public abstract class AbstractRestAction<Req extends ActionReqModel, Res extends
         return FileUtils.isExist(MOCK_PATH + this.getClass().getSimpleName() + ".json");
     }
 
-    private void checkHttpCode(int code) throws BreakActionException {
+    private void checkHttpCode(int code) {
         if (cacheSuccessHttpCodeList != null) {
             if (!cacheSuccessHttpCodeList.contains(code)) {
-                throw new BreakActionException("MGRA05", "client code error : " + code);
+                throw new HttpCodeErrorException(code, "client code error : " + code);
             }
         }
     }
 
-    private void processMockData(RestActionResData<Res> actionData) throws BreakActionException {
+    private void processMockData(RestActionResData<Res> actionData) {
         try (Stream<String> stream = FileUtils.readFile(MOCK_PATH + this.getClass().getSimpleName() + ".json")) {
             String res = stream.collect(Collectors.joining());
             Optional<JsonNode> jsonNodeOptional = jacksonUtils.readTree(res);
@@ -304,31 +306,31 @@ public abstract class AbstractRestAction<Req extends ActionReqModel, Res extends
             Thread.sleep(Long.parseLong(sleep));
             processResBody(actionData, jsonNode.get("data").toString().getBytes(StandardCharsets.UTF_8));
         } catch (Exception e) {
-            throw new BreakActionException("MGRA06", "mock data error");
+            throw new MockDataParseFailException("mock data format error");
         }
     }
 
-    protected Res processResBody(RestActionResData<Res> actionData, byte[] resBody) throws BreakActionException {
+    protected Res processResBody(RestActionResData<Res> actionData, byte[] resBody) {
         JsonNode resultNode = formatResponseBody(new String(resBody, StandardCharsets.UTF_8));
         if (getActionRestResModelClass() != null) {
             Optional<? extends RestActionResModel> actionRestResModelOptional = jacksonUtils.readValue(resultNode.toString(), getActionRestResModelClass());
             if (actionRestResModelOptional.isPresent() && actionRestResModelOptional.get().getCode() != null) {
                 RestActionResModel restActionResModel = actionRestResModelOptional.get();
-                throw new BreakActionException(restActionResModel.getCode(), restActionResModel.getDesc(), processResModel(resultNode));
+                throw new BreakActionLogicException(restActionResModel.getCode(), restActionResModel.getDesc(), processResModel(resultNode));
             } else {
-                throw new BreakActionException("MGRA07", "resModel format error");
+                throw new ActionRestResModelFormatFailException("restActionResModel deserialize error");
             }
         }
         return processResModel(resultNode);
     }
 
-    private Res processResModel(JsonNode resultNode) throws BreakActionException {
+    private Res processResModel(JsonNode resultNode) {
         if (!getResModelClass().equals(ActionResModel.class)) {
             Optional<Res> resModelOptional = jacksonUtils.readValue(processResponseBody(resultNode).toString(), getResModelClass());
             if (resModelOptional.isPresent()) {
                 return resModelOptional.get();
             } else {
-                throw new BreakActionException("MGRA08", "data format error");
+                throw new ActionResModelFormatErrorException("resModel format error");
             }
         }
         return null;

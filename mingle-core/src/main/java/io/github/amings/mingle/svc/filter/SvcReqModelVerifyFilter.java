@@ -35,12 +35,12 @@ public class SvcReqModelVerifyFilter extends AbstractSvcFilter {
             throws ServletException, IOException {
         Optional<?> reqModelOptional = jacksonUtils.readValue(svcInfo.getPayLoadString(), svcInfo.getSvcBinderModel().getReqModelClass());
         if (!reqModelOptional.isPresent()) {
-            throw new ReqModelDeserializeFailException();
+            throw new ReqModelDeserializeFailException("Request model deserialize fail");
         }
         Object object = reqModelOptional.get();
         Set<ConstraintViolation<Object>> set = validator.validate(object);
         if (set.size() > 0) {
-            svcInfo.setSvcReqModelValidFailException(new SvcReqModelValidFailException(new ConstraintViolationException(set)));
+            svcInfo.setSvcReqModelValidFailException(new SvcReqModelValidFailException("Request model valid error", new ConstraintViolationException(set)));
         }
         svcInfo.setValidReqModel(object);
         filterChain.doFilter(request, response);

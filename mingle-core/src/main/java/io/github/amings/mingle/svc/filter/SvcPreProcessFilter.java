@@ -126,7 +126,7 @@ public class SvcPreProcessFilter extends AbstractSvcFilter {
         String payLoadBody = svcAnnotation.encryption() ? decryption(body) : body;
         Optional<JsonNode> jsonNodeOptional = jacksonUtils.readTree(payLoadBody);
         if (!jsonNodeOptional.isPresent()) {
-            throw new ReqBodyNotJsonFormatException();
+            throw new ReqBodyNotJsonFormatException("Request body not json format");
         }
         JsonNode payloadNode = jsonNodeOptional.get();
         svcInfo.setPayLoadNode(payloadNode);

@@ -8,6 +8,7 @@ import org.springframework.security.core.AuthenticationException;
  * @author Ming
  */
 
+@Deprecated
 public class SvcAuthenticationFailException extends AuthenticationException {
 
     public SvcAuthenticationFailException(String msg) {
