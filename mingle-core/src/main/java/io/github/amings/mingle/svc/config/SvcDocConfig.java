@@ -84,7 +84,7 @@ public class SvcDocConfig {
 
     private void buildPathItem(ModelConverters instance, OpenAPI openApi, Operation operation, SvcBinderComponent.SvcBinderModel v) {
         operation.setTags(Arrays.asList(v.getSvc().tags()));
-        operation.setSummary(v.getSvc().desc());
+        operation.setSummary(v.getSvc().summary());
         operation.setDescription(v.getSvc().desc());
         if (!v.isReqCustom()) {
             ResolvedSchema reqModelSchema = instance.readAllAsResolvedSchema(v.getReqModelClass());
