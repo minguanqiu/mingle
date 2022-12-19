@@ -67,6 +67,7 @@ public class SvcPreProcessFilter extends AbstractSvcFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException {
         try {
+            response.setCharacterEncoding("UTF-8");
             start(request, response);
             filterChain.doFilter(svcInfo.getHttpServletRequest(), svcInfo.getHttpServletResponse());
         } catch (Exception e) {
@@ -74,7 +75,6 @@ public class SvcPreProcessFilter extends AbstractSvcFilter {
                 svcInfo.setException(true);
                 ResponseEntity<SvcResModelHandler> responseEntity = exceptionHandlerResolver.resolver(e);
                 svcInfo.getHttpServletResponse().setStatus(responseEntity.getStatusCodeValue());
-                svcInfo.getHttpServletResponse().setCharacterEncoding("UTF-8");
                 svcInfo.getHttpServletResponse().setHeader("Content-Type", "application/json");
                 svcInfo.setSvcResModelHandler(responseEntity.getBody());
                 svcInfo.getHttpServletResponse().resetBuffer();
