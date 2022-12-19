@@ -592,7 +592,7 @@ public class Demo extends AbstractSvcLogic<DemoReq, DemoRes> {
 - `SvcMsgListHandler` -  `Svc` `response` `code`、`desc`定義
 - `SvcResModelHandler` - `response body` template
 
-#### SvcLogHandler
+#### SvcMsgListHandler
 
 ##### 實作
 
