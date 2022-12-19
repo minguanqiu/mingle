@@ -6,10 +6,10 @@
     <parent>
         <groupId>io.github.amings</groupId>
         <artifactId>mingle</artifactId>
-        <version>1.2.1</version>
+        <version>1.2.2</version>
     </parent>
     <artifactId>mingle-svc-action-rest</artifactId>
-    <version>1.2.1</version>
+    <version>1.2.2</version>
     <name>mingle-svc-action-rest</name>
     <description>mingle module for rest client action feature</description>
     <dependencies>
