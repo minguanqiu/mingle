@@ -81,6 +81,13 @@ public class Demo1Application {
 }
 ```
 
+執行`main`方法會得到以下訊息
+
+```text
+MingleRuntimeException: you must create at least one Service
+```
+所以必須先建立`Svc`[Build Svc](#build-svc)
+
 ### Build Svc
 
 #### 目錄規則 (建議)
@@ -131,6 +138,12 @@ public class Simple extends AbstractSvcLogic<SvcReqModel, SvcResModel> {
 
 執行 spring application，並且發送請求，你將會得到以下回應 :
 
+**Request Body :**
+```json
+{}
+```
+
+**Response Body :**
 ```json
 {
   "code": "0",
@@ -198,8 +211,14 @@ public class SimpleRes extends SvcResModel {
 }
 ```
 
-你將會得到以下回應 : 
+**Request Body :**
+```json
+{
+  "name" : "mingle"
+}
+``` 
 
+**Response Body :**
 ```json
 {
   "code": "0",
@@ -483,16 +502,16 @@ public class Demo extends AbstractSvcLogic<DemoReq, DemoRes> {
 
 透過`ActionResData`取得結果，通常都會判斷是否成功，再取得`ResModel`
 
-**Request :**
+**Request Body :**
 
 ```json
 {  
-    "firstName": "ming",  
-    "lastName": "le"
+ "firstName": "ming",  
+ "lastName": "le"
 }
 ```
 
-**Response :**
+**Response Body :**
 
 Success :
 
@@ -554,7 +573,7 @@ public class Demo extends AbstractSvcLogic<DemoReq, DemoRes> {
 
 會讓代碼寫得更少，因為`Action`啟用`AutoBreak`將會中斷`Svc`邏輯，所以不用判斷是否成功，甚至可以直接取得`ResModel`
 
-**Request :**
+**Request Body :**
 
 ```json
 {  
@@ -563,7 +582,7 @@ public class Demo extends AbstractSvcLogic<DemoReq, DemoRes> {
 }
 ```
 
-**Response:**
+**Response Body :**
 
 ```json
 {
@@ -793,9 +812,10 @@ Svc scope
 
 ```json
 {
-    "code": "MG01",
-    "desc": "Unknown exception",
-    "resBody": {}
+  "code": "MG01",
+  "desc": "Unknown exception",
+  "resBody": {}
+}
 ```
 
  實作`AbstractExceptionHandler`
