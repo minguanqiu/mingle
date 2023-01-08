@@ -51,7 +51,7 @@ public class SvcBinderComponent {
     WebConfig webConfig;
     @Autowired
     JacksonUtils jacksonUtils;
-    @Autowired
+    @Autowired(required = false)
     List<AbstractSvcLogic> abstractSvcLogics;
     private Map<Class<?>, SvcBinderModel> svcBinderModelMap = new HashMap<>();
     private Map<String, String> ipAddressMap = new HashMap<>();
@@ -93,6 +93,9 @@ public class SvcBinderComponent {
 
     private void scanSvc() {
         HashMap<String, ArrayList<String>> svcMissingMap = new HashMap<>();
+        if (abstractSvcLogics == null) {
+            throw new MingleRuntimeException("you must create at least one Service");
+        }
         abstractSvcLogics.forEach(svcLogic -> {
             Class<? extends AbstractSvcLogic> clazz = svcLogic.getClass();
             SvcBinderModel svcBinderModel = new SvcBinderModel();
@@ -122,15 +125,15 @@ public class SvcBinderComponent {
                     }
                     boolean hasReqClass = false;
                     for (Class<?> parameterType : method.getParameterTypes()) {
-                        if(SvcReqModel.class.isAssignableFrom(parameterType)) {
-                            if(!reqClass.equals(parameterType)) {
+                        if (SvcReqModel.class.isAssignableFrom(parameterType)) {
+                            if (!reqClass.equals(parameterType)) {
                                 svcErrorMsgList.add("custom method parameter must defined " + reqClass.getSimpleName() + " request class");
                             } else {
                                 hasReqClass = true;
                             }
                         }
                     }
-                    if(!hasReqClass) {
+                    if (!hasReqClass) {
                         svcBinderModel.setReqCustom(true);
                     }
                     if (SvcResModel.class.isAssignableFrom(method.getReturnType())) {
