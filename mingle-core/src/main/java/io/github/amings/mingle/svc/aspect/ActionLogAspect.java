@@ -1,6 +1,7 @@
 package io.github.amings.mingle.svc.aspect;
 
 import io.github.amings.mingle.svc.action.AbstractAction;
+import io.github.amings.mingle.svc.action.ActionReqData;
 import io.github.amings.mingle.svc.action.ActionReqModel;
 import io.github.amings.mingle.svc.action.ActionResData;
 import io.github.amings.mingle.svc.exception.ActionAutoBreakException;
@@ -46,8 +47,17 @@ public class ActionLogAspect {
     public void doPoint() {
     }
 
+    @Pointcut("execution(* io.github.amings.mingle.svc.action.AbstractAction+.doAction(io.github.amings.mingle.svc.action.ActionReqModel,io.github.amings.mingle.svc.action.ActionReqData))")
+    public void doPoint1() {
+    }
+
     @Around("doPoint() && args(reqModel)")
     public Object around(ProceedingJoinPoint joinPoint, ActionReqModel reqModel) {
+        return processAround(joinPoint, reqModel);
+    }
+
+    @Around(value = "doPoint1() && args(reqModel,reqData)", argNames = "joinPoint,reqModel,reqData")
+    public Object around1(ProceedingJoinPoint joinPoint, ActionReqModel reqModel, ActionReqData reqData) {
         return processAround(joinPoint, reqModel);
     }
 
