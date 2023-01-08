@@ -44,8 +44,8 @@ public class SessionBinderComponent {
     }
 
     private void buildBinder() {
-        svcBinderComponent.getSvcBinderModelMap().forEach((k, v) -> {
-            Session session = k.getAnnotation(Session.class);
+        svcBinderComponent.getSvcMap().forEach((k, v) -> {
+            Session session = v.getSvcClass().getAnnotation(Session.class);
             if (session != null) {
                 sessionPathList.add(v.getSvcPath());
                 sessionMap.put(v.getSvcName(), session.value());

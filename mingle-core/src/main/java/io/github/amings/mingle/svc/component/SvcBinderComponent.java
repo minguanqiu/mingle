@@ -53,7 +53,7 @@ public class SvcBinderComponent {
     JacksonUtils jacksonUtils;
     @Autowired(required = false)
     List<AbstractSvcLogic> abstractSvcLogics;
-    private Map<Class<?>, SvcBinderModel> svcBinderModelMap = new HashMap<>();
+    private Map<String, SvcBinderModel> svcBinderModelMap = new HashMap<>();
     private Map<String, String> ipAddressMap = new HashMap<>();
     private List<String> svcPathList;
     private List<String> svcValidBeanPathList;
@@ -67,11 +67,21 @@ public class SvcBinderComponent {
         return AutoConfigurationPackages.get(context.getAutowireCapableBeanFactory()).get(0);
     }
 
+    @Deprecated
     public Optional<SvcBinderModel> getSvcBinderModel(Class<?> clazz) {
-        return Optional.ofNullable(svcBinderModelMap.get(clazz));
+        return Optional.empty();
     }
 
+    @Deprecated
     public Map<Class<?>, SvcBinderModel> getSvcBinderModelMap() {
+        return null;
+    }
+
+    public Optional<SvcBinderModel> getSvcBinderModel(String path) {
+        return Optional.ofNullable(svcBinderModelMap.get(path));
+    }
+
+    public Map<String, SvcBinderModel> getSvcMap() {
         return svcBinderModelMap;
     }
 
@@ -104,8 +114,9 @@ public class SvcBinderComponent {
             if (svc != null) {
                 Class<?> reqClass = svcLogic.getReqClass();
                 Class<?> resClass = svcLogic.getResClass();
-                svcBinderModel.setSvc(svc);
+                svcBinderModel.setSvcClass(clazz);
                 svcBinderModel.setSvcName(clazz.getSimpleName());
+                svcBinderModel.setSvc(svc);
                 svcBinderModel.setReqModelClass(reqClass);
                 svcBinderModel.setResModelClass(resClass);
                 List<Method> methods = Arrays.stream(clazz.getDeclaredMethods()).filter(m -> AnnotationUtils.findAnnotation(m, RequestMapping.class) != null).collect(Collectors.toList());
@@ -196,7 +207,7 @@ public class SvcBinderComponent {
                 svcMissingMap.put(clazz.getSimpleName(), svcErrorMsgList);
             }
 
-            svcBinderModelMap.put(clazz, svcBinderModel);
+            svcBinderModelMap.put(svcBinderModel.getSvcPath(), svcBinderModel);
         });
         if (!svcMissingMap.isEmpty()) {
             try {
@@ -264,6 +275,8 @@ public class SvcBinderComponent {
     @Getter
     @Setter(AccessLevel.PACKAGE)
     public static class SvcBinderModel {
+
+        private Class<?> svcClass;
 
         private String svcName;
 

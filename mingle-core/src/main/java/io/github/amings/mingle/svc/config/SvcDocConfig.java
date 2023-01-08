@@ -53,7 +53,7 @@ public class SvcDocConfig {
     public OpenApiCustomiser svcOpenApiCustomiser() {
         return openApi -> {
             ModelConverters instance = buildConverter();
-            svcBinderComponent.getSvcBinderModelMap().forEach((k, v) -> {
+            svcBinderComponent.getSvcMap().forEach((k, v) -> {
                 PathItem pathItem = openApi.getPaths().get(v.getSvcPath());
                 if (pathItem != null) {
                     Operation operation = null;
