@@ -143,7 +143,7 @@ public abstract class AbstractRestAction<Req extends ActionReqModel, Res extends
         if (mediaType == null) {
             throw new MediaTypeParseFailException("mediaType parse fail,please check mediaType");
         }
-        reqData.headerValueMap.put("Content-Type", mediaType.toString());
+        restClientUtils.setHeader("Content-Type", mediaType.toString());
         before(reqModel);
         if (restClientUtils.getHttpMethod().equals(HttpMethod.GET)) {
             processGetMethodParam(restClientUtils, reqModel);
