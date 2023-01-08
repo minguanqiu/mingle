@@ -20,13 +20,12 @@ public class AllExceptionHandler extends AbstractExceptionHandler<Exception> {
 
     @Override
     public ResponseEntity<SvcResModelHandler> handle(Exception e) {
-        Throwable exception = e;
-        if(exception.getCause() != null) {
-            exception = exception.getCause();
-        }
         ExceptionModel model = new ExceptionModel();
-        model.setException(exception.getClass().getName());
-        model.setMsg(exception.getMessage());
+        model.setException(e.getClass().getName());
+        if(e.getCause() != null) {
+            model.setCauseException(e.getCause().getClass().getName());
+        }
+        model.setMsg(e.getMessage());
         svcInfo.setSvcResModelHandler4Log(svcResUtils.build(SvcCodeFiled.MG01, svcMsgHandler.getMsg(SvcCodeFiled.MG01), model));
         return build(SvcCodeFiled.MG01);
     }

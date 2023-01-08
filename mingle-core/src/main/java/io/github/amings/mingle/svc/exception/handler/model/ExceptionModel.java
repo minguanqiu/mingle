@@ -15,7 +15,8 @@ public class ExceptionModel extends SvcResModel {
 
     @JsonProperty("exception")
     private String exception;
-
+    @JsonProperty("causeException")
+    private String causeException;
     @JsonProperty("msg")
     private String msg;
 
