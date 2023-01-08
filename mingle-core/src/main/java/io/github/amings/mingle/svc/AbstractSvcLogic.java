@@ -24,6 +24,7 @@ public abstract class AbstractSvcLogic<Req extends SvcReqModel, Res extends SvcR
     private final Class<Req> reqClass;
     @Getter
     private final Class<Res> resClass;
+
     @SuppressWarnings("unchecked")
     public AbstractSvcLogic() {
         TypeToken<Req> reqTypeToken = new TypeToken<Req>(getClass()) {
@@ -104,10 +105,11 @@ public abstract class AbstractSvcLogic<Req extends SvcReqModel, Res extends SvcR
      * @return Res Svc response model
      * interrupt Svc Logic by return
      **/
+    @SuppressWarnings("unchecked")
     protected Res returnSvcLogic(String code, String desc) {
         svcInfo.setCode(code);
         svcInfo.setDesc(desc);
-        return null;
+        return (Res) new SvcResModel();
     }
 
     /**
