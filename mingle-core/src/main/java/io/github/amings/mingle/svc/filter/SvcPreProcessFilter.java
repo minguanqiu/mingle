@@ -83,7 +83,7 @@ public class SvcPreProcessFilter extends AbstractSvcFilter {
         svcInfo.setHttpServletRequest(request);
         svcInfo.setHttpServletResponse(response);
         svcInfo.setIp(ipHandler.getIP(svcInfo.getHttpServletRequest()));
-        SvcBinderComponent.SvcBinderModel svcBinderModel = svcBinderComponent.getSvcBinderModel(request.getRequestURI()).orElseThrow(() -> new SvcNotFoundException("Can't found svc in SvcBinderModel"));
+        SvcBinderComponent.SvcBinderModel svcBinderModel = svcBinderComponent.getSvcBinderModel(request.getServletPath()).orElseThrow(() -> new SvcNotFoundException("Can't found svc in SvcBinderModel"));
         buildSvcInfo(svcBinderModel);
     }
 
