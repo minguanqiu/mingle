@@ -18,6 +18,7 @@ import io.github.amings.mingle.utils.ReflectionUtils;
 import io.github.amings.mingle.utils.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.util.ContentCachingRequestWrapper;
@@ -137,13 +138,19 @@ public class SvcPreProcessFilter extends AbstractSvcFilter {
             ContentCachingResponseWrapper httpServletResponse = (ContentCachingResponseWrapper) svcInfo.getHttpServletResponse();
             if (!svcInfo.isException()) {
                 String responseBody = new String(httpServletResponse.getContentAsByteArray(), StandardCharsets.UTF_8);
-                JsonNode jsonNode = jacksonUtils.readTree(responseBody).get();
+                JsonNode jsonNode;
+                if(responseBody.equals("")) {
+                    jsonNode = jacksonUtils.getObjectNode();
+                } else {
+                    jsonNode = jacksonUtils.readTree(responseBody).get();
+                }
                 SvcResModelHandler svcResModelHandlerImpl = ReflectionUtils.newInstance(svcResModelHandler.getClass());
                 svcResModelHandlerImpl.setCode(svcInfo.getCode());
                 svcResModelHandlerImpl.setDesc(svcInfo.getDesc());
                 svcResModelHandlerImpl.setResBody(jsonNode);
                 svcInfo.setSvcResModelHandler(svcResModelHandlerImpl);
                 httpServletResponse.resetBuffer();
+                httpServletResponse.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 httpServletResponse.getWriter().write(jacksonUtils.readTree(svcResModelHandlerImpl).get().toString());
             }
             httpServletResponse.copyBodyToResponse();

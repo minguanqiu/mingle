@@ -105,11 +105,10 @@ public abstract class AbstractSvcLogic<Req extends SvcReqModel, Res extends SvcR
      * @return Res Svc response model
      * interrupt Svc Logic by return
      **/
-    @SuppressWarnings("unchecked")
     protected Res returnSvcLogic(String code, String desc) {
         svcInfo.setCode(code);
         svcInfo.setDesc(desc);
-        return (Res) new SvcResModel();
+        return null;
     }
 
     /**
