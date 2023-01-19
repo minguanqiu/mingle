@@ -45,20 +45,19 @@ public class SessionAuthenticationProvider implements AuthenticationProvider {
         SessionInfo sessionInfo = (SessionInfo) authentication.getCredentials();
         RedisKey redisKey = RedisKey.of(sessionInfo.getKey());
         String type = sessionBinderComponent.getSessionMap().get(svcInfo.getSvcName());
-        if (!type.equals(sessionInfo.getType())) {
-            throw new SessionTypeIncorrectException("Session type incorrect");
+        if (!type.equals("refresh")) {
+            if (!type.equals(sessionInfo.getType())) {
+                throw new SessionTypeIncorrectException("Session type incorrect");
+            }
         }
         Optional<SessionEntity> sessionEntityOptional = sessionDao.get(RedisKey.of(sessionInfo.getKey()));
         if (!sessionEntityOptional.isPresent()) {
             throw new SessionNotFoundException("Session not found");
         }
-        String sessionType = sessionInfo.getType();
         SessionEntity sessionEntity = sessionEntityOptional.get();
-        if (!sessionType.equals("refresh")) {
-            if (sessionInfo.isSingle()) { // if single enable
-                if (!sessionEntity.getId().equals(sessionInfo.getId())) { // check two sessionId and kick
-                    throw new SessionKickException("Session has been logout by another session");
-                }
+        if (sessionInfo.isSingle()) { // if single enable
+            if (!sessionEntity.getId().equals(sessionInfo.getId())) { // check two sessionId and kick
+                throw new SessionKickException("Session has been logout by another session");
             }
         }
         sessionDao.set(redisKey, sessionEntity, Duration.parse(sessionInfo.getTimeToLive())); // refresh session live time
