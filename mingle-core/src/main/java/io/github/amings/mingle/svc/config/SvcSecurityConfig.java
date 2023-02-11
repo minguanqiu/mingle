@@ -39,7 +39,9 @@ public class SvcSecurityConfig {
         httpSecurity
                 .requestMatchers()
                 .antMatchers(svcBinderComponent.getSvcPathList().toArray(new String[0]))
-                .antMatchers(apiDocPath).antMatchers(swaggerUIPath)
+                .antMatchers(apiDocPath)
+                .antMatchers(apiDocPath + "/*")
+                .antMatchers("/swagger-ui/*")
                 .and()
                 .csrf()
                 .disable()
@@ -56,7 +58,8 @@ public class SvcSecurityConfig {
                     });
                     if(!openapiAddress.equals("")) {
                         authorizeRequests.antMatchers(apiDocPath).access(svcBinderComponent.buildIpAddressPattern(openapiAddress));
-                        authorizeRequests.antMatchers(swaggerUIPath).access(svcBinderComponent.buildIpAddressPattern(openapiAddress));
+                        authorizeRequests.antMatchers(apiDocPath + "/*").access(svcBinderComponent.buildIpAddressPattern(openapiAddress));
+                        authorizeRequests.antMatchers("/swagger-ui/*").access(svcBinderComponent.buildIpAddressPattern(openapiAddress));
                     }
                     authorizeRequests.anyRequest().permitAll();
                 });
