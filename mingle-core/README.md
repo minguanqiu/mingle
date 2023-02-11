@@ -315,6 +315,10 @@ public class Simple extends AbstractSvcLogic<SimpleReq, SimpleRes> {
 
 - springdoc.api-docs.path : /v3/api-docs
 
+**保護**
+
+透過`mingle.svc.security.ip.openapi`只允許此IP訪問資源，多筆使用`,`分隔
+
 ### SvcBinderComponent 取得Svc資訊
 
 可以透過`getSvcBinderModelMap()` 取得目前所有的`Svc`資訊

@@ -1,4 +1,4 @@
-# mingle-action-rest-action
+# mingle-svc-action-rest
 
 此模組透過`Action`實現，提供`Restful`client功能
 
@@ -9,7 +9,7 @@ add pom.xml :
 ```xml
 <dependency>
     <groupId>io.github.amings</groupId>
-    <artifactId>mingle-action-rest</artifactId>
+    <artifactId>mingle-svc-action-rest</artifactId>
 </dependency>
 ```
 
