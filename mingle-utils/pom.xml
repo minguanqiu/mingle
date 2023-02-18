@@ -6,10 +6,10 @@
     <parent>
         <groupId>io.github.amings</groupId>
         <artifactId>mingle</artifactId>
-        <version>1.2.7</version>
+        <version>1.2.8</version>
     </parent>
     <artifactId>mingle-utils</artifactId>
-    <version>1.2.7</version>
+    <version>1.2.8</version>
     <name>mingle-utils</name>
     <description>mingle module for tools</description>
     <dependencies>
