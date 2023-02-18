@@ -5,7 +5,6 @@ import io.github.amings.mingle.svc.action.AbstractAction;
 import io.github.amings.mingle.svc.action.ActionReqModel;
 import io.github.amings.mingle.svc.action.ActionResModel;
 import io.github.amings.mingle.svc.action.exception.BreakActionException;
-import io.github.amings.mingle.svc.action.exception.BreakActionLogicException;
 import io.github.amings.mingle.svc.action.rest.annotation.DataProperty;
 import io.github.amings.mingle.svc.action.rest.annotation.ExcludeRequestBody;
 import io.github.amings.mingle.svc.action.rest.annotation.PathVariable;
@@ -310,13 +309,14 @@ public abstract class AbstractRestAction<Req extends ActionReqModel, Res extends
         }
     }
 
-    protected Res processResBody(RestActionResData<Res> actionData, byte[] resBody) {
+    protected Res processResBody(RestActionResData<Res> resRestActionResData, byte[] resBody) {
         JsonNode resultNode = formatResponseBody(new String(resBody, StandardCharsets.UTF_8));
         if (getActionRestResModelClass() != null) {
             Optional<? extends RestActionResModel> actionRestResModelOptional = jacksonUtils.readValue(resultNode.toString(), getActionRestResModelClass());
             if (actionRestResModelOptional.isPresent() && actionRestResModelOptional.get().getCode() != null) {
                 RestActionResModel restActionResModel = actionRestResModelOptional.get();
-                throw new BreakActionLogicException(restActionResModel.getCode(), restActionResModel.getDesc(), processResModel(resultNode));
+                resRestActionResData.setCode(restActionResModel.getCode());
+                resRestActionResData.setDesc(restActionResModel.getDesc());
             } else {
                 throw new ActionRestResModelFormatFailException("restActionResModel deserialize error");
             }

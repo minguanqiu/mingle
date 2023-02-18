@@ -23,4 +23,12 @@ public class RestActionResData<Res extends ActionResModel> extends ActionResData
 
     private Map<String, List<String>> responseHeaderValue;
 
+    protected void setCode(String code) {
+        super.setCode(code);
+    }
+
+    protected void setDesc(String desc) {
+        super.setDesc(desc);
+    }
+
 }
