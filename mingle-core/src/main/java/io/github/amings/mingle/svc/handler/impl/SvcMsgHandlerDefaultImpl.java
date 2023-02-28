@@ -65,7 +65,7 @@ public class SvcMsgHandlerDefaultImpl implements SvcMsgHandler {
     }
 
     @PostConstruct
-    private void init() {
+    public void init() {
         List<SvcMsgListHandler> mingleSvcMsgHandlers = svcMsgListHandlers.stream().filter(handler -> handler.getClass().getAnnotation(MingleSvcMsg.class) != null).collect(Collectors.toList());
         List<SvcMsgListHandler> svcMsgHandlers = svcMsgListHandlers.stream().filter(handler -> handler.getClass().getAnnotation(MingleSvcMsg.class) == null).collect(Collectors.toList());
         buildMsg(mingleSvcMsgHandlers);
