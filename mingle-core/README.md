@@ -86,6 +86,7 @@ public class Demo1Application {
 ```text
 MingleRuntimeException: you must create at least one Service
 ```
+
 所以必須先建立`Svc`[Build Svc](#build-svc)
 
 ### Build Svc
@@ -139,11 +140,13 @@ public class Simple extends AbstractSvcLogic<SvcReqModel, SvcResModel> {
 執行 spring application，並且發送請求，你將會得到以下回應 :
 
 **Request Body :**
+
 ```json
 {}
 ```
 
 **Response Body :**
+
 ```json
 {
   "code": "0",
@@ -212,13 +215,15 @@ public class SimpleRes extends SvcResModel {
 ```
 
 **Request Body :**
+
 ```json
 {
   "name" : "mingle"
 }
-``` 
+```
 
 **Response Body :**
+
 ```json
 {
   "code": "0",
@@ -602,7 +607,9 @@ public class Demo extends AbstractSvcLogic<DemoReq, DemoRes> {
 
 ### 日誌紀錄
 
-對於`Svc`、`Action`是重要的功能之一，能夠紀錄`name`、`request`、`response`、`code`、`desc`、`runTime`等，你透過`svcUuid`把`Action`關聯建立起來，可以明確知道`Svc`執行了那些`Action`，甚至成功或失敗都會有相關的資訊
+對於`Svc`、`Action`是重要的功能之一，能夠紀錄`name`、`request`、`response`、`code`、`desc`、`runTime`等，透過`Svc`的`uuid`把`Action`關聯建立起來，可以知道`Svc`執行了哪些`Action`，甚至成功或失敗都會有相關的資訊
+
+如果不是`Request Scope`或非同步處理，就必須透過`ActionUtils`或`SvcLogThreadLocal`自行處理`uuid`，配置完成後才會正常紀錄
 
 ### Handler
 
