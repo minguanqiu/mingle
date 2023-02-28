@@ -45,7 +45,8 @@ public class SvcInfo {
     @Setter(AccessLevel.PACKAGE)
     private SvcBinderComponent.SvcBinderModel svcBinderModel;
 
-    @Setter(AccessLevel.PACKAGE)
+    @Deprecated
+    @Setter(AccessLevel.PRIVATE)
     private String svcUuid;
 
     @Setter(AccessLevel.PACKAGE)

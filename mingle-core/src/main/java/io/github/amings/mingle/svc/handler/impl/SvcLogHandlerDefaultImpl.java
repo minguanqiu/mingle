@@ -16,13 +16,12 @@ public class SvcLogHandlerDefaultImpl implements SvcLogHandler {
 
     @Override
     public void writeBeginLog(SvcBeginModel model) {
-        log.info("【Svc PayLoad】 : " + model.getPayloadBody());
-        log.info("【Svc Model】 : " + model.getModelBody());
+        log.info("【Svc Request】【" + model.getUuid() + "】: " + model.getModelBody());
     }
 
     @Override
     public void writeEndLog(SvcEndModel model) {
-        log.info("【Svc Response】 : " + model.getResponseBody());
+        log.info("【Svc Response】【" + model.getUuid() + "】: " + model.getResponseBody());
     }
 
 }

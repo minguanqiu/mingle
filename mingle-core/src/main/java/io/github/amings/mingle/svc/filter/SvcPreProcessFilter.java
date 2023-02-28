@@ -15,7 +15,6 @@ import io.github.amings.mingle.svc.handler.model.SvcEndModel;
 import io.github.amings.mingle.utils.DateUtils;
 import io.github.amings.mingle.utils.JacksonUtils;
 import io.github.amings.mingle.utils.ReflectionUtils;
-import io.github.amings.mingle.utils.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
@@ -96,7 +95,6 @@ public class SvcPreProcessFilter extends AbstractSvcFilter {
     private void buildSvcInfo(SvcBinderComponent.SvcBinderModel svcBinderModel) {
         Svc svc = svcBinderModel.getSvc();
         svcInfo.setSvcBinderModel(svcBinderModel);
-        svcInfo.setSvcUuid(UUIDUtils.generateUuid());
         svcInfo.setSvcName(svcBinderModel.getSvcName());
         if (!svcBinderModel.isReqCustom()) {
             ContentCachingRequestWrapper reqWrapper = new ContentCachingRequestWrapper(svcInfo.getHttpServletRequest());

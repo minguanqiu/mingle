@@ -12,7 +12,7 @@ public class LogUtils {
         if (RequestContextHolder.getRequestAttributes() != null) {
             if (svcInfo.getSvcBinderModel().getSvc().log()) {
                 SvcLogModel model = new SvcLogModel();
-                model.setSvcUuid(svcInfo.getSvcUuid());
+                model.setSvcUuid(svcInfo.getUuid());
                 model.setIp(svcInfo.getIp());
                 return model;
             }

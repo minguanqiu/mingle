@@ -7,7 +7,7 @@ import io.github.amings.mingle.svc.handler.PayLoadDecryptionHandler;
 import io.github.amings.mingle.svc.handler.SvcLogHandler;
 import io.github.amings.mingle.svc.handler.SvcMsgHandler;
 import io.github.amings.mingle.svc.handler.SvcResModelHandler;
-import io.github.amings.mingle.svc.handler.impl.ActionLogHandlerDefalutImpl;
+import io.github.amings.mingle.svc.handler.impl.ActionLogHandlerDefaultImpl;
 import io.github.amings.mingle.svc.handler.impl.IPHandlerDefaultImpl;
 import io.github.amings.mingle.svc.handler.impl.PayLoadDecryptionHandlerDefaultImpl;
 import io.github.amings.mingle.svc.handler.impl.SvcLogHandlerDefaultImpl;
@@ -49,7 +49,7 @@ public class SvcBeanConfig {
     @Bean
     @ConditionalOnMissingBean
     public ActionLogHandler actionLogHandler() {
-        return new ActionLogHandlerDefalutImpl();
+        return new ActionLogHandlerDefaultImpl();
     }
 
     /**

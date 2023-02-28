@@ -14,16 +14,16 @@ import java.time.LocalDateTime;
  */
 
 @Slf4j
-public class ActionLogHandlerDefalutImpl implements ActionLogHandler {
+public class ActionLogHandlerDefaultImpl implements ActionLogHandler {
 
     @Override
     public void writeBeginLog(ActionBeginModel model) {
-        log.info("【Action Request】 : " + model.getRequestBody());
+        log.info("【Action Request】【" + model.getSvcUuid() + "】: " + model.getRequestBody());
     }
 
     @Override
     public void writeEndLog(ActionEndModel model) {
-        log.info("【Action Response】 : " + model.getResponseBody());
+        log.info("【Action Response】【" + model.getSvcUuid() + "】: " + model.getResponseBody());
     }
 
     @Override
