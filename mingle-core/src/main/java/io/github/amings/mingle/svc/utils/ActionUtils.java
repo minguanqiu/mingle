@@ -16,11 +16,25 @@ public class ActionUtils {
     /**
      * using single thread or not request scope
      */
-    public static <Req extends ActionReqModel, Res extends ActionResModel, ReqData extends ActionReqData, ResData extends ActionResData<Res>> ResData doActionByLog(SvcLogModel svcLogModel,AbstractAction<Req, Res, ReqData, ResData> action, Req reqModel) {
+    public static <Req extends ActionReqModel, Res extends ActionResModel, ReqData extends ActionReqData, ResData extends ActionResData<Res>> ResData doActionByLog(SvcLogModel svcLogModel, AbstractAction<Req, Res, ReqData, ResData> action, Req reqModel) {
         SvcLogThreadLocal.set(svcLogModel);
-        ResData resData = action.doAction(reqModel);
-        SvcLogThreadLocal.remove();
-        return resData;
+        try {
+            return action.doAction(reqModel);
+        } finally {
+            SvcLogThreadLocal.remove();
+        }
+    }
+
+    /**
+     * using single thread or not request scope
+     */
+    public static <Req extends ActionReqModel, Res extends ActionResModel, ReqData extends ActionReqData, ResData extends ActionResData<Res>> ResData doActionByLog(SvcLogModel svcLogModel, AbstractAction<Req, Res, ReqData, ResData> action, Req reqModel, ReqData reqData) {
+        SvcLogThreadLocal.set(svcLogModel);
+        try {
+            return action.doAction(reqModel, reqData);
+        } finally {
+            SvcLogThreadLocal.remove();
+        }
     }
 
 }
