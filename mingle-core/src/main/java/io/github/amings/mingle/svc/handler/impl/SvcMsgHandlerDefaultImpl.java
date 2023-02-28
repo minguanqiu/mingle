@@ -4,6 +4,7 @@ import io.github.amings.mingle.svc.action.ActionResData;
 import io.github.amings.mingle.svc.annotation.MingleSvcMsg;
 import io.github.amings.mingle.svc.handler.SvcMsgHandler;
 import io.github.amings.mingle.svc.handler.SvcMsgListHandler;
+import io.github.amings.mingle.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
@@ -48,6 +49,15 @@ public class SvcMsgHandlerDefaultImpl implements SvcMsgHandler {
             }
         }
         return actionResData.getDesc();
+    }
+
+    @Override
+    public String getMsg(String code, Map<String, String> values) {
+        String msg = getMsg(code);
+        if (msg != null) {
+            return StringUtils.templateConvert(msg, values, "{", "}");
+        }
+        return null;
     }
 
     private void buildMsg(List<SvcMsgListHandler> handlers) {

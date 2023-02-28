@@ -8,6 +8,8 @@ import io.github.amings.mingle.svc.handler.SvcMsgHandler;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Map;
+
 /**
  * Base Svc class for All Svc logic，must be implements will get Svc Feature
  *
@@ -43,6 +45,15 @@ public abstract class AbstractSvcLogic<Req extends SvcReqModel, Res extends SvcR
      **/
     protected void breakSvcLogic(String code) throws BreakSvcProcessException {
         breakSvcLogic(code, svcMsgHandler.getMsg(code));
+    }
+
+    /**
+     * @param code   response code
+     * @param values template convert values
+     *               interrupt Svc Logic by throw exception
+     **/
+    protected void breakSvcLogic(String code, Map<String, String> values) throws BreakSvcProcessException {
+        breakSvcLogic(code, svcMsgHandler.getMsg(code, values));
     }
 
     /**
@@ -87,7 +98,17 @@ public abstract class AbstractSvcLogic<Req extends SvcReqModel, Res extends SvcR
      * interrupt Svc Logic by return
      **/
     protected Res returnSvcLogic(String code) {
-        return returnSvcLogic(code, svcMsgHandler.getMsg(code));
+        return returnSvcLogic(code, svcMsgHandler.getMsg(code), null);
+    }
+
+    /**
+     * @param code   response code
+     * @param values template convert values
+     * @return Res Svc response model
+     * interrupt Svc Logic by return
+     **/
+    protected Res returnSvcLogic(String code, Map<String, String> values) {
+        return returnSvcLogic(code, svcMsgHandler.getMsg(code, values), null);
     }
 
     /**
@@ -96,7 +117,7 @@ public abstract class AbstractSvcLogic<Req extends SvcReqModel, Res extends SvcR
      * interrupt Svc Logic by return
      **/
     protected Res returnSvcLogic(ActionResData<?> actionResData) {
-        return returnSvcLogic(actionResData.getCode(), actionResData.getDesc());
+        return returnSvcLogic(actionResData.getCode(), actionResData.getDesc(), null);
     }
 
     /**
@@ -106,9 +127,7 @@ public abstract class AbstractSvcLogic<Req extends SvcReqModel, Res extends SvcR
      * interrupt Svc Logic by return
      **/
     protected Res returnSvcLogic(String code, String desc) {
-        svcInfo.setCode(code);
-        svcInfo.setDesc(desc);
-        return null;
+        return returnSvcLogic(code, desc, null);
     }
 
     /**
