@@ -10,7 +10,7 @@
     </parent>
     <groupId>io.github.amings</groupId>
     <artifactId>mingle</artifactId>
-    <version>1.2.8</version>
+    <version>1.3.0</version>
     <packaging>pom</packaging>
     <name>mingle</name>
     <description>mingle parent</description>
@@ -74,32 +74,32 @@
             <dependency>
                 <groupId>io.github.amings</groupId>
                 <artifactId>mingle-core</artifactId>
-                <version>1.2.8</version>
+                <version>1.3.0</version>
             </dependency>
             <dependency>
                 <groupId>io.github.amings</groupId>
                 <artifactId>mingle-svc-session</artifactId>
-                <version>1.2.8</version>
+                <version>1.3.0</version>
             </dependency>
             <dependency>
                 <groupId>io.github.amings</groupId>
                 <artifactId>mingle-svc-redis</artifactId>
-                <version>1.2.8</version>
+                <version>1.3.0</version>
             </dependency>
             <dependency>
                 <groupId>io.github.amings</groupId>
                 <artifactId>mingle-svc-data</artifactId>
-                <version>1.2.8</version>
+                <version>1.3.0</version>
             </dependency>
             <dependency>
                 <groupId>io.github.amings</groupId>
                 <artifactId>mingle-svc-action-rest</artifactId>
-                <version>1.2.8</version>
+                <version>1.3.0</version>
             </dependency>
             <dependency>
                 <groupId>io.github.amings</groupId>
                 <artifactId>mingle-utils</artifactId>
-                <version>1.2.8</version>
+                <version>1.3.0</version>
             </dependency>
             <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
             <dependency>
