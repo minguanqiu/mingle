@@ -162,7 +162,7 @@ public abstract class AbstractRestAction<Req extends ActionReqModel, Res extends
                 throw new ClientErrorException("client error : " + e.getMessage(), e);
             }
         } else {
-            processMockData(resData);
+            resModel = processMockData(resData);
         }
         if (resModel != null) {
             after(resModel);
@@ -295,7 +295,7 @@ public abstract class AbstractRestAction<Req extends ActionReqModel, Res extends
         }
     }
 
-    private void processMockData(RestActionResData<Res> actionData) {
+    private Res processMockData(RestActionResData<Res> actionData) {
         try (Stream<String> stream = FileUtils.readFile(MOCK_PATH + this.getClass().getSimpleName() + ".json")) {
             String res = stream.collect(Collectors.joining());
             Optional<JsonNode> jsonNodeOptional = jacksonUtils.readTree(res);
@@ -303,7 +303,7 @@ public abstract class AbstractRestAction<Req extends ActionReqModel, Res extends
             JsonNode jsonNode = jsonNodeOptional.get();
             String sleep = jsonNode.get("sleep").asText();
             Thread.sleep(Long.parseLong(sleep));
-            processResBody(actionData, jsonNode.get("data").toString().getBytes(StandardCharsets.UTF_8));
+            return processResBody(actionData, jsonNode.get("data").toString().getBytes(StandardCharsets.UTF_8));
         } catch (Exception e) {
             throw new MockDataParseFailException("mock data format error");
         }
