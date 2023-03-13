@@ -69,7 +69,7 @@ public class JacksonUtils {
     }
 
     public Optional<JsonNode> readTree(String value) {
-        if(!isJson(value)){
+        if(value == null || !isJson(value)){
             return Optional.empty();
         }
         try {
