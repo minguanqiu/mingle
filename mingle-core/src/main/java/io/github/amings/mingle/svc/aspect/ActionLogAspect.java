@@ -52,16 +52,16 @@ public class ActionLogAspect {
     }
 
     @Around("doPoint() && args(reqModel)")
-    public Object around(ProceedingJoinPoint joinPoint, ActionReqModel reqModel) {
+    public Object around(ProceedingJoinPoint joinPoint, ActionReqModel reqModel) throws Throwable {
         return processAround(joinPoint, reqModel);
     }
 
     @Around(value = "doPoint1() && args(reqModel,reqData)", argNames = "joinPoint,reqModel,reqData")
-    public Object around1(ProceedingJoinPoint joinPoint, ActionReqModel reqModel, ActionReqData reqData) {
+    public Object around1(ProceedingJoinPoint joinPoint, ActionReqModel reqModel, ActionReqData reqData) throws Throwable {
         return processAround(joinPoint, reqModel);
     }
 
-    private Object processAround(ProceedingJoinPoint joinPoint, ActionReqModel reqModel) {
+    private Object processAround(ProceedingJoinPoint joinPoint, ActionReqModel reqModel) throws Throwable {
         String uuid = UUIDUtils.generateUuidRandom();
         LocalDateTime startDateTime = DateUtils.getNowLocalDateTime();
         SvcLogModel svcLogModel = LogUtils.getSvcLogModel(svcInfo);
@@ -91,7 +91,7 @@ public class ActionLogAspect {
             if (svcLogModel != null) {
                 actionLogHandler.afterThrowing(t, buildActionEndModel(svcLogModel, uuid, startDateTime, null));
             }
-            throw new RuntimeException(t);
+            throw t;
         }
     }
 

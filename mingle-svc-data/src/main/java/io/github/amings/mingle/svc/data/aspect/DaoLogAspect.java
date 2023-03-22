@@ -49,11 +49,11 @@ public class DaoLogAspect {
     }
 
     @Around("doPoint()")
-    public Object around(ProceedingJoinPoint joinPoint) {
+    public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
         return processAround(joinPoint);
     }
 
-    private Object processAround(ProceedingJoinPoint joinPoint) {
+    private Object processAround(ProceedingJoinPoint joinPoint) throws Throwable {
         String uuid = UUIDUtils.generateUuid();
         LocalDateTime start = DateUtils.getNowLocalDateTime();
         SvcLogModel svcLogModel = LogUtils.getSvcLogModel(svcInfo);
@@ -78,7 +78,7 @@ public class DaoLogAspect {
             if (svcLogModel != null) {
                 daoLogHandler.afterThrowing(t, processEndLog(svcLogModel, uuid, start, null));
             }
-            throw new RuntimeException(t);
+            throw t;
         }
     }
 
