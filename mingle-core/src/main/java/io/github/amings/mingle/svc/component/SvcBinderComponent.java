@@ -25,16 +25,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.util.pattern.PathPattern;
+import org.springframework.web.util.pattern.PathPatternParser;
 
 import javax.annotation.PostConstruct;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -188,6 +184,7 @@ public class SvcBinderComponent {
                                     .produces(MediaType.APPLICATION_JSON_VALUE)
                                     .options(requestMappingHandlerMapping.getBuilderConfiguration()).build(), context.getBeanNamesForType(clazz)[0], doService);
                     svcBinderModel.setSvcPath(svcPath);
+                    svcBinderModel.setPathPattern(new PathPatternParser().parse(svcPath));
                     svcBinderModel.setMethod(RequestMethod.POST);
                 }
 
@@ -281,6 +278,8 @@ public class SvcBinderComponent {
         private String svcName;
 
         private String svcPath;
+
+        private PathPattern pathPattern;
 
         private RequestMethod method;
 

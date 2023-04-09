@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.server.PathContainer;
 import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
@@ -32,6 +33,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -83,7 +85,20 @@ public class SvcPreProcessFilter extends AbstractSvcFilter {
         svcInfo.setHttpServletRequest(request);
         svcInfo.setHttpServletResponse(response);
         svcInfo.setIp(ipHandler.getIP(svcInfo.getHttpServletRequest()));
-        SvcBinderComponent.SvcBinderModel svcBinderModel = svcBinderComponent.getSvcBinderModel(request.getServletPath()).orElseThrow(() -> new SvcNotFoundException("Can't found svc in SvcBinderModel"));
+        String servletPath = request.getServletPath();
+        Optional<SvcBinderComponent.SvcBinderModel> optionalSvcBinderModel = svcBinderComponent.getSvcBinderModel(servletPath);
+        SvcBinderComponent.SvcBinderModel svcBinderModel = null;
+        if (!optionalSvcBinderModel.isPresent()) {
+            for (Map.Entry<String, SvcBinderComponent.SvcBinderModel> svcBinderModelEntry : svcBinderComponent.getSvcMap().entrySet()) {
+                if (svcBinderModelEntry.getValue().getPathPattern().matches(PathContainer.parsePath(request.getServletPath()))) {
+                    svcBinderModel = svcBinderModelEntry.getValue();
+                }
+            }
+            if (svcBinderModel == null)
+                throw new SvcNotFoundException("Can't found Svc in SvcBinderModel");
+        } else {
+            svcBinderModel = optionalSvcBinderModel.get();
+        }
         buildSvcInfo(svcBinderModel);
     }
 
@@ -137,7 +152,7 @@ public class SvcPreProcessFilter extends AbstractSvcFilter {
             if (!svcInfo.isException()) {
                 String responseBody = new String(httpServletResponse.getContentAsByteArray(), StandardCharsets.UTF_8);
                 JsonNode jsonNode;
-                if(responseBody.equals("")) {
+                if (responseBody.equals("")) {
                     jsonNode = jacksonUtils.getObjectNode();
                 } else {
                     jsonNode = jacksonUtils.readTree(responseBody).get();
