@@ -11,11 +11,13 @@ public class LogUtils {
     public static SvcLogModel getSvcLogModel(SvcInfo svcInfo) {
         if (RequestContextHolder.getRequestAttributes() != null) {
             if (svcInfo != null) {
-                if (svcInfo.getSvcBinderModel().getSvc().log()) {
-                    SvcLogModel model = new SvcLogModel();
-                    model.setSvcUuid(svcInfo.getUuid());
-                    model.setIp(svcInfo.getIp());
-                    return model;
+                if(svcInfo.getSvcBinderModel() != null) {
+                    if (svcInfo.getSvcBinderModel().getSvc().log()) {
+                        SvcLogModel model = new SvcLogModel();
+                        model.setSvcUuid(svcInfo.getUuid());
+                        model.setIp(svcInfo.getIp());
+                        return model;
+                    }
                 }
             }
         } else {
