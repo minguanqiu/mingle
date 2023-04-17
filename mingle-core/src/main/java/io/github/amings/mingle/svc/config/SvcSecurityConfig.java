@@ -4,11 +4,6 @@ import io.github.amings.mingle.svc.component.SvcBinderComponent;
 import io.github.amings.mingle.svc.security.SvcAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -18,8 +13,9 @@ import org.springframework.security.web.SecurityFilterChain;
  * @author Ming
  */
 
-@Configuration
-@EnableAutoConfiguration(exclude = SecurityAutoConfiguration.class)
+@Deprecated
+//@Configuration
+//@EnableAutoConfiguration(exclude = SecurityAutoConfiguration.class)
 public class SvcSecurityConfig {
 
     @Autowired
@@ -33,8 +29,8 @@ public class SvcSecurityConfig {
     @Value("${mingle.svc.security.ip.openapi:}")
     private String openapiAddress;
 
-    @Bean
-    @Order
+//    @Bean
+//    @Order
     public SecurityFilterChain svcSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .requestMatchers()

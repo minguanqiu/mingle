@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.springframework.web.util.pattern.PathPattern;
-import org.springframework.web.util.pattern.PathPatternParser;
 
 import javax.annotation.PostConstruct;
 import java.lang.reflect.Method;
@@ -50,6 +49,7 @@ public class SvcBinderComponent {
     @Autowired(required = false)
     List<AbstractSvcLogic> abstractSvcLogics;
     private Map<String, SvcBinderModel> svcBinderModelMap = new HashMap<>();
+
     private Map<String, String> ipAddressMap = new HashMap<>();
     private List<String> svcPathList;
     private List<String> svcValidBeanPathList;
@@ -81,6 +81,7 @@ public class SvcBinderComponent {
         return svcBinderModelMap;
     }
 
+    @Deprecated
     public Map<String, String> getIpAddressMap() {
         return ipAddressMap;
     }
@@ -184,14 +185,13 @@ public class SvcBinderComponent {
                                     .produces(MediaType.APPLICATION_JSON_VALUE)
                                     .options(requestMappingHandlerMapping.getBuilderConfiguration()).build(), context.getBeanNamesForType(clazz)[0], doService);
                     svcBinderModel.setSvcPath(svcPath);
-                    svcBinderModel.setPathPattern(new PathPatternParser().parse(svcPath));
                     svcBinderModel.setMethod(RequestMethod.POST);
                 }
 
                 if (svc.ipAddressSecure()) {
                     String property = context.getEnvironment().getProperty("mingle.svc.security.ip." + clazz.getSimpleName());
                     if (property != null) {
-                        ipAddressMap.put(svcBinderModel.getSvcPath(), buildIpAddressPattern(property));
+                        svcBinderModel.setIpSecure(property);
                     } else {
                         svcErrorMsgList
                                 .add("ipAddressSecure is true，must set " + "mingle.svc.security.ip." + clazz.getSimpleName());
@@ -214,7 +214,6 @@ public class SvcBinderComponent {
             }
         }
         svcBinderModelMap = Collections.unmodifiableMap(svcBinderModelMap);
-        ipAddressMap = Collections.unmodifiableMap(ipAddressMap);
     }
 
     public String buildIpAddressPattern(String property) {
@@ -279,6 +278,7 @@ public class SvcBinderComponent {
 
         private String svcPath;
 
+        @Deprecated
         private PathPattern pathPattern;
 
         private RequestMethod method;
@@ -294,6 +294,8 @@ public class SvcBinderComponent {
         private Class<?> reqModelClass;
 
         private Class<?> resModelClass;
+
+        private String ipSecure;
 
     }
 
