@@ -1,7 +1,5 @@
 package io.github.amings.mingle.svc.config;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -25,7 +23,6 @@ public class JacksonConfig {
     @ConditionalOnMissingBean(JacksonUtils.class)
     public JacksonUtils jacksonUtils() {
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setVisibility(objectMapper.getVisibilityChecker().withVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY));
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         return new JacksonUtils(objectMapper);
@@ -35,7 +32,6 @@ public class JacksonConfig {
     @ConditionalOnMissingBean(name = "svcLogJacksonUtils")
     public JacksonUtils svcLogJacksonUtils() {
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setVisibility(objectMapper.getVisibilityChecker().withVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY));
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         objectMapper.setConfig(objectMapper.getSerializationConfig().withView(Views.class));
@@ -47,7 +43,6 @@ public class JacksonConfig {
     @ConditionalOnMissingBean(name = "actionLogJacksonUtils")
     public JacksonUtils actionLogJacksonUtils() {
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setVisibility(objectMapper.getVisibilityChecker().withVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY));
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         objectMapper.setConfig(objectMapper.getSerializationConfig().withView(Views.class));
