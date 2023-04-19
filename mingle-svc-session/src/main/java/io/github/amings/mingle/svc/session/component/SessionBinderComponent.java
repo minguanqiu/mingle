@@ -9,11 +9,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Session binder component
@@ -48,7 +44,7 @@ public class SessionBinderComponent {
             Session session = v.getSvcClass().getAnnotation(Session.class);
             if (session != null) {
                 sessionPathList.add(v.getSvcPath());
-                sessionMap.put(v.getSvcName(), session.value());
+                sessionMap.put(v.getSvcPath(), session.value());
                 if (session.authority()) {
                     authorityMap.put(v.getSvcPath(), v.getSvcName());
                 }
