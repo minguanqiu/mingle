@@ -18,6 +18,10 @@
             <artifactId>mingle-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.github.amings</groupId>
             <artifactId>mingle-svc-redis</artifactId>
         </dependency>
