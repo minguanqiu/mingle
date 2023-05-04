@@ -1,5 +1,6 @@
 package io.github.amings.mingle.svc.session.config;
 
+import io.github.amings.mingle.svc.filter.SvcPreProcessFilter;
 import io.github.amings.mingle.svc.session.component.SessionBinderComponent;
 import io.github.amings.mingle.svc.session.filter.JwtAuthenticationFilter;
 import io.github.amings.mingle.svc.session.security.SessionAccessDeniedHandler;
@@ -8,7 +9,6 @@ import io.github.amings.mingle.svc.session.security.SessionAuthenticationProvide
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
@@ -27,6 +27,8 @@ public class SessionSecurityConfig {
     @Autowired
     JwtAuthenticationFilter jwtAuthenticationFilter;
     @Autowired
+    SvcPreProcessFilter svcPreProcessFilter;
+    @Autowired
     SessionAuthenticationProvider sessionAuthenticationProvider;
     @Autowired
     SessionAuthenticationEntryPoint sessionAuthenticationEntryPoint;
@@ -34,7 +36,6 @@ public class SessionSecurityConfig {
     SessionAccessDeniedHandler sessionAccessDeniedHandler;
 
     @Bean
-    @Order(0)
     public SecurityFilterChain sessionSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .requestMatchers().antMatchers(sessionBinderComponent.getSessionPathList().toArray(new String[0]))
@@ -51,6 +52,7 @@ public class SessionSecurityConfig {
                 })
                 .sessionManagement(sessionStrategy -> sessionStrategy.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(svcPreProcessFilter, JwtAuthenticationFilter.class)
                 .authenticationProvider(sessionAuthenticationProvider)
                 .authorizeRequests(authorizeRequests -> {
                     sessionBinderComponent.getAuthorityMap().forEach((k, v) -> {
