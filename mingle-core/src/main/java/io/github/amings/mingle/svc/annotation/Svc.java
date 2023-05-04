@@ -1,13 +1,9 @@
 package io.github.amings.mingle.svc.annotation;
 
 import io.github.amings.mingle.svc.handler.PayLoadDecryptionHandler;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * Main annotation for configuration Svc feature
@@ -16,7 +12,7 @@ import java.lang.annotation.Target;
  */
 
 @Documented
-@RestController
+@Controller
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Svc {
