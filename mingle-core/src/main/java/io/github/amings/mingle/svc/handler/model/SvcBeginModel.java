@@ -2,6 +2,7 @@ package io.github.amings.mingle.svc.handler.model;
 
 import lombok.Data;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 
 /**
@@ -12,6 +13,8 @@ import java.time.LocalDateTime;
 
 @Data
 public class SvcBeginModel {
+
+    private HttpServletRequest httpServletRequest;
 
     private String uuid;
 
@@ -26,5 +29,7 @@ public class SvcBeginModel {
     private String ip;
 
     private boolean valid;
+
+    private boolean back;
 
 }

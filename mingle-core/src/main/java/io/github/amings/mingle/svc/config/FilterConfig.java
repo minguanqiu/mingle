@@ -1,5 +1,6 @@
 package io.github.amings.mingle.svc.config;
 
+import io.github.amings.mingle.svc.component.PropertyComponent;
 import io.github.amings.mingle.svc.component.SvcBinderComponent;
 import io.github.amings.mingle.svc.filter.SvcLogFilter;
 import io.github.amings.mingle.svc.filter.SvcPreProcessFilter;
@@ -19,10 +20,13 @@ import org.springframework.context.annotation.Configuration;
 public class FilterConfig {
 
     @Autowired
+    PropertyComponent propertyComponent;
+    @Autowired
     SvcBinderComponent svcBinderComponent;
 
     /**
      * Svc preProcess filter bean
+     *
      * @return FilterRegistrationBean
      * @see SvcPreProcessFilter
      */
@@ -32,12 +36,13 @@ public class FilterConfig {
         registration.setFilter(svcPreProcessFilter());
         registration.setName("svcPreProcessFilter");
         registration.addUrlPatterns(svcBinderComponent.getSvcPathList().toArray(new String[0]));
-        registration.setOrder(5);
+        registration.setOrder(0);
         return registration;
     }
 
     /**
      * Svc request model javax bean valid filter bean
+     *
      * @return FilterRegistrationBean
      * @see SvcReqModelVerifyFilter
      */
@@ -53,6 +58,7 @@ public class FilterConfig {
 
     /**
      * logging filter bean
+     *
      * @return FilterRegistrationBean
      * @see SvcLogFilter
      */
@@ -62,7 +68,7 @@ public class FilterConfig {
         registration.setFilter(svcLogFilter());
         registration.setName("svcLogFilter");
         registration.addUrlPatterns(svcBinderComponent.getSvcLogPathList().toArray(new String[0]));
-        registration.setOrder(11);
+        registration.setOrder(15);
         return registration;
     }
 

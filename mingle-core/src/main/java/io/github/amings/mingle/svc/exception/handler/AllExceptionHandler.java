@@ -26,6 +26,7 @@ public class AllExceptionHandler extends AbstractExceptionHandler<Exception> {
             model.setCauseException(e.getCause().getClass().getName());
         }
         model.setMsg(e.getMessage());
+        log.info("Exception by " + e);
         svcInfo.setSvcResModelHandler4Log(svcResUtils.build(SvcCodeFiled.MG01, svcMsgHandler.getMsg(SvcCodeFiled.MG01), model));
         return build(SvcCodeFiled.MG01);
     }

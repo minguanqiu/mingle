@@ -29,27 +29,68 @@ public class SvcLogFilter extends AbstractSvcFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (!svcInfo.getSvcBinderModel().isReqCustom()) {
+        writeSvcBegin();
+        try {
+            filterChain.doFilter(request, response);
+        } catch (Exception e) {
+            writeSvcBeginBack();
+            throw e;
+        }
+        writeSvcBeginBack();
+    }
+
+    private void writeSvcBegin() {
+        if (svcInfo.getSvcBinderModel() != null && svcInfo.getSvcBinderModel().isCustom()) {
             try {
                 svcLogHandler.writeBeginLog(buildSvcBeginModel());
             } catch (Exception ignored) {
 
             }
         }
-        filterChain.doFilter(request, response);
+    }
+
+    private void writeSvcBeginBack() {
+        if (svcInfo.getSvcBinderModel() != null && svcInfo.getSvcBinderModel().isCustom()) {
+            try {
+                svcLogHandler.writeBeginLog(buildSvcBeginBackModel());
+            } catch (Exception ignored) {
+
+            }
+        }
     }
 
     private SvcBeginModel buildSvcBeginModel() {
         SvcBeginModel model = new SvcBeginModel();
+        model.setHttpServletRequest(svcInfo.getHttpServletRequest());
         model.setUuid(svcInfo.getUuid());
         model.setName(svcInfo.getSvcName());
         model.setStartDateTime(svcInfo.getStartDateTime());
-        model.setModelBody(jacksonUtils.readTree(svcInfo.getValidReqModel()).get().toString());
+        jacksonUtils.readTree(svcInfo.getValidReqModel()).ifPresent(node -> {
+            model.setModelBody(node.toString());
+        });
         model.setPayloadBody(svcInfo.getPayLoadNode().toString());
         model.setIp(svcInfo.getIp());
         if (svcInfo.getSvcReqModelValidFailException() == null) {
             model.setValid(true);
         }
+        return model;
+    }
+
+    private SvcBeginModel buildSvcBeginBackModel() {
+        SvcBeginModel model = new SvcBeginModel();
+        model.setHttpServletRequest(svcInfo.getHttpServletRequest());
+        model.setUuid(svcInfo.getUuid());
+        model.setName(svcInfo.getSvcName());
+        model.setStartDateTime(svcInfo.getStartDateTime());
+        jacksonUtils.readTree(svcInfo.getBackReqModel()).ifPresent(node -> {
+            model.setModelBody(node.toString());
+            model.setPayloadBody(node.toString());
+        });
+        model.setIp(svcInfo.getIp());
+        if (svcInfo.getSvcReqModelValidFailException() == null) {
+            model.setValid(true);
+        }
+        model.setBack(true);
         return model;
     }
 

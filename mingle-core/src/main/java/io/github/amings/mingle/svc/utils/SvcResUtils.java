@@ -36,6 +36,10 @@ public class SvcResUtils {
     }
 
     public SvcResModelHandler build(String code, String desc, SvcResModel svcResModel) {
+        return build(code, desc, svcResModel, jacksonUtils);
+    }
+
+    public SvcResModelHandler build(String code, String desc, SvcResModel svcResModel, JacksonUtils jacksonUtils) {
         SvcResModelHandler svcResModelHandlerImpl = ReflectionUtils.newInstance(svcResModelHandler.getClass());
         svcResModelHandlerImpl.setCode(code);
         svcResModelHandlerImpl.setDesc(desc);

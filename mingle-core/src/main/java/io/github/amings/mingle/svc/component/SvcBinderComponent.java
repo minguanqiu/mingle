@@ -3,12 +3,9 @@ package io.github.amings.mingle.svc.component;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.amings.mingle.svc.AbstractSvcLogic;
-import io.github.amings.mingle.svc.SvcReqModel;
 import io.github.amings.mingle.svc.SvcResModel;
 import io.github.amings.mingle.svc.annotation.Svc;
-import io.github.amings.mingle.svc.config.WebConfig;
 import io.github.amings.mingle.svc.exception.MingleRuntimeException;
-import io.github.amings.mingle.utils.JacksonUtils;
 import io.github.amings.mingle.utils.UUIDUtils;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -19,12 +16,10 @@ import org.springframework.boot.autoconfigure.AutoConfigurationPackages;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.pattern.PathPattern;
 
 import javax.annotation.PostConstruct;
@@ -43,19 +38,14 @@ import java.util.stream.Collectors;
 public class SvcBinderComponent {
 
     @Autowired
-    WebConfig webConfig;
-    @Autowired
-    JacksonUtils jacksonUtils;
+    private PropertyComponent propertyComponent;
     @Autowired(required = false)
-    List<AbstractSvcLogic> abstractSvcLogics;
+    private List<AbstractSvcLogic> abstractSvcLogics;
     private Map<String, SvcBinderModel> svcBinderModelMap = new HashMap<>();
-
     private Map<String, String> ipAddressMap = new HashMap<>();
     private List<String> svcPathList;
     private List<String> svcValidBeanPathList;
     private List<String> svcLogPathList;
-    @Autowired
-    private RequestMappingHandlerMapping requestMappingHandlerMapping;
     @Autowired
     private ApplicationContext context;
 
@@ -131,19 +121,19 @@ public class SvcBinderComponent {
                     } else {
                         svcErrorMsgList.add("custom request method can not empty");
                     }
-                    boolean hasReqClass = false;
-                    for (Class<?> parameterType : method.getParameterTypes()) {
-                        if (SvcReqModel.class.isAssignableFrom(parameterType)) {
-                            if (!reqClass.equals(parameterType)) {
-                                svcErrorMsgList.add("custom method parameter must defined " + reqClass.getSimpleName() + " request class");
-                            } else {
-                                hasReqClass = true;
-                            }
-                        }
-                    }
-                    if (!hasReqClass) {
-                        svcBinderModel.setReqCustom(true);
-                    }
+//                    boolean hasReqClass = false;
+//                    for (Class<?> parameterType : method.getParameterTypes()) {
+//                        if (SvcReqModel.class.isAssignableFrom(parameterType)) {
+//                            if (!reqClass.equals(parameterType)) {
+//                                svcErrorMsgList.add("custom method parameter must defined " + reqClass.getSimpleName() + " request class");
+//                            } else {
+//                                hasReqClass = true;
+//                            }
+//                        }
+//                    }
+//                    if (!hasReqClass) {
+//                        svcBinderModel.setReqCustom(true);
+//                    }
                     if (SvcResModel.class.isAssignableFrom(method.getReturnType())) {
                         if (!resClass.equals(method.getReturnType())) {
                             svcErrorMsgList.add("custom method returnType must defined " + resClass.getSimpleName() + " response class");
@@ -160,16 +150,22 @@ public class SvcBinderComponent {
                         svcErrorMsgList.add("custom path can not empty");
                     }
                 }
-                Method doService = null;
-                try {
-                    doService = clazz.getMethod("doService", reqClass, resClass);
-                } catch (NoSuchMethodException ignored) {
-                }
-                if (AnnotationUtils.findAnnotation(doService, RequestMapping.class) != null) {
-                    svcErrorMsgList.add("doService method can not add @RequestMapping");
-                }
                 if (!svcBinderModel.isCustom()) {
-                    String svcPathPrefix = webConfig.getSvcPath();
+                    Method doService = null;
+                    try {
+                        doService = clazz.getMethod("doService", reqClass, resClass);
+                    } catch (NoSuchMethodException ignored) {
+                    }
+                    if (AnnotationUtils.findAnnotation(clazz, ResponseBody.class) != null) {
+                        svcErrorMsgList.add("Svc class can not add @ResponseBody");
+                    }
+                    if (AnnotationUtils.findAnnotation(doService, RequestMapping.class) != null) {
+                        svcErrorMsgList.add("doService method can not add @RequestMapping");
+                    }
+                    if (AnnotationUtils.findAnnotation(doService, ResponseBody.class) != null) {
+                        svcErrorMsgList.add("doService method can not add @ResponseBody");
+                    }
+                    String svcPathPrefix = propertyComponent.getSvcPath();
                     if (!svc.path().equals("")) {
                         String path = svc.path();
                         if (!path.startsWith("/")) {
@@ -178,12 +174,7 @@ public class SvcBinderComponent {
                         svcPathPrefix += path;
                     }
                     String svcPath = svcPathPrefix + "/" + clazz.getSimpleName();
-                    requestMappingHandlerMapping
-                            .registerMapping(RequestMappingInfo.paths(svcPath)
-                                    .methods(RequestMethod.POST)
-                                    .consumes(MediaType.APPLICATION_JSON_VALUE)
-                                    .produces(MediaType.APPLICATION_JSON_VALUE)
-                                    .options(requestMappingHandlerMapping.getBuilderConfiguration()).build(), context.getBeanNamesForType(clazz)[0], doService);
+                    svcBinderModel.setSvcMethod(doService);
                     svcBinderModel.setSvcPath(svcPath);
                     svcBinderModel.setMethod(RequestMethod.POST);
                 }
@@ -203,7 +194,6 @@ public class SvcBinderComponent {
             if (!svcErrorMsgList.isEmpty()) {
                 svcMissingMap.put(clazz.getSimpleName(), svcErrorMsgList);
             }
-
             svcBinderModelMap.put(svcBinderModel.getSvcPath(), svcBinderModel);
         });
         if (!svcMissingMap.isEmpty()) {
@@ -244,7 +234,7 @@ public class SvcBinderComponent {
             if (v.getSvc().log()) {
                 svcLogPathList.add(v.getSvcPath());
             }
-            if (!v.isReqCustom()) {
+            if (!v.isCustom()) {
                 svcValidBeanPathList.add(v.getSvcPath());
             }
         });
@@ -278,15 +268,18 @@ public class SvcBinderComponent {
 
         private String svcPath;
 
-        @Deprecated
+        @Getter(onMethod = @__(@Deprecated))
         private PathPattern pathPattern;
 
         private RequestMethod method;
+
+        private Method svcMethod;
 
         private Svc svc;
 
         private boolean custom;
 
+        @Getter(onMethod = @__(@Deprecated))
         private boolean reqCustom;
 
         private boolean resCustom;

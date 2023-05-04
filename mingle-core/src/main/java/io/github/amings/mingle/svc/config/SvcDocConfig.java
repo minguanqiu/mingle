@@ -15,16 +15,18 @@ import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
-import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
+import org.springdoc.api.AbstractOpenApiResource;
 import org.springdoc.core.GroupedOpenApi;
 import org.springdoc.core.customizers.OpenApiCustomiser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.PostConstruct;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -86,17 +88,17 @@ public class SvcDocConfig {
         operation.setTags(Arrays.asList(v.getSvc().tags()));
         operation.setSummary(v.getSvc().summary());
         operation.setDescription(v.getSvc().desc());
-        if (!v.isReqCustom()) {
-            ResolvedSchema reqModelSchema = instance.readAllAsResolvedSchema(v.getReqModelClass());
-            operation.setRequestBody(new RequestBody()
-                    .content(new Content()
-                            .addMediaType("application/json", new MediaType().schema(reqModelSchema.schema))));
-            if (operation.getParameters() != null) {
-                operation.getParameters().clear();
-            }
-            openApi.schema(reqModelSchema.schema.getName(), reqModelSchema.schema);
-            buildSchema(openApi, reqModelSchema.referencedSchemas);
-        }
+//        if (!v.isReqCustom()) {
+//            ResolvedSchema reqModelSchema = instance.readAllAsResolvedSchema(v.getReqModelClass());
+//            operation.setRequestBody(new RequestBody()
+//                    .content(new Content()
+//                            .addMediaType("application/json", new MediaType().schema(reqModelSchema.schema))));
+//            if (operation.getParameters() != null) {
+//                operation.getParameters().clear();
+//            }
+//            openApi.schema(reqModelSchema.schema.getName(), reqModelSchema.schema);
+//            buildSchema(openApi, reqModelSchema.referencedSchemas);
+//        }
         if (!v.isResCustom()) {
             ResolvedSchema resModelSchema = instance.readAllAsResolvedSchema(v.getResModelClass());
             ResolvedSchema mainSvcResSchema = buildMainSvcResSchema(instance, v.getResModelClass());
@@ -153,6 +155,15 @@ public class SvcDocConfig {
             return this.useFqn ? cls.getName().replace("$", "_") : cls.getSimpleName();
         }
 
+    }
+
+    @PostConstruct
+    private void init() {
+        ArrayList<Class<?>> classes = new ArrayList<>();
+        svcBinderComponent.getSvcBinderModelMap().forEach((k, v) -> {
+            classes.add(k);
+        });
+        AbstractOpenApiResource.addRestControllers(classes.toArray(new Class[0]));
     }
 
 }
