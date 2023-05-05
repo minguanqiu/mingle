@@ -40,7 +40,7 @@ public class SvcLogFilter extends AbstractSvcFilter {
     }
 
     private void writeSvcBegin() {
-        if (svcInfo.getSvcBinderModel() != null && svcInfo.getSvcBinderModel().isReqCustom()) {
+        if (svcInfo.getSvcBinderModel() != null && !svcInfo.getSvcBinderModel().isReqCustom()) {
             try {
                 svcLogHandler.writeBeginLog(buildSvcBeginModel());
             } catch (Exception ignored) {
