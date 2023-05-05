@@ -88,4 +88,7 @@ public class SvcInfo {
     @Setter(AccessLevel.PACKAGE)
     private boolean exception = false;
 
+    @Setter(AccessLevel.PACKAGE)
+    private boolean writeBegin = false;
+
 }

@@ -41,21 +41,15 @@ public class SvcLogFilter extends AbstractSvcFilter {
 
     private void writeSvcBegin() {
         if (svcInfo.getSvcBinderModel() != null && !svcInfo.getSvcBinderModel().isReqCustom()) {
-            try {
-                svcLogHandler.writeBeginLog(buildSvcBeginModel());
-            } catch (Exception ignored) {
-
-            }
+            svcInfo.setWriteBegin(true);
+            svcLogHandler.writeBeginLog(buildSvcBeginModel());
         }
     }
 
     private void writeSvcBeginBack() {
         if (svcInfo.getSvcBinderModel() != null && svcInfo.getSvcBinderModel().isReqCustom()) {
-            try {
-                svcLogHandler.writeBeginLog(buildSvcBeginBackModel());
-            } catch (Exception ignored) {
-
-            }
+            svcInfo.setWriteBegin(true);
+            svcLogHandler.writeBeginLog(buildSvcBeginBackModel());
         }
     }
 

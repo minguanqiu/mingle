@@ -82,7 +82,7 @@ public class SvcPreProcessFilter extends AbstractSvcFilter {
             }
         }
         if (svcInfo.getSvcBinderModel() != null) {
-            if (svcInfo.getSvcBinderModel().getSvc().log()) {
+            if (svcInfo.getSvcBinderModel().getSvc().log() && svcInfo.isWriteBegin()) {
                 svcLogHandler.writeEndLog(buildSvcEndModel());
             }
         }
