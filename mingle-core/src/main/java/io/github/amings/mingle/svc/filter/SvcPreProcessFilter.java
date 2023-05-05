@@ -118,7 +118,7 @@ public class SvcPreProcessFilter extends AbstractSvcFilter {
                 throw new IPAuthenticationFailException("IP Authentication Fail");
             }
         }
-        if (!svcBinderModel.isCustom()) {
+        if (!svcBinderModel.isReqCustom()) {
             ContentCachingRequestWrapper contentCachingRequestWrapper = new ContentCachingRequestWrapper(request);
             svcInfo.setHttpServletRequest(contentCachingRequestWrapper);
             processSvcRequest(contentCachingRequestWrapper, svcBinderModel.getSvc());

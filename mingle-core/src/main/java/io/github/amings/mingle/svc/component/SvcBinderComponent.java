@@ -111,6 +111,7 @@ public class SvcBinderComponent {
                     svcErrorMsgList.add("only allow one API entrance");
                 } else if (methods.size() == 1) {
                     svcBinderModel.setCustom(true);
+                    svcBinderModel.setReqCustom(true);
                     Method method = methods.get(0);
                     RequestMapping annotation = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping.class);
                     RequestMethod[] requestMethod = annotation.method();
@@ -234,7 +235,7 @@ public class SvcBinderComponent {
             if (v.getSvc().log()) {
                 svcLogPathList.add(v.getSvcPath());
             }
-            if (!v.isCustom()) {
+            if (!v.isReqCustom()) {
                 svcValidBeanPathList.add(v.getSvcPath());
             }
         });
@@ -277,9 +278,8 @@ public class SvcBinderComponent {
 
         private Svc svc;
 
-        private boolean custom;
+        private boolean custom; // method custom
 
-        @Getter(onMethod = @__(@Deprecated))
         private boolean reqCustom;
 
         private boolean resCustom;

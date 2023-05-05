@@ -21,7 +21,7 @@ public class SvcReqArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return SvcReqModel.class.isAssignableFrom(parameter.getParameterType()) && (svcInfo.getSvcBinderModel() != null && !svcInfo.getSvcBinderModel().isCustom());
+        return SvcReqModel.class.isAssignableFrom(parameter.getParameterType()) && (svcInfo.getSvcBinderModel() != null && !svcInfo.getSvcBinderModel().isReqCustom());
     }
 
     @Override

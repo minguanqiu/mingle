@@ -26,14 +26,14 @@ public class SvcRegisterComponent {
 
     @PostConstruct
     private void init() {
-        svcBinderComponent.getSvcBinderModelMap().forEach((k, v) -> {
+        svcBinderComponent.getSvcMap().forEach((k, v) -> {
             if(!v.isCustom()) {
                 requestMappingHandlerMapping
                         .registerMapping(RequestMappingInfo.paths(v.getSvcPath())
                                 .methods(RequestMethod.POST)
                                 .consumes(MediaType.APPLICATION_JSON_VALUE)
                                 .produces(MediaType.APPLICATION_JSON_VALUE)
-                                .options(requestMappingHandlerMapping.getBuilderConfiguration()).build(), context.getBeanNamesForType(k)[0], v.getSvcMethod());
+                                .options(requestMappingHandlerMapping.getBuilderConfiguration()).build(), context.getBeanNamesForType(v.getSvcClass())[0], v.getSvcMethod());
             }
         });
     }
