@@ -40,15 +40,17 @@ public class JwtAuthenticationFilter extends AbstractSvcFilter {
             throw new JwtHeaderMissingException("JWT header missing");
         }
         Optional<String> jweOptional = sessionUtils.decryptionJWEToken(jweHeader.replace("Bearer ", ""));
-        if (!jweOptional.isPresent()) {
+        if (jweOptional.isEmpty()) {
             throw new JwtDecryptionFailException("JWT decryption fail");
         }
         String jwe = jweOptional.get();
         Optional<SessionInfo> sessionInfoOptional = jacksonUtils.readValue(jwe, SessionInfo.class);
-        if (!sessionInfoOptional.isPresent()) {
+        if (sessionInfoOptional.isEmpty()) {
             throw new SessionInfoDeserializeFailException("SessionInfo deserialize fail");
         }
-        SecurityContextHolder.getContext().setAuthentication(new SessionAuthentication(null, sessionInfoOptional.get()));
+        SessionAuthentication sessionAuthentication = new SessionAuthentication(null, sessionInfoOptional.get());
+        sessionAuthentication.setAuthenticated(true);
+        SecurityContextHolder.getContext().setAuthentication(sessionAuthentication);
         filterChain.doFilter(request, response);
     }
 }
