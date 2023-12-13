@@ -1,9 +1,8 @@
 package io.github.amings.mingle.svc.data.dao;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.data.repository.Repository;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 /**
  * Base class for all dao logic class

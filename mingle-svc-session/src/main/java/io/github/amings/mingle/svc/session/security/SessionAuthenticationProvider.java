@@ -9,6 +9,7 @@ import io.github.amings.mingle.svc.session.exception.SessionKickException;
 import io.github.amings.mingle.svc.session.exception.SessionNotFoundException;
 import io.github.amings.mingle.svc.session.exception.SessionTypeIncorrectException;
 import io.github.amings.mingle.svc.session.security.model.SessionInfo;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
@@ -16,7 +17,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.util.Optional;
 

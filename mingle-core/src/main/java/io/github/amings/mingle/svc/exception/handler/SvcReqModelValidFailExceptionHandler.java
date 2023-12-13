@@ -6,11 +6,11 @@ import io.github.amings.mingle.svc.exception.handler.abs.AbstractExceptionHandle
 import io.github.amings.mingle.svc.exception.handler.model.ConstraintViolationModel;
 import io.github.amings.mingle.svc.handler.SvcResModelHandler;
 import io.github.amings.mingle.svc.utils.SvcCodeFiled;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Path;
 import org.springframework.http.ResponseEntity;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Path;
 import java.util.ArrayList;
 
 /**

@@ -2,11 +2,10 @@ package io.github.amings.mingle.svc.action.rest.handler.impl;
 
 import io.github.amings.mingle.svc.action.rest.component.RestClientComponent;
 import io.github.amings.mingle.svc.action.rest.handler.RestClientHandler;
+import jakarta.annotation.PostConstruct;
 import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-
-import javax.annotation.PostConstruct;
 
 /**
  * @author Ming

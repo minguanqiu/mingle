@@ -8,6 +8,8 @@ import io.github.amings.mingle.svc.handler.SvcResModelHandler;
 import io.github.amings.mingle.svc.utils.SvcSuccessField;
 import io.github.amings.mingle.utils.DateUtils;
 import io.github.amings.mingle.utils.UUIDUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
@@ -15,8 +17,6 @@ import lombok.Setter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 
 /**

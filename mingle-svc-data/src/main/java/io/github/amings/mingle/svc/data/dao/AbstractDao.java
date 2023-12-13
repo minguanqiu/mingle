@@ -2,11 +2,10 @@ package io.github.amings.mingle.svc.data.dao;
 
 import com.google.common.reflect.TypeToken;
 import io.github.amings.mingle.svc.data.annotation.DaoService;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.repository.Repository;
-
-import javax.annotation.PostConstruct;
 
 /**
  * Base class for all database class

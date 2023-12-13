@@ -3,12 +3,12 @@ package io.github.amings.mingle.svc.session.component;
 import io.github.amings.mingle.svc.component.SvcBinderComponent;
 import io.github.amings.mingle.svc.session.annotation.Session;
 import io.github.amings.mingle.utils.UUIDUtils;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 
 /**

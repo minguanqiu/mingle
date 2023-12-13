@@ -1,8 +1,7 @@
 package io.github.amings.mingle.svc.exception;
 
+import jakarta.validation.ConstraintViolationException;
 import lombok.Getter;
-
-import javax.validation.ConstraintViolationException;
 
 /**
  * @author Ming

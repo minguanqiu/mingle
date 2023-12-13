@@ -7,6 +7,7 @@ import io.github.amings.mingle.svc.SvcResModel;
 import io.github.amings.mingle.svc.annotation.Svc;
 import io.github.amings.mingle.svc.exception.MingleRuntimeException;
 import io.github.amings.mingle.utils.UUIDUtils;
+import jakarta.annotation.PostConstruct;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.pattern.PathPattern;
 
-import javax.annotation.PostConstruct;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;

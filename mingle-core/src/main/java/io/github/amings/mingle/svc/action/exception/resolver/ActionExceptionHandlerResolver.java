@@ -3,10 +3,10 @@ package io.github.amings.mingle.svc.action.exception.resolver;
 import io.github.amings.mingle.svc.action.ActionExceptionModel;
 import io.github.amings.mingle.svc.action.annotation.ActionExceptionHandler;
 import io.github.amings.mingle.svc.action.exception.handler.abs.AbstractActionExceptionHandler;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

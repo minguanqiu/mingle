@@ -5,9 +5,9 @@ import io.github.amings.mingle.svc.annotation.MingleSvcMsg;
 import io.github.amings.mingle.svc.handler.SvcMsgHandler;
 import io.github.amings.mingle.svc.handler.SvcMsgListHandler;
 import io.github.amings.mingle.utils.StringUtils;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

@@ -1,8 +1,7 @@
 package io.github.amings.mingle.svc.handler.impl;
 
 import io.github.amings.mingle.svc.handler.IPHandler;
-
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * {@link IPHandler} impl

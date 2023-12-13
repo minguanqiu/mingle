@@ -1,9 +1,9 @@
 package io.github.amings.mingle.svc.action.rest.component;
 
+import jakarta.annotation.PostConstruct;
 import okhttp3.OkHttpClient;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.X509TrustManager;
 import java.security.KeyManagementException;

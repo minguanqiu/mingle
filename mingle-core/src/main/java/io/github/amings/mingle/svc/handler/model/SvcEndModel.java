@@ -1,8 +1,8 @@
 package io.github.amings.mingle.svc.handler.model;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
 
-import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 
 /**
