@@ -5,7 +5,6 @@ import io.github.amings.mingle.svc.SvcReqModel;
 import io.github.amings.mingle.svc.component.SvcBinderComponent;
 import io.github.amings.mingle.svc.exception.SvcReqModelValidFailException;
 import io.github.amings.mingle.svc.handler.SvcResModelHandler;
-import io.github.amings.mingle.svc.utils.SvcSuccessField;
 import io.github.amings.mingle.utils.DateUtils;
 import io.github.amings.mingle.utils.UUIDUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -45,10 +44,6 @@ public class SvcInfo {
     @Setter(AccessLevel.PACKAGE)
     private SvcBinderComponent.SvcBinderModel svcBinderModel;
 
-    @Deprecated
-    @Setter(AccessLevel.PRIVATE)
-    private String svcUuid;
-
     @Setter(AccessLevel.PACKAGE)
     private String svcName;
 
@@ -58,9 +53,9 @@ public class SvcInfo {
     @Setter(AccessLevel.PACKAGE)
     private JsonNode payLoadNode;
 
-    private String code = SvcSuccessField.getSuccessCode();
+    private String code;
 
-    private String desc = SvcSuccessField.getSuccessDesc();
+    private String desc;
 
     @Setter(AccessLevel.PACKAGE)
     private String ip;

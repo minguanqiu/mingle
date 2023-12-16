@@ -7,8 +7,6 @@ import io.github.amings.mingle.svc.handler.model.ActionEndModel;
 import io.github.amings.mingle.utils.DateUtils;
 import io.github.amings.mingle.utils.JacksonUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.time.LocalDateTime;
 
@@ -21,9 +19,11 @@ import java.time.LocalDateTime;
 @Slf4j
 public class ActionLogHandlerDefaultImpl implements ActionLogHandler {
 
-    @Autowired
-    @Qualifier("actionLogJacksonUtils")
-    private JacksonUtils jacksonUtils;
+    private final JacksonUtils jacksonUtils;
+
+    public ActionLogHandlerDefaultImpl(JacksonUtils jacksonUtils) {
+        this.jacksonUtils = jacksonUtils;
+    }
 
     @Override
     public void writeBeginLog(ActionBeginModel model) {

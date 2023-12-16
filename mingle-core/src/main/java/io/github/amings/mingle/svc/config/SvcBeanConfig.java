@@ -1,23 +1,17 @@
 package io.github.amings.mingle.svc.config;
 
 import io.github.amings.mingle.svc.aspect.ActionLogAspect;
-import io.github.amings.mingle.svc.handler.ActionLogHandler;
-import io.github.amings.mingle.svc.handler.IPHandler;
-import io.github.amings.mingle.svc.handler.PayLoadDecryptionHandler;
-import io.github.amings.mingle.svc.handler.SvcLogHandler;
-import io.github.amings.mingle.svc.handler.SvcMsgHandler;
-import io.github.amings.mingle.svc.handler.SvcResModelHandler;
-import io.github.amings.mingle.svc.handler.impl.ActionLogHandlerDefaultImpl;
-import io.github.amings.mingle.svc.handler.impl.IPHandlerDefaultImpl;
-import io.github.amings.mingle.svc.handler.impl.PayLoadDecryptionHandlerDefaultImpl;
-import io.github.amings.mingle.svc.handler.impl.SvcLogHandlerDefaultImpl;
-import io.github.amings.mingle.svc.handler.impl.SvcMsgHandlerDefaultImpl;
-import io.github.amings.mingle.svc.handler.impl.SvcResModelDefaultImpl;
+import io.github.amings.mingle.svc.handler.*;
+import io.github.amings.mingle.svc.handler.impl.*;
+import io.github.amings.mingle.utils.JacksonUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+
+import java.util.List;
 
 /**
  * bean configuration bundle
@@ -48,8 +42,8 @@ public class SvcBeanConfig {
      */
     @Bean
     @ConditionalOnMissingBean
-    public ActionLogHandler actionLogHandler() {
-        return new ActionLogHandlerDefaultImpl();
+    public ActionLogHandler actionLogHandler(@Qualifier("actionLogJacksonUtils")JacksonUtils jacksonUtils) {
+        return new ActionLogHandlerDefaultImpl(jacksonUtils);
     }
 
     /**
@@ -86,8 +80,8 @@ public class SvcBeanConfig {
      */
     @Bean
     @Primary
-    public SvcMsgHandler svcMsgHandler() {
-        return new SvcMsgHandlerDefaultImpl();
+    public SvcMsgHandler svcMsgHandler(List<SvcMsgListHandler> svcMsgListHandlers) {
+        return new SvcMsgHandlerDefaultImpl(svcMsgListHandlers);
     }
 
     /**

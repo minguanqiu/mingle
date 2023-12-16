@@ -3,10 +3,8 @@ package io.github.amings.mingle.svc.config;
 import io.github.amings.mingle.svc.SvcReqArgumentResolver;
 import io.github.amings.mingle.svc.SvcResArgumentResolver;
 import io.github.amings.mingle.svc.SvcReturnValueResolver;
-import io.github.amings.mingle.svc.component.SvcBinderComponent;
 import io.github.amings.mingle.svc.json.converter.JacksonMessageConverter;
 import io.github.amings.mingle.utils.JacksonUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -26,16 +24,10 @@ import java.util.List;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-//    @Value("${mingle.svc.path:/svc}")
-    private String svcPath;
-    @Autowired
-    private SvcBinderComponent svcBinderComponent;
-    @Autowired
-    private JacksonUtils jacksonUtils;
+    private final JacksonUtils jacksonUtils;
 
-    @Deprecated
-    public String getSvcPath() {
-        return svcPath;
+    public WebConfig(JacksonUtils jacksonUtils) {
+        this.jacksonUtils = jacksonUtils;
     }
 
     @Override

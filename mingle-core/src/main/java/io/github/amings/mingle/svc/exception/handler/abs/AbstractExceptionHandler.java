@@ -1,13 +1,11 @@
 package io.github.amings.mingle.svc.exception.handler.abs;
 
-import com.google.common.reflect.TypeToken;
 import io.github.amings.mingle.svc.SvcResModel;
+import io.github.amings.mingle.svc.config.properties.SvcProperties;
 import io.github.amings.mingle.svc.filter.SvcInfo;
 import io.github.amings.mingle.svc.handler.SvcMsgHandler;
 import io.github.amings.mingle.svc.handler.SvcResModelHandler;
 import io.github.amings.mingle.svc.utils.SvcResUtils;
-import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
 /**
@@ -18,17 +16,17 @@ import org.springframework.http.ResponseEntity;
 
 public abstract class AbstractExceptionHandler<E extends Exception> {
 
-    @Autowired
-    public SvcInfo svcInfo;
-    @Autowired
-    public SvcResUtils svcResUtils;
-    @Autowired
-    public SvcMsgHandler svcMsgHandler;
-    @Getter
-    private final Class<E> eClass;
-    @SuppressWarnings("unchecked")
-    public AbstractExceptionHandler() {
-        eClass = (Class<E>) new TypeToken<E>(getClass()) {}.getRawType();
+    protected final SvcInfo svcInfo;
+    protected final SvcResUtils svcResUtils;
+    protected final SvcMsgHandler svcMsgHandler;
+    protected final SvcProperties svcProperties;
+
+
+    public AbstractExceptionHandler(SvcInfo svcInfo, SvcResUtils svcResUtils, SvcMsgHandler svcMsgHandler, SvcProperties svcProperties) {
+        this.svcInfo = svcInfo;
+        this.svcResUtils = svcResUtils;
+        this.svcMsgHandler = svcMsgHandler;
+        this.svcProperties = svcProperties;
     }
 
     /**
@@ -44,7 +42,7 @@ public abstract class AbstractExceptionHandler<E extends Exception> {
      * @return ResponseEntity
      */
     protected ResponseEntity<SvcResModelHandler> build(String code) {
-        return build(code, svcMsgHandler.getMsg(code));
+        return build(code, svcMsgHandler.getMsg(svcProperties.getMsgType(), code));
     }
 
     /**

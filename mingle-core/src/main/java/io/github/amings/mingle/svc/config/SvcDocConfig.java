@@ -22,7 +22,6 @@ import jakarta.annotation.PostConstruct;
 import org.springdoc.api.AbstractOpenApiResource;
 import org.springdoc.core.GroupedOpenApi;
 import org.springdoc.core.customizers.OpenApiCustomiser;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,12 +40,15 @@ import java.util.Map;
 @Configuration
 public class SvcDocConfig {
 
-    @Autowired
-    private SvcBinderComponent svcBinderComponent;
-    @Autowired
-    private SvcResModelHandler svcResModelHandler;
+    private final SvcBinderComponent svcBinderComponent;
+    private final SvcResModelHandler svcResModelHandler;
     @Value("${mingle.svc.openapi.useFqn:false}")
     public boolean useFqn;
+
+    public SvcDocConfig(SvcBinderComponent svcBinderComponent, SvcResModelHandler svcResModelHandler) {
+        this.svcBinderComponent = svcBinderComponent;
+        this.svcResModelHandler = svcResModelHandler;
+    }
 
     @Bean
     public GroupedOpenApi svcGroup() {
@@ -63,7 +65,7 @@ public class SvcDocConfig {
             if (useFqn) {
                 buildConverter(instance);
             }
-            svcBinderComponent.getSvcMap().forEach((k, v) -> {
+            svcBinderComponent.getSvcBinderModelMap().forEach((k, v) -> {
                 PathItem pathItem = openApi.getPaths().get(v.getSvcPath());
                 if (pathItem != null) {
                     Operation operation = null;
@@ -166,7 +168,7 @@ public class SvcDocConfig {
     @PostConstruct
     private void init() {
         ArrayList<Class<?>> classes = new ArrayList<>();
-        svcBinderComponent.getSvcMap().forEach((k, v) -> {
+        svcBinderComponent.getSvcBinderModelMap().forEach((k, v) -> {
             classes.add(v.getSvcClass());
         });
         AbstractOpenApiResource.addRestControllers(classes.toArray(new Class[0]));

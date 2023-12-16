@@ -1,11 +1,19 @@
 package io.github.amings.mingle.svc.config;
 
-import io.github.amings.mingle.svc.component.PropertyComponent;
 import io.github.amings.mingle.svc.component.SvcBinderComponent;
+import io.github.amings.mingle.svc.config.properties.SvcProperties;
+import io.github.amings.mingle.svc.exception.handler.resolver.ExceptionHandlerResolver;
+import io.github.amings.mingle.svc.filter.SvcInfo;
 import io.github.amings.mingle.svc.filter.SvcLogFilter;
 import io.github.amings.mingle.svc.filter.SvcPreProcessFilter;
 import io.github.amings.mingle.svc.filter.SvcReqModelVerifyFilter;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.github.amings.mingle.svc.handler.IPHandler;
+import io.github.amings.mingle.svc.handler.PayLoadDecryptionHandler;
+import io.github.amings.mingle.svc.handler.SvcLogHandler;
+import io.github.amings.mingle.svc.handler.SvcMsgHandler;
+import io.github.amings.mingle.utils.JacksonUtils;
+import jakarta.validation.Validator;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,10 +27,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class FilterConfig {
 
-    @Autowired
-    PropertyComponent propertyComponent;
-    @Autowired
-    SvcBinderComponent svcBinderComponent;
+    private final SvcBinderComponent svcBinderComponent;
+
+    public FilterConfig(SvcBinderComponent svcBinderComponent) {
+        this.svcBinderComponent = svcBinderComponent;
+    }
 
     /**
      * Svc preProcess filter bean
@@ -31,11 +40,11 @@ public class FilterConfig {
      * @see SvcPreProcessFilter
      */
     @Bean
-    public FilterRegistrationBean<SvcPreProcessFilter> svcFilterRegistration() {
+    public FilterRegistrationBean<SvcPreProcessFilter> svcFilterRegistration(SvcPreProcessFilter svcPreProcessFilter) {
         FilterRegistrationBean<SvcPreProcessFilter> registration = new FilterRegistrationBean<>();
-        registration.setFilter(svcPreProcessFilter());
+        registration.setFilter(svcPreProcessFilter);
         registration.setName("svcPreProcessFilter");
-        registration.addUrlPatterns(svcBinderComponent.getSvcPathList().toArray(new String[0]));
+        registration.addUrlPatterns(svcBinderComponent.findSvcPath(svcBinderModel -> true));
         registration.setOrder(0);
         return registration;
     }
@@ -47,11 +56,16 @@ public class FilterConfig {
      * @see SvcReqModelVerifyFilter
      */
     @Bean
-    public FilterRegistrationBean<SvcReqModelVerifyFilter> beanValidFilterRegistration() {
+    public FilterRegistrationBean<SvcReqModelVerifyFilter> beanValidFilterRegistration(SvcReqModelVerifyFilter svcReqModelVerifyFilter) {
         FilterRegistrationBean<SvcReqModelVerifyFilter> registration = new FilterRegistrationBean<>();
-        registration.setFilter(svcReqModelValidFilter());
+        registration.setFilter(svcReqModelVerifyFilter);
         registration.setName("svcReqModelValidFilter");
-        registration.addUrlPatterns(svcBinderComponent.getSvcValidBeanPathList().toArray(new String[0]));
+        String[] svcPath = svcBinderComponent.findSvcPath(svcBinderModel -> !svcBinderModel.isReqCustom());
+        if (svcPath.length == 0) {
+            registration.setEnabled(false);
+        } else {
+            registration.addUrlPatterns(svcPath);
+        }
         registration.setOrder(10);
         return registration;
     }
@@ -63,28 +77,33 @@ public class FilterConfig {
      * @see SvcLogFilter
      */
     @Bean
-    public FilterRegistrationBean<SvcLogFilter> svcLogFilterRegistration() {
+    public FilterRegistrationBean<SvcLogFilter> svcLogFilterRegistration(SvcLogFilter svcLogFilter) {
         FilterRegistrationBean<SvcLogFilter> registration = new FilterRegistrationBean<>();
-        registration.setFilter(svcLogFilter());
+        registration.setFilter(svcLogFilter);
         registration.setName("svcLogFilter");
-        registration.addUrlPatterns(svcBinderComponent.getSvcLogPathList().toArray(new String[0]));
+        String[] svcPath = svcBinderComponent.findSvcPath(svcBinderModel -> svcBinderModel.getSvc().log());
+        if (svcPath.length == 0) {
+            registration.setEnabled(false);
+        } else {
+            registration.addUrlPatterns(svcPath);
+        }
         registration.setOrder(15);
         return registration;
     }
 
     @Bean
-    public SvcPreProcessFilter svcPreProcessFilter() {
-        return new SvcPreProcessFilter();
+    public SvcPreProcessFilter svcPreProcessFilter(SvcInfo svcInfo, SvcMsgHandler svcMsgHandler, SvcProperties svcProperties, PayLoadDecryptionHandler payLoadDecryptionHandler, SvcLogHandler svcLogHandler, ExceptionHandlerResolver exceptionHandlerResolver, IPHandler ipHandler, SvcBinderComponent svcBinderComponent, JacksonUtils jacksonUtils) {
+        return new SvcPreProcessFilter(svcInfo, svcMsgHandler, svcProperties, payLoadDecryptionHandler, svcLogHandler, exceptionHandlerResolver, ipHandler, svcBinderComponent, jacksonUtils);
     }
 
     @Bean
-    public SvcLogFilter svcLogFilter() {
-        return new SvcLogFilter();
+    public SvcLogFilter svcLogFilter(SvcInfo svcInfo, SvcMsgHandler svcMsgHandler, SvcProperties svcProperties, SvcLogHandler svcLogHandler, @Qualifier("svcLogJacksonUtils") JacksonUtils jacksonUtils) {
+        return new SvcLogFilter(svcInfo, svcMsgHandler, svcProperties, svcLogHandler, jacksonUtils);
     }
 
     @Bean
-    public SvcReqModelVerifyFilter svcReqModelValidFilter() {
-        return new SvcReqModelVerifyFilter();
+    public SvcReqModelVerifyFilter svcReqModelValidFilter(SvcInfo svcInfo, SvcMsgHandler svcMsgHandler, SvcProperties svcProperties, Validator validator, JacksonUtils jacksonUtils) {
+        return new SvcReqModelVerifyFilter(svcInfo, svcMsgHandler, svcProperties, validator, jacksonUtils);
     }
 
 }
