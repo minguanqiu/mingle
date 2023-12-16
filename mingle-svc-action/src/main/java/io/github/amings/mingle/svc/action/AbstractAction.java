@@ -2,9 +2,9 @@ package io.github.amings.mingle.svc.action;
 
 import com.google.common.reflect.TypeToken;
 import io.github.amings.mingle.svc.action.annotation.AutoBreak;
+import io.github.amings.mingle.svc.action.exception.ActionAutoBreakException;
 import io.github.amings.mingle.svc.action.exception.BreakActionLogicException;
 import io.github.amings.mingle.svc.action.exception.resolver.ActionExceptionHandlerResolver;
-import io.github.amings.mingle.svc.exception.ActionAutoBreakException;
 import io.github.amings.mingle.utils.ReflectionUtils;
 import lombok.AccessLevel;
 import lombok.Getter;

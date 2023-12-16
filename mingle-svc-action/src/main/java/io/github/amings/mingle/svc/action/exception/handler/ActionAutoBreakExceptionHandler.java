@@ -1,10 +1,10 @@
-package io.github.amings.mingle.svc.exception.handler;
+package io.github.amings.mingle.svc.action.exception.handler;
 
 import io.github.amings.mingle.svc.action.ActionResData;
 import io.github.amings.mingle.svc.action.ActionResModel;
+import io.github.amings.mingle.svc.action.exception.ActionAutoBreakException;
 import io.github.amings.mingle.svc.annotation.ExceptionHandler;
 import io.github.amings.mingle.svc.config.properties.SvcProperties;
-import io.github.amings.mingle.svc.exception.ActionAutoBreakException;
 import io.github.amings.mingle.svc.exception.handler.abs.AbstractExceptionHandler;
 import io.github.amings.mingle.svc.filter.SvcInfo;
 import io.github.amings.mingle.svc.handler.SvcMsgHandler;

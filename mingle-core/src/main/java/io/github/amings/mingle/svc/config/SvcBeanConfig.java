@@ -1,12 +1,10 @@
 package io.github.amings.mingle.svc.config;
 
-import io.github.amings.mingle.svc.aspect.ActionLogAspect;
 import io.github.amings.mingle.svc.handler.*;
 import io.github.amings.mingle.svc.handler.impl.*;
 import io.github.amings.mingle.utils.JacksonUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -42,7 +40,7 @@ public class SvcBeanConfig {
      */
     @Bean
     @ConditionalOnMissingBean
-    public ActionLogHandler actionLogHandler(@Qualifier("actionLogJacksonUtils")JacksonUtils jacksonUtils) {
+    public ActionLogHandler actionLogHandler(@Qualifier("actionLogJacksonUtils") JacksonUtils jacksonUtils) {
         return new ActionLogHandlerDefaultImpl(jacksonUtils);
     }
 
@@ -82,16 +80,6 @@ public class SvcBeanConfig {
     @Primary
     public SvcMsgHandler svcMsgHandler(List<SvcMsgListHandler> svcMsgListHandlers) {
         return new SvcMsgHandlerDefaultImpl(svcMsgListHandlers);
-    }
-
-    /**
-     * @return ActionLogAspect
-     * action logging aspect bean
-     */
-    @Bean
-    @ConditionalOnProperty(prefix = "mingle.svc.action", name = "logging", havingValue = "enable")
-    public ActionLogAspect actionLogAspect() {
-        return new ActionLogAspect();
     }
 
     /**

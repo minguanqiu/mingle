@@ -1,4 +1,4 @@
-package io.github.amings.mingle.svc.exception;
+package io.github.amings.mingle.svc.action.exception;
 
 import io.github.amings.mingle.svc.action.ActionResData;
 import io.github.amings.mingle.svc.action.ActionResModel;
