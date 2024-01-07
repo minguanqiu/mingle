@@ -20,8 +20,8 @@ import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import jakarta.annotation.PostConstruct;
 import org.springdoc.api.AbstractOpenApiResource;
-import org.springdoc.core.GroupedOpenApi;
-import org.springdoc.core.customizers.OpenApiCustomiser;
+import org.springdoc.core.customizers.OpenApiCustomizer;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -54,12 +54,12 @@ public class SvcDocConfig {
     public GroupedOpenApi svcGroup() {
         return GroupedOpenApi.builder()
                 .group("Service")
-                .addOpenApiCustomiser(svcOpenApiCustomiser())
+                .addOpenApiCustomizer(svcOpenApiCustomizer())
                 .build();
     }
 
     @Bean
-    public OpenApiCustomiser svcOpenApiCustomiser() {
+    public OpenApiCustomizer svcOpenApiCustomizer() {
         return openApi -> {
             ModelConverters instance = ModelConverters.getInstance();
             if (useFqn) {
