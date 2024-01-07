@@ -80,7 +80,7 @@ public class ReflectionUtils {
             if (parameterizedType.getRawType().equals(target)) {
                 return genericSuperclass;
             } else {
-                genericSuperclass = parameterizedType.getRawType();
+                genericSuperclass = findGenericSuperclass((Class<?>) parameterizedType.getRawType(),target);
             }
         } else {
             if (!genericSuperclass.equals(target)) {
