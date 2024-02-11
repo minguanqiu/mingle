@@ -69,7 +69,7 @@ public class JacksonUtils {
     }
 
     public Optional<JsonNode> readTree(String value) {
-        if(value == null || !isJson(value)){
+        if(!isJson(value)){
             return Optional.empty();
         }
         try {
@@ -81,6 +81,9 @@ public class JacksonUtils {
     }
 
     public boolean isJson(String str) {
+        if(str == null || str.isEmpty()) {
+            return false;
+        }
         try {
             defaultObjectMapper.readTree(str);
         } catch (JsonProcessingException e) {
