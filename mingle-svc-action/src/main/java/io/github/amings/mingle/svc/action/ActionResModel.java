@@ -9,4 +9,5 @@ package io.github.amings.mingle.svc.action;
 
 public class ActionResModel {
 
+
 }

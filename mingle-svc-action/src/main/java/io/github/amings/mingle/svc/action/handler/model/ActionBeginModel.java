@@ -1,4 +1,4 @@
-package io.github.amings.mingle.svc.handler.model;
+package io.github.amings.mingle.svc.action.handler.model;
 
 import lombok.Data;
 
@@ -13,16 +13,10 @@ import java.time.LocalDateTime;
 @Data
 public class ActionBeginModel {
 
-    private String svcUuid;
+    private String svcSerialNum;
 
-    private String uuid;
-
-    private String name;
+    private String actSerialNum;
 
     private LocalDateTime startDateTime;
-
-    private String requestBody;
-
-    private String type;
 
 }

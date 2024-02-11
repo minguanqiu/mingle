@@ -2,6 +2,7 @@ package io.github.amings.mingle.svc.action.exception;
 
 import io.github.amings.mingle.svc.action.ActionResData;
 import io.github.amings.mingle.svc.action.ActionResModel;
+import io.github.amings.mingle.svc.action.ActionResponse;
 import lombok.Getter;
 
 /**
@@ -10,13 +11,13 @@ import lombok.Getter;
  * @author Ming
  */
 
+@Getter
 public class ActionAutoBreakException extends RuntimeException {
 
-    @Getter
-    private final ActionResData<? extends ActionResModel> actionResData;
+    private final ActionResponse<? extends ActionResData, ? extends ActionResModel> actionResponse;
 
-    public ActionAutoBreakException(ActionResData<? extends ActionResModel> actionResData) {
-        this.actionResData = actionResData;
+    public ActionAutoBreakException(ActionResponse<? extends ActionResData, ? extends ActionResModel> actionResponse) {
+        this.actionResponse = actionResponse;
     }
 
 }

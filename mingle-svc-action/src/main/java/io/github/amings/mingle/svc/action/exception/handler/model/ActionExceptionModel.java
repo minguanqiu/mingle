@@ -1,4 +1,4 @@
-package io.github.amings.mingle.svc.action;
+package io.github.amings.mingle.svc.action.exception.handler.model;
 
 import lombok.Data;
 

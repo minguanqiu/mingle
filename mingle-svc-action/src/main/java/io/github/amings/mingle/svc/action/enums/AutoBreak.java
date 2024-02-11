@@ -1,4 +1,4 @@
-package io.github.amings.mingle.svc.action.annotation;
+package io.github.amings.mingle.svc.action.enums;
 
 /**
  * @author Ming

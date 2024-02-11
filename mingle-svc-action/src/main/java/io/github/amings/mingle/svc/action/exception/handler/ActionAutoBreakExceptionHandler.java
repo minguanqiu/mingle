@@ -1,9 +1,7 @@
 package io.github.amings.mingle.svc.action.exception.handler;
 
-import io.github.amings.mingle.svc.action.ActionResData;
-import io.github.amings.mingle.svc.action.ActionResModel;
+import io.github.amings.mingle.svc.action.ActionResponse;
 import io.github.amings.mingle.svc.action.exception.ActionAutoBreakException;
-import io.github.amings.mingle.svc.annotation.ExceptionHandler;
 import io.github.amings.mingle.svc.config.properties.SvcProperties;
 import io.github.amings.mingle.svc.exception.handler.abs.AbstractExceptionHandler;
 import io.github.amings.mingle.svc.filter.SvcInfo;
@@ -18,7 +16,6 @@ import org.springframework.http.ResponseEntity;
  * @author Ming
  */
 
-@ExceptionHandler
 public class ActionAutoBreakExceptionHandler extends AbstractExceptionHandler<ActionAutoBreakException> {
 
     public ActionAutoBreakExceptionHandler(SvcInfo svcInfo, SvcResUtils svcResUtils, SvcMsgHandler svcMsgHandler, SvcProperties svcProperties) {
@@ -27,8 +24,8 @@ public class ActionAutoBreakExceptionHandler extends AbstractExceptionHandler<Ac
 
     @Override
     public ResponseEntity<SvcResModelHandler> handle(ActionAutoBreakException e) {
-        ActionResData<? extends ActionResModel> actionResData = e.getActionResData();
-        return build(actionResData.getCode(), svcMsgHandler.getMsg(actionResData.getMsgType(), actionResData.getCode()));
+        ActionResponse<?, ?> actionResponse = e.getActionResponse();
+        return build(actionResponse.getCode(), svcMsgHandler.getMsg(actionResponse.getMsgType(), actionResponse.getCode()));
     }
 
 }
