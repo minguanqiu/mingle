@@ -49,7 +49,7 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <com.google.guava.version>31.1-jre</com.google.guava.version>
+        <com.google.guava.version>33.0.0-jre</com.google.guava.version>
     </properties>
     <modules>
         <module>mingle-core</module>
