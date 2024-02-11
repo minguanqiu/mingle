@@ -6,9 +6,9 @@ import lombok.Getter;
  * @author Ming
  */
 
+@Getter
 public class HttpCodeErrorException extends RuntimeException {
 
-    @Getter
     private final int code;
 
     public HttpCodeErrorException(int code, String message) {

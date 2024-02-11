@@ -1,11 +1,10 @@
 package io.github.amings.mingle.svc.action.rest.handler.impl;
 
-import io.github.amings.mingle.svc.action.rest.component.RestClientComponent;
+import io.github.amings.mingle.svc.action.rest.configuration.properties.RestClientProperties;
 import io.github.amings.mingle.svc.action.rest.handler.RestClientHandler;
-import jakarta.annotation.PostConstruct;
 import okhttp3.OkHttpClient;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Ming
@@ -13,27 +12,18 @@ import org.springframework.beans.factory.annotation.Value;
 
 public class RestClientDefaultHandler implements RestClientHandler {
 
-    @Autowired
-    RestClientComponent restClientComponent;
+    private final OkHttpClient okHttpClient;
 
-    @Value("${mingle.svc.action.rest.client.connectTimeOut:3000}")
-    private int connectTimeOut;
-
-    @Value("${mingle.svc.action.rest.client.readTimeOut:70000}")
-    private int readTimeOut;
-
-    @Value("${mingle.svc.action.rest.client.ignoreSSL:false}")
-    private boolean ignoreSSL;
-    private OkHttpClient okHttpClient;
+    public RestClientDefaultHandler(RestClientProperties restClientProperties) {
+        OkHttpClient.Builder builder = new OkHttpClient().newBuilder();
+        builder.connectTimeout(restClientProperties.getConnectTimeOut(), TimeUnit.MILLISECONDS)
+                .readTimeout(restClientProperties.getReadTimeOut(),TimeUnit.MILLISECONDS);
+        this.okHttpClient = builder.build();
+    }
 
     @Override
     public OkHttpClient getClient() {
         return okHttpClient;
-    }
-
-    @PostConstruct
-    private void init() {
-        okHttpClient = restClientComponent.buildClient(connectTimeOut, readTimeOut, ignoreSSL).build();
     }
 
 }

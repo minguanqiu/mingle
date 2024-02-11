@@ -1,34 +1,20 @@
 package io.github.amings.mingle.svc.action.rest;
 
 import io.github.amings.mingle.svc.action.ActionResData;
-import io.github.amings.mingle.svc.action.ActionResModel;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
 import java.util.Map;
-
-/**
- * @author Ming
- */
-
 @Getter
 @Setter(AccessLevel.PACKAGE)
-public class RestActionResData<Res extends ActionResModel> extends ActionResData<Res> {
+public class RestActionResData extends ActionResData {
 
     private String uri;
 
-    private int httpCode;
+    private String httpCode;
 
     private Map<String, List<String>> responseHeaderValue;
-
-    protected void setCode(String code) {
-        super.setCode(code);
-    }
-
-    protected void setDesc(String desc) {
-        super.setDesc(desc);
-    }
 
 }
