@@ -1,7 +1,6 @@
 package io.github.amings.mingle.svc;
 
-import io.github.amings.mingle.svc.action.ActionResData;
-import io.github.amings.mingle.svc.configuration.properties.SvcProperties;
+import io.github.amings.mingle.svc.config.properties.SvcProperties;
 import io.github.amings.mingle.svc.exception.BreakSvcProcessException;
 import io.github.amings.mingle.svc.filter.SvcInfo;
 import io.github.amings.mingle.svc.handler.SvcMsgHandler;
@@ -44,14 +43,6 @@ public abstract class AbstractSvcLogic<Req extends SvcReqModel, Res extends SvcR
      **/
     protected void breakSvcLogic(String code, Map<String, String> values) throws BreakSvcProcessException {
         breakSvcLogic(code, svcMsgHandler.getMsg(svcProperties.getMsgType(), code, values));
-    }
-
-    /**
-     * @param actionResData Action response data
-     *                      interrupt Svc Logic by throw exception
-     **/
-    protected void breakSvcLogic(ActionResData<?> actionResData) throws BreakSvcProcessException {
-        breakSvcLogic(actionResData.getCode(), svcMsgHandler.getMsg(actionResData.getMsgType(), actionResData.getCode()));
     }
 
     /**
@@ -101,14 +92,6 @@ public abstract class AbstractSvcLogic<Req extends SvcReqModel, Res extends SvcR
         return returnSvcLogic(code, svcMsgHandler.getMsg(svcProperties.getMsgType(), code, values), null);
     }
 
-    /**
-     * @param actionResData Action response data
-     * @return Res Svc response model
-     * interrupt Svc Logic by return
-     **/
-    protected Res returnSvcLogic(ActionResData<?> actionResData) {
-        return returnSvcLogic(actionResData.getCode(), actionResData.getDesc(), null);
-    }
 
     /**
      * @param code response code

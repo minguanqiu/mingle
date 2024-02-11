@@ -40,7 +40,7 @@ public class SvcBeanConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean
-    public ActionLogHandler actionLogHandler(@Qualifier("actionLogJacksonUtils")JacksonUtils jacksonUtils) {
+    public ActionLogHandler actionLogHandler(@Qualifier("actionLogJacksonUtils") JacksonUtils jacksonUtils) {
         return new ActionLogHandlerDefaultImpl(jacksonUtils);
     }
 
