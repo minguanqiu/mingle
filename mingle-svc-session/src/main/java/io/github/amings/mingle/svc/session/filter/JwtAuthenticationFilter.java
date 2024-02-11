@@ -1,6 +1,6 @@
 package io.github.amings.mingle.svc.session.filter;
 
-import io.github.amings.mingle.svc.config.properties.SvcProperties;
+import io.github.amings.mingle.svc.configuration.properties.SvcProperties;
 import io.github.amings.mingle.svc.filter.AbstractSvcFilter;
 import io.github.amings.mingle.svc.filter.SvcInfo;
 import io.github.amings.mingle.svc.handler.SvcMsgHandler;

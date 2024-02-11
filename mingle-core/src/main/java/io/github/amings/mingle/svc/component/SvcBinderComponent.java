@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.amings.mingle.svc.AbstractSvcLogic;
 import io.github.amings.mingle.svc.annotation.Svc;
-import io.github.amings.mingle.svc.config.properties.SvcProperties;
+import io.github.amings.mingle.svc.configuration.properties.SvcProperties;
 import io.github.amings.mingle.svc.exception.MingleRuntimeException;
 import io.github.amings.mingle.utils.ReflectionUtils;
 import jakarta.annotation.PostConstruct;

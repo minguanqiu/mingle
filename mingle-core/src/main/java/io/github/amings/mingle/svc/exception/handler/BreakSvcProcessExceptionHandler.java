@@ -2,7 +2,7 @@ package io.github.amings.mingle.svc.exception.handler;
 
 import io.github.amings.mingle.svc.AbstractSvcLogic;
 import io.github.amings.mingle.svc.annotation.ExceptionHandler;
-import io.github.amings.mingle.svc.config.properties.SvcProperties;
+import io.github.amings.mingle.svc.configuration.properties.SvcProperties;
 import io.github.amings.mingle.svc.exception.BreakSvcProcessException;
 import io.github.amings.mingle.svc.exception.handler.abs.AbstractExceptionHandler;
 import io.github.amings.mingle.svc.filter.SvcInfo;

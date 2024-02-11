@@ -1,7 +1,7 @@
-package io.github.amings.mingle.svc.config;
+package io.github.amings.mingle.svc.configuration;
 
 import io.github.amings.mingle.svc.component.SvcBinderComponent;
-import io.github.amings.mingle.svc.config.properties.SvcProperties;
+import io.github.amings.mingle.svc.configuration.properties.SvcProperties;
 import io.github.amings.mingle.svc.exception.handler.resolver.ExceptionHandlerResolver;
 import io.github.amings.mingle.svc.filter.SvcInfo;
 import io.github.amings.mingle.svc.filter.SvcLogFilter;
@@ -25,11 +25,11 @@ import org.springframework.context.annotation.Configuration;
  */
 
 @Configuration
-public class FilterConfig {
+public class FilterConfiguration {
 
     private final SvcBinderComponent svcBinderComponent;
 
-    public FilterConfig(SvcBinderComponent svcBinderComponent) {
+    public FilterConfiguration(SvcBinderComponent svcBinderComponent) {
         this.svcBinderComponent = svcBinderComponent;
     }
 

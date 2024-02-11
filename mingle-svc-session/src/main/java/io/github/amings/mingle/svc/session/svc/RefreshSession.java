@@ -4,7 +4,7 @@ import io.github.amings.mingle.svc.AbstractSvcLogic;
 import io.github.amings.mingle.svc.SvcReqModel;
 import io.github.amings.mingle.svc.SvcResModel;
 import io.github.amings.mingle.svc.annotation.Svc;
-import io.github.amings.mingle.svc.config.properties.SvcProperties;
+import io.github.amings.mingle.svc.configuration.properties.SvcProperties;
 import io.github.amings.mingle.svc.filter.SvcInfo;
 import io.github.amings.mingle.svc.handler.SvcMsgHandler;
 import io.github.amings.mingle.svc.session.annotation.Session;

@@ -1,6 +1,6 @@
 package io.github.amings.mingle.svc.filter;
 
-import io.github.amings.mingle.svc.config.properties.SvcProperties;
+import io.github.amings.mingle.svc.configuration.properties.SvcProperties;
 import io.github.amings.mingle.svc.exception.ReqModelDeserializeFailException;
 import io.github.amings.mingle.svc.exception.SvcReqModelValidFailException;
 import io.github.amings.mingle.svc.handler.SvcMsgHandler;

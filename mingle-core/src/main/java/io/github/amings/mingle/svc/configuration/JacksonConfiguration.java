@@ -1,4 +1,4 @@
-package io.github.amings.mingle.svc.config;
+package io.github.amings.mingle.svc.configuration;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,7 +17,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
  */
 
 @Configuration
-public class JacksonConfig {
+public class JacksonConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(JacksonUtils.class)

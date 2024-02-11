@@ -3,7 +3,7 @@ package io.github.amings.mingle.svc.filter;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.github.amings.mingle.svc.annotation.Svc;
 import io.github.amings.mingle.svc.component.SvcBinderComponent;
-import io.github.amings.mingle.svc.config.properties.SvcProperties;
+import io.github.amings.mingle.svc.configuration.properties.SvcProperties;
 import io.github.amings.mingle.svc.exception.IPAuthenticationFailException;
 import io.github.amings.mingle.svc.exception.ReqBodyNotJsonFormatException;
 import io.github.amings.mingle.svc.exception.SvcNotFoundException;

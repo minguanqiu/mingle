@@ -1,4 +1,4 @@
-package io.github.amings.mingle.svc.config.properties;
+package io.github.amings.mingle.svc.configuration.properties;
 
 import lombok.Getter;
 import lombok.Setter;

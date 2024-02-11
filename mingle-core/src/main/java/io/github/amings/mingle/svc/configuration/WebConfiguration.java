@@ -1,4 +1,4 @@
-package io.github.amings.mingle.svc.config;
+package io.github.amings.mingle.svc.configuration;
 
 import io.github.amings.mingle.svc.SvcReqArgumentResolver;
 import io.github.amings.mingle.svc.SvcResArgumentResolver;
@@ -22,11 +22,11 @@ import java.util.List;
  */
 
 @Configuration
-public class WebConfig implements WebMvcConfigurer {
+public class WebConfiguration implements WebMvcConfigurer {
 
     private final JacksonUtils jacksonUtils;
 
-    public WebConfig(JacksonUtils jacksonUtils) {
+    public WebConfiguration(JacksonUtils jacksonUtils) {
         this.jacksonUtils = jacksonUtils;
     }
 

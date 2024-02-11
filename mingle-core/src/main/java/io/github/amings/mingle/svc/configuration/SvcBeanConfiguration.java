@@ -1,12 +1,10 @@
-package io.github.amings.mingle.svc.config;
+package io.github.amings.mingle.svc.configuration;
 
-import io.github.amings.mingle.svc.aspect.ActionLogAspect;
 import io.github.amings.mingle.svc.handler.*;
 import io.github.amings.mingle.svc.handler.impl.*;
 import io.github.amings.mingle.utils.JacksonUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -20,7 +18,7 @@ import java.util.List;
  */
 
 @Configuration
-public class SvcBeanConfig {
+public class SvcBeanConfiguration {
 
     /**
      * implements {@link SvcLogHandler} to override default impl
@@ -82,16 +80,6 @@ public class SvcBeanConfig {
     @Primary
     public SvcMsgHandler svcMsgHandler(List<SvcMsgListHandler> svcMsgListHandlers) {
         return new SvcMsgHandlerDefaultImpl(svcMsgListHandlers);
-    }
-
-    /**
-     * @return ActionLogAspect
-     * action logging aspect bean
-     */
-    @Bean
-    @ConditionalOnProperty(prefix = "mingle.svc.action", name = "logging", havingValue = "enable")
-    public ActionLogAspect actionLogAspect() {
-        return new ActionLogAspect();
     }
 
     /**

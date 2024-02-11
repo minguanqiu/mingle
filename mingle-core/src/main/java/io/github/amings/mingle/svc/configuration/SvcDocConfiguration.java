@@ -1,4 +1,4 @@
-package io.github.amings.mingle.svc.config;
+package io.github.amings.mingle.svc.configuration;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.amings.mingle.svc.component.SvcBinderComponent;
@@ -38,14 +38,14 @@ import java.util.Map;
  */
 
 @Configuration
-public class SvcDocConfig {
+public class SvcDocConfiguration {
 
     private final SvcBinderComponent svcBinderComponent;
     private final SvcResModelHandler svcResModelHandler;
     @Value("${mingle.svc.openapi.useFqn:false}")
     public boolean useFqn;
 
-    public SvcDocConfig(SvcBinderComponent svcBinderComponent, SvcResModelHandler svcResModelHandler) {
+    public SvcDocConfiguration(SvcBinderComponent svcBinderComponent, SvcResModelHandler svcResModelHandler) {
         this.svcBinderComponent = svcBinderComponent;
         this.svcResModelHandler = svcResModelHandler;
     }

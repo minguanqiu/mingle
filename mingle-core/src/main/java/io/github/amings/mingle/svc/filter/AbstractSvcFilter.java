@@ -1,6 +1,6 @@
 package io.github.amings.mingle.svc.filter;
 
-import io.github.amings.mingle.svc.config.properties.SvcProperties;
+import io.github.amings.mingle.svc.configuration.properties.SvcProperties;
 import io.github.amings.mingle.svc.exception.BreakFilterProcessException;
 import io.github.amings.mingle.svc.handler.SvcMsgHandler;
 import org.springframework.web.filter.OncePerRequestFilter;
