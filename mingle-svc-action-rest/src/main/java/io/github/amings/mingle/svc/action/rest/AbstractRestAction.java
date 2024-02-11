@@ -1,14 +1,15 @@
 package io.github.amings.mingle.svc.action.rest;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.reflect.TypeToken;
 import io.github.amings.mingle.svc.action.AbstractAction;
-import io.github.amings.mingle.svc.action.ActionReqModel;
-import io.github.amings.mingle.svc.action.ActionResModel;
-import io.github.amings.mingle.svc.action.exception.BreakActionException;
+import io.github.amings.mingle.svc.action.exception.resolver.ActionExceptionHandlerResolver;
+import io.github.amings.mingle.svc.action.interceptor.ActionInterceptor;
 import io.github.amings.mingle.svc.action.rest.annotation.DataProperty;
 import io.github.amings.mingle.svc.action.rest.annotation.ExcludeRequestBody;
 import io.github.amings.mingle.svc.action.rest.annotation.PathVariable;
 import io.github.amings.mingle.svc.action.rest.annotation.RestAction;
+import io.github.amings.mingle.svc.action.rest.configuration.properties.RestActionProperties;
 import io.github.amings.mingle.svc.action.rest.exception.*;
 import io.github.amings.mingle.svc.action.rest.handler.RestClientHandler;
 import io.github.amings.mingle.utils.FileUtils;
@@ -16,20 +17,13 @@ import io.github.amings.mingle.utils.JacksonUtils;
 import io.github.amings.mingle.utils.RestClientUtils;
 import io.github.amings.mingle.utils.StringUtils;
 import io.github.amings.mingle.utils.enums.HttpMethod;
-import jakarta.annotation.PostConstruct;
 import okhttp3.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -39,21 +33,26 @@ import java.util.stream.Stream;
  * @author Ming
  */
 
-public abstract class AbstractRestAction<Req extends ActionReqModel, Res extends ActionResModel>
-        extends AbstractAction<Req, Res, RestActionReqData, RestActionResData<Res>> {
+public abstract class AbstractRestAction<Req extends RestActionReqModel, ResData extends RestActionResData, Res extends RestActionResModel>
+        extends AbstractAction<Req, ResData, Res> {
 
-    @Autowired
-    Environment environment;
-    @Autowired
-    RestClientHandler restClientHandler;
-    @Autowired
-    @Qualifier("restActionJacksonUtils")
-    protected JacksonUtils jacksonUtils;
+    protected final Environment environment;
+    protected final RestActionProperties restActionProperties;
+    protected final RestClientHandler restClientHandler;
+    protected final JacksonUtils jacksonUtils;
     private RestAction restAction;
-    @Value("${mingle.svc.action.rest.mock.path:}")
-    private String MOCK_PATH;
-    private Map<String, String> cacheHeaderValueMap;
-    private Set<Integer> cacheSuccessHttpCodeList;
+    private Map<String, String> commonHeaderValueMap;
+    private Set<Integer> successHttpCodeSet;
+    private Class<Res> resClass;
+
+    public AbstractRestAction(RestActionProperties actionProperties, ActionExceptionHandlerResolver actionExceptionHandlerResolver, List<ActionInterceptor> actionInterceptors, Environment environment, RestClientHandler restClientHandler, JacksonUtils jacksonUtils) {
+        super(actionProperties.getActionProperties(), actionExceptionHandlerResolver, actionInterceptors);
+        this.environment = environment;
+        this.restActionProperties = actionProperties;
+        this.restClientHandler = restClientHandler;
+        this.jacksonUtils = jacksonUtils;
+        init();
+    }
 
 
     /**
@@ -61,14 +60,18 @@ public abstract class AbstractRestAction<Req extends ActionReqModel, Res extends
      *
      * @return Map
      */
-    protected abstract Map<String, String> buildRequestCacheHeaderValue();
+    protected Map<String, String> buildCommonHeaderValue() {
+        return null;
+    }
 
     /**
      * Build action success http code for cache,if not contains code,this action will set error code and not success
      *
      * @return Set
      */
-    protected abstract Set<Integer> buildCacheSuccessHttpCode();
+    protected Set<Integer> buildSuccessHttpCodeSet() {
+        return null;
+    }
 
     /**
      * API response body format specification to json string
@@ -77,7 +80,7 @@ public abstract class AbstractRestAction<Req extends ActionReqModel, Res extends
      * @return JsonNode
      */
     protected JsonNode formatResponseBody(String responseBody) {
-        return jacksonUtils.readTree(responseBody).get();
+        return jacksonUtils.readTree(responseBody).orElseThrow(() -> new ResponseBodyFormatFailException("response body is not a json"));
     }
 
     /**
@@ -95,38 +98,38 @@ public abstract class AbstractRestAction<Req extends ActionReqModel, Res extends
      *
      * @param reqModel action request model
      */
-    protected abstract void before(Req reqModel);
+    protected void before(Req reqModel) {
+    }
 
     /**
      * PostProcess action response model format
      *
      * @param resModel action response model
      */
-    protected abstract void after(Res resModel);
-
-    /**
-     * Defined target API common response body to check success result,default by no restResModel
-     *
-     * @return Class
-     */
-    protected Class<? extends RestActionResModel> getActionRestResModelClass() {
-        return null;
+    protected void after(Res resModel) {
     }
 
+
+    protected RestActionResHeaderModel buildResHeaderModel(JsonNode resultNode) {
+        RestActionResHeaderModel restActionResHeaderModel = new RestActionResHeaderModel();
+        restActionResHeaderModel.setSuccessCode(actionProperties.getSuccessCode());
+        restActionResHeaderModel.setCode(actionProperties.getSuccessCode());
+        restActionResHeaderModel.setDesc(actionProperties.getSuccessDesc());
+        return restActionResHeaderModel;
+    }
 
     /**
      * Process rest action logic
      *
      * @param reqModel Action request model
-     * @param reqData  Action request data
-     * @param resData  Action response data
+     * @param resData
      * @return Res Action response model
      */
     @Override
-    protected final Res processAction(Req reqModel, RestActionReqData reqData, RestActionResData<Res> resData) throws BreakActionException {
-        RestClientUtils restClientUtils = new RestClientUtils(getOkHttpClient(reqData));
+    protected final Res processLogic(Req reqModel, ResData resData) {
+        RestClientUtils restClientUtils = new RestClientUtils(getOkHttpClient(reqModel));
         restClientUtils.setHttpMethod(restAction.method());
-        buildHeader(restClientUtils, reqData);
+        buildHeader(restClientUtils, reqModel);
         MediaType mediaType = MediaType.parse(restAction.mediaType());
         if (mediaType == null) {
             throw new MediaTypeParseFailException("mediaType parse fail,please check mediaType");
@@ -140,18 +143,17 @@ public abstract class AbstractRestAction<Req extends ActionReqModel, Res extends
         }
         buildUri(restClientUtils, reqModel);
         resData.setUri(restClientUtils.getHttpUrl().toString());
-        Res resModel = null;
+        Res resModel;
         if (!checkMockExist()) {
             try (Response response = restClientUtils.call()) {
-                resData.setHttpCode(resData.getHttpCode());
-                resData.setResponseHeaderValue(response.headers().toMultimap());
+                buildResData(resData, response);
                 checkHttpCode(response.code());
-                resModel = processResBody(resData, response.body().bytes());
+                resModel = buildResModel(response.body().bytes());
             } catch (IOException e) {
                 throw new ClientErrorException("client error : " + e.getMessage(), e);
             }
         } else {
-            resModel = processMockData(resData);
+            resModel = processMockData();
         }
         if (resModel != null) {
             after(resModel);
@@ -159,19 +161,19 @@ public abstract class AbstractRestAction<Req extends ActionReqModel, Res extends
         return resModel;
     }
 
-    private OkHttpClient getOkHttpClient(RestActionReqData reqModel) {
+    private OkHttpClient getOkHttpClient(RestActionReqModel reqModel) {
         if (reqModel.getOkHttpClientBuilder() != null) {
             return reqModel.getOkHttpClientBuilder().build();
         }
         return restClientHandler.getClient();
     }
 
-    private void buildHeader(RestClientUtils restClientUtils, RestActionReqData reqData) {
-        if (reqData.headerValueMap != null) {
-            reqData.headerValueMap.forEach(restClientUtils::setHeader);
+    private void buildHeader(RestClientUtils restClientUtils, RestActionReqModel reqModel) {
+        if (reqModel.getHeaderValueMap() != null) {
+            reqModel.getHeaderValueMap().forEach(restClientUtils::setHeader);
         } else {
-            if (cacheHeaderValueMap != null) {
-                cacheHeaderValueMap.forEach(restClientUtils::setHeader);
+            if (commonHeaderValueMap != null) {
+                commonHeaderValueMap.forEach(restClientUtils::setHeader);
             }
         }
     }
@@ -186,7 +188,7 @@ public abstract class AbstractRestAction<Req extends ActionReqModel, Res extends
                     stringHashMap = new HashMap<>();
                 }
                 try {
-                    if (!annotation.value().equals("")) {
+                    if (!annotation.value().isEmpty()) {
                         stringHashMap.put(annotation.value(), (String) field.get(reqModel));
                     } else {
                         stringHashMap.put(field.getName(), (String) field.get(reqModel));
@@ -270,66 +272,61 @@ public abstract class AbstractRestAction<Req extends ActionReqModel, Res extends
     }
 
     private boolean checkMockExist() {
-        if (MOCK_PATH.equals("")) {
+        if (restActionProperties.getMockPath().isEmpty()) {
             return false;
         }
-        return FileUtils.isExist(MOCK_PATH + this.getClass().getSimpleName() + ".json");
+        return FileUtils.isExist(restActionProperties.getMockPath() + this.getClass().getSimpleName() + ".json");
     }
 
     private void checkHttpCode(int code) {
-        if (cacheSuccessHttpCodeList != null) {
-            if (!cacheSuccessHttpCodeList.contains(code)) {
+        if (successHttpCodeSet != null) {
+            if (!successHttpCodeSet.contains(code)) {
                 throw new HttpCodeErrorException(code, "client code error : " + code);
             }
         }
     }
 
-    private Res processMockData(RestActionResData<Res> actionData) {
-        try (Stream<String> stream = FileUtils.readFile(MOCK_PATH + this.getClass().getSimpleName() + ".json")) {
+    private Res processMockData() {
+        try (Stream<String> stream = FileUtils.readFile(restActionProperties.getMockPath() + this.getClass().getSimpleName() + ".json")) {
             String res = stream.collect(Collectors.joining());
             Optional<JsonNode> jsonNodeOptional = jacksonUtils.readTree(res);
             jsonNodeOptional.orElseThrow(Exception::new);
             JsonNode jsonNode = jsonNodeOptional.get();
             String sleep = jsonNode.get("sleep").asText();
             Thread.sleep(Long.parseLong(sleep));
-            return processResBody(actionData, jsonNode.get("data").toString().getBytes(StandardCharsets.UTF_8));
+            return buildResModel(jsonNode.get("data").toString().getBytes(StandardCharsets.UTF_8));
         } catch (Exception e) {
             throw new MockDataParseFailException("mock data format error");
         }
     }
 
-    protected Res processResBody(RestActionResData<Res> resRestActionResData, byte[] resBody) {
-        JsonNode resultNode = formatResponseBody(new String(resBody, StandardCharsets.UTF_8));
-        if (getActionRestResModelClass() != null) {
-            Optional<? extends RestActionResModel> actionRestResModelOptional = jacksonUtils.readValue(resultNode.toString(), getActionRestResModelClass());
-            if (actionRestResModelOptional.isPresent() && actionRestResModelOptional.get().getCode() != null) {
-                RestActionResModel restActionResModel = actionRestResModelOptional.get();
-                resRestActionResData.setCode(restActionResModel.getCode());
-                resRestActionResData.setDesc(restActionResModel.getDesc());
-            } else {
-                throw new ActionRestResModelFormatFailException("restActionResModel deserialize error");
-            }
-        }
-        return processResModel(resultNode);
+    protected void buildResData(ResData resData, Response response) {
+        resData.setHttpCode(String.valueOf(response.code()));
+        resData.setResponseHeaderValue(response.headers().toMultimap());
     }
 
-    private Res processResModel(JsonNode resultNode) {
-        if (!getResModelClass().equals(ActionResModel.class)) {
-            Optional<Res> resModelOptional = jacksonUtils.readValue(processResponseBody(resultNode).toString(), getResModelClass());
-            if (resModelOptional.isPresent()) {
-                return resModelOptional.get();
-            } else {
-                throw new ActionResModelFormatErrorException("resModel format error");
-            }
+    protected Res buildResModel(byte[] resBody) {
+        JsonNode responseBodyNode = formatResponseBody(new String(resBody, StandardCharsets.UTF_8));
+        Res resModel = deserializeResModel(responseBodyNode);
+        RestActionResHeaderModel restActionResHeaderModel = buildResHeaderModel(responseBodyNode);
+        if (!restActionResHeaderModel.getSuccessCode().equals(restActionResHeaderModel.getCode())) {
+            breakActionLogic(restActionResHeaderModel.getCode(), restActionResHeaderModel.getDesc(), resModel);
         }
-        return null;
+        return resModel;
     }
 
-    @PostConstruct
+    private Res deserializeResModel(JsonNode resultNode) {
+        return jacksonUtils.readValue(processResponseBody(resultNode).toString(), resClass).orElseThrow(() -> new ActionResModelFormatErrorException("resModel format error"));
+    }
+
+    @SuppressWarnings("unchecked")
     private void init() {
-        cacheSuccessHttpCodeList = buildCacheSuccessHttpCode();
-        cacheHeaderValueMap = buildRequestCacheHeaderValue();
+        successHttpCodeSet = buildSuccessHttpCodeSet();
+        commonHeaderValueMap = buildCommonHeaderValue();
         restAction = this.getClass().getAnnotation(RestAction.class);
+        resClass = (Class<Res>) new TypeToken<Res>(getClass()) {
+        }.getRawType();
     }
+
 
 }

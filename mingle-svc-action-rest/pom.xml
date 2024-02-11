@@ -21,5 +21,10 @@
             <groupId>io.github.amings</groupId>
             <artifactId>mingle-svc-action</artifactId>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
     </dependencies>
 </project>
