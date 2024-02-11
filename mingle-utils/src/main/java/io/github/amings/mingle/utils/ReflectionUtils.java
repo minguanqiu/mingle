@@ -5,11 +5,7 @@ import org.reflections.Reflections;
 import org.reflections.util.ConfigurationBuilder;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 
 /**
  * Reflection Utils
@@ -78,6 +74,22 @@ public class ReflectionUtils {
         return (Class<?>) ((ParameterizedType) parameterized.getActualTypeArguments()[index]).getRawType();
     }
 
+    public static Type findGenericSuperclass(Class<?> clazz, Class<?> target) {
+        Type genericSuperclass = clazz.getGenericSuperclass();
+        if (genericSuperclass instanceof ParameterizedType parameterizedType) {
+            if (parameterizedType.getRawType().equals(target)) {
+                return genericSuperclass;
+            } else {
+                genericSuperclass = findGenericSuperclass((Class<?>) parameterizedType.getRawType(),target);
+            }
+        } else {
+            if (!genericSuperclass.equals(target)) {
+                genericSuperclass = findGenericSuperclass((Class<?>) genericSuperclass, target);
+            }
+        }
+        return genericSuperclass;
+    }
+
     public static String toHexString(Object object) {
         return object.getClass().getName() + "@" + Integer.toHexString(object.hashCode());
     }
@@ -85,7 +97,8 @@ public class ReflectionUtils {
     public static <T> T newInstance(Class<T> tClass) {
         try {
             return tClass.getDeclaredConstructor().newInstance();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
             return null;
         }
     }

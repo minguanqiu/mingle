@@ -57,12 +57,6 @@ public @interface Svc {
      * @return boolean
      * If set ture,must configuration in properties
      **/
-    boolean ipAddressSecure() default false;
+    boolean ipSecure() default false;
 
-    /**
-     * @return boolean
-     * Defined custom controller to escape Svc limit
-     **/
-    @Deprecated
-    boolean custom() default false;
 }

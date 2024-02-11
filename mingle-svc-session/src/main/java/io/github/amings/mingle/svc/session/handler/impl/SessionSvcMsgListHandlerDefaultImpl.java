@@ -1,6 +1,5 @@
 package io.github.amings.mingle.svc.session.handler.impl;
 
-import io.github.amings.mingle.svc.annotation.MingleSvcMsg;
 import io.github.amings.mingle.svc.handler.SvcMsgListHandler;
 import io.github.amings.mingle.svc.handler.model.MsgModel;
 
@@ -12,7 +11,6 @@ import java.util.List;
  *
  * @author Ming
  */
-@MingleSvcMsg
 public class SessionSvcMsgListHandlerDefaultImpl implements SvcMsgListHandler {
 
     @Override

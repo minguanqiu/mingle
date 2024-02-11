@@ -1,14 +1,14 @@
 package io.github.amings.mingle.svc.filter;
 
+import io.github.amings.mingle.svc.configuration.properties.SvcProperties;
 import io.github.amings.mingle.svc.handler.SvcLogHandler;
+import io.github.amings.mingle.svc.handler.SvcMsgHandler;
 import io.github.amings.mingle.svc.handler.model.SvcBeginModel;
 import io.github.amings.mingle.utils.JacksonUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.io.IOException;
 
@@ -20,12 +20,15 @@ import java.io.IOException;
 
 public class SvcLogFilter extends AbstractSvcFilter {
 
-    @Autowired
-    private SvcLogHandler svcLogHandler;
+    private final SvcLogHandler svcLogHandler;
+    private final JacksonUtils jacksonUtils;
 
-    @Autowired
-    @Qualifier("svcLogJacksonUtils")
-    private JacksonUtils jacksonUtils;
+    public SvcLogFilter(SvcInfo svcInfo, SvcMsgHandler svcMsgHandler, SvcProperties svcProperties, SvcLogHandler svcLogHandler, JacksonUtils jacksonUtils) {
+        super(svcInfo, svcMsgHandler, svcProperties);
+        this.svcLogHandler = svcLogHandler;
+        this.jacksonUtils = jacksonUtils;
+    }
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {

@@ -1,19 +1,20 @@
 package io.github.amings.mingle.svc.session.filter;
 
+import io.github.amings.mingle.svc.configuration.properties.SvcProperties;
 import io.github.amings.mingle.svc.filter.AbstractSvcFilter;
+import io.github.amings.mingle.svc.filter.SvcInfo;
+import io.github.amings.mingle.svc.handler.SvcMsgHandler;
 import io.github.amings.mingle.svc.session.exception.JwtDecryptionFailException;
 import io.github.amings.mingle.svc.session.exception.JwtHeaderMissingException;
 import io.github.amings.mingle.svc.session.exception.SessionInfoDeserializeFailException;
 import io.github.amings.mingle.svc.session.security.SessionAuthentication;
 import io.github.amings.mingle.svc.session.security.model.SessionInfo;
-import io.github.amings.mingle.svc.session.utils.JwtUtils;
 import io.github.amings.mingle.svc.session.utils.SessionUtils;
 import io.github.amings.mingle.utils.JacksonUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
@@ -26,12 +27,15 @@ import java.util.Optional;
  */
 
 public class JwtAuthenticationFilter extends AbstractSvcFilter {
-    @Autowired
-    SessionUtils sessionUtils;
-    @Autowired
-    JwtUtils jwtUtils;
-    @Autowired
-    JacksonUtils jacksonUtils;
+
+    private final SessionUtils sessionUtils;
+    private final JacksonUtils jacksonUtils;
+
+    public JwtAuthenticationFilter(SvcInfo svcInfo, SvcMsgHandler svcMsgHandler, SvcProperties svcProperties, SessionUtils sessionUtils, JacksonUtils jacksonUtils) {
+        super(svcInfo, svcMsgHandler, svcProperties);
+        this.sessionUtils = sessionUtils;
+        this.jacksonUtils = jacksonUtils;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {

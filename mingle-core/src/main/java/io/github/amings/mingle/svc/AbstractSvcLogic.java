@@ -1,12 +1,10 @@
 package io.github.amings.mingle.svc;
 
-import com.google.common.reflect.TypeToken;
 import io.github.amings.mingle.svc.action.ActionResData;
+import io.github.amings.mingle.svc.configuration.properties.SvcProperties;
 import io.github.amings.mingle.svc.exception.BreakSvcProcessException;
 import io.github.amings.mingle.svc.filter.SvcInfo;
 import io.github.amings.mingle.svc.handler.SvcMsgHandler;
-import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 
@@ -18,23 +16,15 @@ import java.util.Map;
 
 public abstract class AbstractSvcLogic<Req extends SvcReqModel, Res extends SvcResModel> {
 
-    @Autowired
-    protected SvcInfo svcInfo;
-    @Autowired
-    private SvcMsgHandler svcMsgHandler;
-    @Getter
-    private final Class<Req> reqClass;
-    @Getter
-    private final Class<Res> resClass;
+    protected final SvcInfo svcInfo;
+    protected final SvcMsgHandler svcMsgHandler;
+    protected final SvcProperties svcProperties;
 
-    @SuppressWarnings("unchecked")
-    public AbstractSvcLogic() {
-        TypeToken<Req> reqTypeToken = new TypeToken<Req>(getClass()) {
-        };
-        TypeToken<Res> resTypeToken = new TypeToken<Res>(getClass()) {
-        };
-        reqClass = (Class<Req>) reqTypeToken.getRawType();
-        resClass = (Class<Res>) resTypeToken.getRawType();
+
+    public AbstractSvcLogic(SvcInfo svcInfo, SvcMsgHandler svcMsgHandler, SvcProperties svcProperties) {
+        this.svcInfo = svcInfo;
+        this.svcMsgHandler = svcMsgHandler;
+        this.svcProperties = svcProperties;
     }
 
     public abstract Res doService(Req reqModel, Res resModel);
@@ -44,7 +34,7 @@ public abstract class AbstractSvcLogic<Req extends SvcReqModel, Res extends SvcR
      *             interrupt Svc Logic by throw exception
      **/
     protected void breakSvcLogic(String code) throws BreakSvcProcessException {
-        breakSvcLogic(code, svcMsgHandler.getMsg(code));
+        breakSvcLogic(code, svcMsgHandler.getMsg(svcProperties.getMsgType(), code));
     }
 
     /**
@@ -53,7 +43,7 @@ public abstract class AbstractSvcLogic<Req extends SvcReqModel, Res extends SvcR
      *               interrupt Svc Logic by throw exception
      **/
     protected void breakSvcLogic(String code, Map<String, String> values) throws BreakSvcProcessException {
-        breakSvcLogic(code, svcMsgHandler.getMsg(code, values));
+        breakSvcLogic(code, svcMsgHandler.getMsg(svcProperties.getMsgType(), code, values));
     }
 
     /**
@@ -61,7 +51,7 @@ public abstract class AbstractSvcLogic<Req extends SvcReqModel, Res extends SvcR
      *                      interrupt Svc Logic by throw exception
      **/
     protected void breakSvcLogic(ActionResData<?> actionResData) throws BreakSvcProcessException {
-        breakSvcLogic(actionResData.getCode(), svcMsgHandler.getMsg(actionResData));
+        breakSvcLogic(actionResData.getCode(), svcMsgHandler.getMsg(actionResData.getMsgType(), actionResData.getCode()));
     }
 
     /**
@@ -79,7 +69,7 @@ public abstract class AbstractSvcLogic<Req extends SvcReqModel, Res extends SvcR
      *                 interrupt Svc Logic by throw exception
      **/
     protected void breakSvcLogic(String code, Res resModel) throws BreakSvcProcessException {
-        breakSvcLogic(code, svcMsgHandler.getMsg(code), resModel);
+        breakSvcLogic(code, svcMsgHandler.getMsg(svcProperties.getMsgType(), code), resModel);
     }
 
     /**
@@ -98,7 +88,7 @@ public abstract class AbstractSvcLogic<Req extends SvcReqModel, Res extends SvcR
      * interrupt Svc Logic by return
      **/
     protected Res returnSvcLogic(String code) {
-        return returnSvcLogic(code, svcMsgHandler.getMsg(code), null);
+        return returnSvcLogic(code, svcMsgHandler.getMsg(svcProperties.getMsgType(), code), null);
     }
 
     /**
@@ -108,7 +98,7 @@ public abstract class AbstractSvcLogic<Req extends SvcReqModel, Res extends SvcR
      * interrupt Svc Logic by return
      **/
     protected Res returnSvcLogic(String code, Map<String, String> values) {
-        return returnSvcLogic(code, svcMsgHandler.getMsg(code, values), null);
+        return returnSvcLogic(code, svcMsgHandler.getMsg(svcProperties.getMsgType(), code, values), null);
     }
 
     /**
@@ -137,7 +127,7 @@ public abstract class AbstractSvcLogic<Req extends SvcReqModel, Res extends SvcR
      * interrupt Svc Logic by return
      **/
     protected Res returnSvcLogic(String code, Res resModel) {
-        return returnSvcLogic(code, svcMsgHandler.getMsg(code), resModel);
+        return returnSvcLogic(code, svcMsgHandler.getMsg(svcProperties.getMsgType(), code), resModel);
     }
 
     /**

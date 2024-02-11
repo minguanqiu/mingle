@@ -3,17 +3,15 @@ package io.github.amings.mingle.svc.component;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.amings.mingle.svc.AbstractSvcLogic;
-import io.github.amings.mingle.svc.SvcResModel;
 import io.github.amings.mingle.svc.annotation.Svc;
+import io.github.amings.mingle.svc.configuration.properties.SvcProperties;
 import io.github.amings.mingle.svc.exception.MingleRuntimeException;
-import io.github.amings.mingle.utils.UUIDUtils;
+import io.github.amings.mingle.utils.ReflectionUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigurationPackages;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -21,11 +19,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.util.pattern.PathPattern;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.function.Predicate;
 
 /**
  * Svc Binder Configuration
@@ -37,55 +35,20 @@ import java.util.stream.Collectors;
 @Component
 public class SvcBinderComponent {
 
-    @Autowired
-    private PropertyComponent propertyComponent;
-    @Autowired(required = false)
-    private List<AbstractSvcLogic> abstractSvcLogics;
+    private final SvcProperties svcProperties;
+    private final List<AbstractSvcLogic<?, ?>> abstractSvcLogics;
+    private final ApplicationContext context;
+    @Getter
     private Map<String, SvcBinderModel> svcBinderModelMap = new HashMap<>();
-    private Map<String, String> ipAddressMap = new HashMap<>();
-    private List<String> svcPathList;
-    private List<String> svcValidBeanPathList;
-    private List<String> svcLogPathList;
-    @Autowired
-    private ApplicationContext context;
 
-    public String getMainPackage() {
-        return AutoConfigurationPackages.get(context.getAutowireCapableBeanFactory()).get(0);
-    }
-
-    @Deprecated
-    public Optional<SvcBinderModel> getSvcBinderModel(Class<?> clazz) {
-        return Optional.empty();
-    }
-
-    @Deprecated
-    public Map<Class<?>, SvcBinderModel> getSvcBinderModelMap() {
-        return null;
+    public SvcBinderComponent(SvcProperties svcProperties, List<AbstractSvcLogic<?, ?>> abstractSvcLogics, ApplicationContext applicationContext) {
+        this.svcProperties = svcProperties;
+        this.abstractSvcLogics = abstractSvcLogics;
+        this.context = applicationContext;
     }
 
     public Optional<SvcBinderModel> getSvcBinderModel(String path) {
         return Optional.ofNullable(svcBinderModelMap.get(path));
-    }
-
-    public Map<String, SvcBinderModel> getSvcMap() {
-        return svcBinderModelMap;
-    }
-
-    @Deprecated
-    public Map<String, String> getIpAddressMap() {
-        return ipAddressMap;
-    }
-
-    public List<String> getSvcPathList() {
-        return svcPathList;
-    }
-
-    public List<String> getSvcValidBeanPathList() {
-        return svcValidBeanPathList;
-    }
-
-    public List<String> getSvcLogPathList() {
-        return svcLogPathList;
     }
 
     private void scanSvc() {
@@ -94,99 +57,58 @@ public class SvcBinderComponent {
             throw new MingleRuntimeException("you must create at least one Service");
         }
         abstractSvcLogics.forEach(svcLogic -> {
-            Class<? extends AbstractSvcLogic> clazz = svcLogic.getClass();
+            Class<?> clazz = svcLogic.getClass();
             SvcBinderModel svcBinderModel = new SvcBinderModel();
             ArrayList<String> svcErrorMsgList = new ArrayList<>();
             Svc svc = AnnotatedElementUtils.findMergedAnnotation(clazz, Svc.class);
             if (svc != null) {
-                Class<?> reqClass = svcLogic.getReqClass();
-                Class<?> resClass = svcLogic.getResClass();
                 svcBinderModel.setSvcClass(clazz);
                 svcBinderModel.setSvcName(clazz.getSimpleName());
                 svcBinderModel.setSvc(svc);
-                svcBinderModel.setReqModelClass(reqClass);
-                svcBinderModel.setResModelClass(resClass);
-                List<Method> methods = Arrays.stream(clazz.getDeclaredMethods()).filter(m -> AnnotationUtils.findAnnotation(m, RequestMapping.class) != null).collect(Collectors.toList());
+                List<Method> methods = Arrays.stream(clazz.getDeclaredMethods()).filter(m -> AnnotationUtils.findAnnotation(m, RequestMapping.class) != null).toList();
                 if (methods.size() > 1) {
                     svcErrorMsgList.add("only allow one API entrance");
-                } else if (methods.size() == 1) {
-                    svcBinderModel.setCustom(true);
-                    svcBinderModel.setReqCustom(true);
-                    Method method = methods.get(0);
-                    RequestMapping annotation = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping.class);
-                    RequestMethod[] requestMethod = annotation.method();
-                    if (requestMethod.length == 1) {
-                        svcBinderModel.setMethod(annotation.method()[0]);
-                    } else if (requestMethod.length > 1) {
-                        svcErrorMsgList.add("custom request method can not multiple");
-                    } else {
-                        svcErrorMsgList.add("custom request method can not empty");
-                    }
-//                    boolean hasReqClass = false;
-//                    for (Class<?> parameterType : method.getParameterTypes()) {
-//                        if (SvcReqModel.class.isAssignableFrom(parameterType)) {
-//                            if (!reqClass.equals(parameterType)) {
-//                                svcErrorMsgList.add("custom method parameter must defined " + reqClass.getSimpleName() + " request class");
-//                            } else {
-//                                hasReqClass = true;
-//                            }
-//                        }
-//                    }
-//                    if (!hasReqClass) {
-//                        svcBinderModel.setReqCustom(true);
-//                    }
-                    if (SvcResModel.class.isAssignableFrom(method.getReturnType())) {
-                        if (!resClass.equals(method.getReturnType())) {
-                            svcErrorMsgList.add("custom method returnType must defined " + resClass.getSimpleName() + " response class");
-                        }
-                    } else {
-                        svcBinderModel.setResCustom(true);
-                    }
-                    String[] path = annotation.path().length == 0 ? annotation.value() : annotation.path();
-                    if (path.length == 1) {
-                        svcBinderModel.setSvcPath(annotation.path()[0]);
-                    } else if (path.length > 1) {
-                        svcErrorMsgList.add("custom path can not multiple");
-                    } else {
-                        svcErrorMsgList.add("custom path can not empty");
-                    }
                 }
-                if (!svcBinderModel.isCustom()) {
-                    Method doService = null;
-                    try {
-                        doService = clazz.getMethod("doService", reqClass, resClass);
-                    } catch (NoSuchMethodException ignored) {
-                    }
-                    if (AnnotationUtils.findAnnotation(clazz, ResponseBody.class) != null) {
-                        svcErrorMsgList.add("Svc class can not add @ResponseBody");
-                    }
-                    if (AnnotationUtils.findAnnotation(doService, RequestMapping.class) != null) {
-                        svcErrorMsgList.add("doService method can not add @RequestMapping");
-                    }
-                    if (AnnotationUtils.findAnnotation(doService, ResponseBody.class) != null) {
-                        svcErrorMsgList.add("doService method can not add @ResponseBody");
-                    }
-                    String svcPathPrefix = propertyComponent.getSvcPath();
-                    if (!svc.path().equals("")) {
-                        String path = svc.path();
-                        if (!path.startsWith("/")) {
-                            path += "/" + path;
-                        }
-                        svcPathPrefix += path;
-                    }
-                    String svcPath = svcPathPrefix + "/" + clazz.getSimpleName();
-                    svcBinderModel.setSvcMethod(doService);
-                    svcBinderModel.setSvcPath(svcPath);
-                    svcBinderModel.setMethod(RequestMethod.POST);
-                }
+                ParameterizedType parameterizedType = (ParameterizedType) ReflectionUtils.findGenericSuperclass(clazz, AbstractSvcLogic.class);
+                Class<?> reqModelClass = (Class<?>) parameterizedType.getActualTypeArguments()[0];
+                Class<?> resModelClass = (Class<?>) parameterizedType.getActualTypeArguments()[1];
+                svcBinderModel.setReqModelClass(reqModelClass);
+                svcBinderModel.setResModelClass(resModelClass);
+                Method doService = null;
+                try {
+                    doService = clazz.getMethod("doService", reqModelClass, resModelClass);
+                } catch (NoSuchMethodException ignored) {
 
-                if (svc.ipAddressSecure()) {
+                }
+                if (AnnotationUtils.findAnnotation(clazz, ResponseBody.class) != null) {
+                    svcErrorMsgList.add("Svc class can not add @ResponseBody");
+                }
+                if (AnnotationUtils.findAnnotation(doService, RequestMapping.class) != null) {
+                    svcErrorMsgList.add("doService method can not add @RequestMapping");
+                }
+                if (AnnotationUtils.findAnnotation(doService, ResponseBody.class) != null) {
+                    svcErrorMsgList.add("doService method can not add @ResponseBody");
+                }
+                String svcPathPrefix = svcProperties.getRootPath();
+                if (!svc.path().isEmpty()) {
+                    String path = svc.path();
+                    if (!path.startsWith("/")) {
+                        path += "/" + path;
+                    }
+                    svcPathPrefix += path;
+                }
+                String svcPath = svcPathPrefix + "/" + clazz.getSimpleName();
+                svcBinderModel.setSvcMethod(doService);
+                svcBinderModel.setSvcPath(svcPath);
+                svcBinderModel.setMethod(RequestMethod.POST);
+
+                if (svc.ipSecure()) {
                     String property = context.getEnvironment().getProperty("mingle.svc.security.ip." + clazz.getSimpleName());
                     if (property != null) {
-                        svcBinderModel.setIpSecure(property);
+                        svcBinderModel.setIpSecureList(property.split(","));
                     } else {
                         svcErrorMsgList
-                                .add("ipAddressSecure is true，must set " + "mingle.svc.security.ip." + clazz.getSimpleName());
+                                .add("ipSecure if true，must set " + "mingle.svc.security.ip." + clazz.getSimpleName());
                     }
                 }
             } else {
@@ -207,55 +129,20 @@ public class SvcBinderComponent {
         svcBinderModelMap = Collections.unmodifiableMap(svcBinderModelMap);
     }
 
-    public String buildIpAddressPattern(String property) {
-        StringBuilder ipString = new StringBuilder();
-        if (!property.contains(",")) {
-            ipString.append("hasIpAddress('")
-                    .append(property)
-                    .append("')");
-            return ipString.toString();
-        } else {
-            String[] ipAddressProperties = property.split(",");
-            for (String ip : ipAddressProperties) {
-                ipString.append("hasIpAddress('")
-                        .append(ip)
-                        .append("') or ");
-            }
-            return ipString.substring(0, ipString.length() - 4);
-        }
-    }
-
-
-    private void buildSvcPathList() {
-        ArrayList<String> svcPathList = new ArrayList<>();
-        ArrayList<String> svcValidBeanPathList = new ArrayList<>();
-        ArrayList<String> svcLogPathList = new ArrayList<>();
+    public String[] findSvcPath(Predicate<SvcBinderModel> predicate) {
+        ArrayList<String> strings = new ArrayList<>();
         svcBinderModelMap.forEach((k, v) -> {
-            svcPathList.add(v.getSvcPath());
-            if (v.getSvc().log()) {
-                svcLogPathList.add(v.getSvcPath());
-            }
-            if (!v.isReqCustom()) {
-                svcValidBeanPathList.add(v.getSvcPath());
+            if (predicate.test(v)) {
+                strings.add(k);
             }
         });
-        if (svcLogPathList.isEmpty()) {
-            svcLogPathList.add("/" + UUIDUtils.generateUuid());
-        }
-        if (svcValidBeanPathList.isEmpty()) {
-            svcValidBeanPathList.add("/" + UUIDUtils.generateUuid());
-        }
-        this.svcPathList = Collections.unmodifiableList(svcPathList);
-        this.svcValidBeanPathList = Collections.unmodifiableList(svcValidBeanPathList);
-        this.svcLogPathList = Collections.unmodifiableList(svcLogPathList);
+        return strings.toArray(new String[0]);
     }
 
     @PostConstruct
     private void init() {
         scanSvc();
-        buildSvcPathList();
-        log.info("SvcPathList : " + svcPathList);
-        log.info("IpAddressSecurityMap : " + ipAddressMap);
+        log.info("SvcPathList : " + Arrays.toString(findSvcPath(svcBinderModel -> true)));
         log.info(this.getClass().getSimpleName() + " " + "Init success");
     }
 
@@ -268,9 +155,6 @@ public class SvcBinderComponent {
         private String svcName;
 
         private String svcPath;
-
-        @Getter(onMethod = @__(@Deprecated))
-        private PathPattern pathPattern;
 
         private RequestMethod method;
 
@@ -288,7 +172,7 @@ public class SvcBinderComponent {
 
         private Class<?> resModelClass;
 
-        private String ipSecure;
+        private String[] ipSecureList;
 
     }
 

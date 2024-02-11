@@ -1,17 +1,13 @@
 package io.github.amings.mingle.svc.handler.impl;
 
-import io.github.amings.mingle.svc.action.ActionResData;
-import io.github.amings.mingle.svc.annotation.MingleSvcMsg;
 import io.github.amings.mingle.svc.handler.SvcMsgHandler;
 import io.github.amings.mingle.svc.handler.SvcMsgListHandler;
 import io.github.amings.mingle.utils.StringUtils;
 import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * {@link SvcMsgHandler} impl
@@ -21,39 +17,32 @@ import java.util.stream.Collectors;
 
 public class SvcMsgHandlerDefaultImpl implements SvcMsgHandler {
 
-    @Autowired
-    List<SvcMsgListHandler> svcMsgListHandlers;
+    private final List<SvcMsgListHandler> svcMsgListHandlers;
     private final Map<String, Map<String, String>> msgMap = new HashMap<>();
 
+    public SvcMsgHandlerDefaultImpl(List<SvcMsgListHandler> svcMsgListHandlers) {
+        this.svcMsgListHandlers = svcMsgListHandlers;
+    }
+
     /**
-     * Get svc type msg desc
+     * Get msg desc
      */
     @Override
-    public String getMsg(String code) {
-        if (msgMap.containsKey("svc")) {
-            if (msgMap.get("svc").containsKey(code)) {
-                return msgMap.get("svc").get(code);
+    public String getMsg(String type, String code) {
+        if (msgMap.containsKey(type)) {
+            if (msgMap.get(type).containsKey(code)) {
+                return msgMap.get(type).get(code);
             }
         }
         return null;
     }
 
     /**
-     * Get action type msg desc
+     * Get type msg desc
      */
     @Override
-    public String getMsg(ActionResData<?> actionResData) {
-        if (msgMap.containsKey(actionResData.getMsgType())) {
-            if (msgMap.get(actionResData.getMsgType()).containsKey(actionResData.getCode())) {
-                return msgMap.get(actionResData.getMsgType()).get(actionResData.getCode());
-            }
-        }
-        return actionResData.getDesc();
-    }
-
-    @Override
-    public String getMsg(String code, Map<String, String> values) {
-        String msg = getMsg(code);
+    public String getMsg(String type, String code, Map<String, String> values) {
+        String msg = getMsg(type, code);
         if (msg != null) {
             return StringUtils.templateConvert(msg, values, "{", "}");
         }
@@ -61,25 +50,15 @@ public class SvcMsgHandlerDefaultImpl implements SvcMsgHandler {
     }
 
     private void buildMsg(List<SvcMsgListHandler> handlers) {
-        handlers.forEach(handler -> {
-            handler.getMsgList().forEach(node -> {
-                if (msgMap.containsKey(node.getMsgType())) {
-                    msgMap.get(node.getMsgType()).put(node.getCode(), node.getDesc());
-                } else {
-                    Map<String, String> tmp = new HashMap<>();
-                    tmp.put(node.getCode(), node.getDesc());
-                    msgMap.put(node.getMsgType(), tmp);
-                }
-            });
-        });
+        handlers.forEach(handler -> handler.getMsgList()
+                .forEach(node -> msgMap
+                        .computeIfAbsent(node.getMsgType(), k -> new HashMap<>())
+                        .put(node.getCode(), node.getDesc())));
     }
 
     @PostConstruct
     public void init() {
-        List<SvcMsgListHandler> mingleSvcMsgHandlers = svcMsgListHandlers.stream().filter(handler -> handler.getClass().getAnnotation(MingleSvcMsg.class) != null).collect(Collectors.toList());
-        List<SvcMsgListHandler> svcMsgHandlers = svcMsgListHandlers.stream().filter(handler -> handler.getClass().getAnnotation(MingleSvcMsg.class) == null).collect(Collectors.toList());
-        buildMsg(mingleSvcMsgHandlers);
-        buildMsg(svcMsgHandlers);
+        buildMsg(svcMsgListHandlers);
     }
 
 }

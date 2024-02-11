@@ -1,4 +1,4 @@
-package io.github.amings.mingle.svc.config;
+package io.github.amings.mingle.svc.configuration;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.amings.mingle.svc.component.SvcBinderComponent;
@@ -20,9 +20,8 @@ import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import jakarta.annotation.PostConstruct;
 import org.springdoc.api.AbstractOpenApiResource;
-import org.springdoc.core.GroupedOpenApi;
-import org.springdoc.core.customizers.OpenApiCustomiser;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springdoc.core.customizers.OpenApiCustomizer;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,31 +38,34 @@ import java.util.Map;
  */
 
 @Configuration
-public class SvcDocConfig {
+public class SvcDocConfiguration {
 
-    @Autowired
-    private SvcBinderComponent svcBinderComponent;
-    @Autowired
-    private SvcResModelHandler svcResModelHandler;
+    private final SvcBinderComponent svcBinderComponent;
+    private final SvcResModelHandler svcResModelHandler;
     @Value("${mingle.svc.openapi.useFqn:false}")
     public boolean useFqn;
+
+    public SvcDocConfiguration(SvcBinderComponent svcBinderComponent, SvcResModelHandler svcResModelHandler) {
+        this.svcBinderComponent = svcBinderComponent;
+        this.svcResModelHandler = svcResModelHandler;
+    }
 
     @Bean
     public GroupedOpenApi svcGroup() {
         return GroupedOpenApi.builder()
                 .group("Service")
-                .addOpenApiCustomiser(svcOpenApiCustomiser())
+                .addOpenApiCustomizer(svcOpenApiCustomizer())
                 .build();
     }
 
     @Bean
-    public OpenApiCustomiser svcOpenApiCustomiser() {
+    public OpenApiCustomizer svcOpenApiCustomizer() {
         return openApi -> {
             ModelConverters instance = ModelConverters.getInstance();
             if (useFqn) {
                 buildConverter(instance);
             }
-            svcBinderComponent.getSvcMap().forEach((k, v) -> {
+            svcBinderComponent.getSvcBinderModelMap().forEach((k, v) -> {
                 PathItem pathItem = openApi.getPaths().get(v.getSvcPath());
                 if (pathItem != null) {
                     Operation operation = null;
@@ -166,7 +168,7 @@ public class SvcDocConfig {
     @PostConstruct
     private void init() {
         ArrayList<Class<?>> classes = new ArrayList<>();
-        svcBinderComponent.getSvcMap().forEach((k, v) -> {
+        svcBinderComponent.getSvcBinderModelMap().forEach((k, v) -> {
             classes.add(v.getSvcClass());
         });
         AbstractOpenApiResource.addRestControllers(classes.toArray(new Class[0]));
