@@ -9,11 +9,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Action annotation
+ * Annotation for action
  *
  * @author Ming
  */
-
 @Service
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -24,6 +23,6 @@ public @interface Action {
     )
     String value() default "";
 
-    String desc();
+    String desc() default "";
 
 }

@@ -1,18 +1,17 @@
 package io.github.amings.mingle.svc.handler;
 
-import io.github.amings.mingle.svc.handler.model.SvcBeginModel;
-import io.github.amings.mingle.svc.handler.model.SvcEndModel;
+import io.github.amings.mingle.svc.filter.SvcInfo;
 
 /**
- * Implements to custom Svc logging method，must be a spring bean
+ * Handler for service logging logic
  *
  * @author Ming
  */
 
 public interface SvcLogHandler {
 
-    void writeBeginLog(SvcBeginModel model);
+    void writeBeginLog(SvcInfo svcInfo);
 
-    void writeEndLog(SvcEndModel model);
+    void writeEndLog(SvcInfo svcInfo);
 
 }

@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Exception resolver
+ * This class collect all register {@link AbstractActionExceptionHandler} and resolver exception
  *
  * @author Ming
  */

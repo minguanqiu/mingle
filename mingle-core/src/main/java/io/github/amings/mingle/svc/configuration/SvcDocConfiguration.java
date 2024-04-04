@@ -1,14 +1,11 @@
 package io.github.amings.mingle.svc.configuration;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
 import io.github.amings.mingle.svc.component.SvcBinderComponent;
-import io.github.amings.mingle.svc.handler.SvcResModelHandler;
-import io.swagger.v3.core.converter.ModelConverter;
+import io.github.amings.mingle.svc.handler.SvcResponseHandler;
 import io.swagger.v3.core.converter.ModelConverters;
 import io.swagger.v3.core.converter.ResolvedSchema;
-import io.swagger.v3.core.jackson.ModelResolver;
-import io.swagger.v3.core.jackson.TypeNameResolver;
-import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
@@ -18,11 +15,9 @@ import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
-import jakarta.annotation.PostConstruct;
 import org.springdoc.api.AbstractOpenApiResource;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springdoc.core.models.GroupedOpenApi;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -32,26 +27,26 @@ import java.util.Arrays;
 import java.util.Map;
 
 /**
- * Custom springdoc for Svc
+ * Configuration for service spring doc
  *
  * @author Ming
  */
-
 @Configuration
 public class SvcDocConfiguration {
 
     private final SvcBinderComponent svcBinderComponent;
-    private final SvcResModelHandler svcResModelHandler;
-    @Value("${mingle.svc.openapi.useFqn:false}")
-    public boolean useFqn;
+    private final SvcResponseHandler svcResponseHandler;
+    private String responseBodyFiledName;
+    private final ModelConverters instance = ModelConverters.getInstance();
 
-    public SvcDocConfiguration(SvcBinderComponent svcBinderComponent, SvcResModelHandler svcResModelHandler) {
+    public SvcDocConfiguration(SvcBinderComponent svcBinderComponent, SvcResponseHandler svcResponseHandler) {
         this.svcBinderComponent = svcBinderComponent;
-        this.svcResModelHandler = svcResModelHandler;
+        this.svcResponseHandler = svcResponseHandler;
+        init();
     }
 
     @Bean
-    public GroupedOpenApi svcGroup() {
+    public GroupedOpenApi svcGroupedOpenApi() {
         return GroupedOpenApi.builder()
                 .group("Service")
                 .addOpenApiCustomizer(svcOpenApiCustomizer())
@@ -61,10 +56,6 @@ public class SvcDocConfiguration {
     @Bean
     public OpenApiCustomizer svcOpenApiCustomizer() {
         return openApi -> {
-            ModelConverters instance = ModelConverters.getInstance();
-            if (useFqn) {
-                buildConverter(instance);
-            }
             svcBinderComponent.getSvcBinderModelMap().forEach((k, v) -> {
                 PathItem pathItem = openApi.getPaths().get(v.getSvcPath());
                 if (pathItem != null) {
@@ -74,7 +65,7 @@ public class SvcDocConfiguration {
                     } else if (pathItem.getPut() != null) {
                         operation = pathItem.getPut();
                     } else if (pathItem.getPost() != null) {
-                        operation = pathItem.getPost();
+                        operation = pathItem.getPost(); //svc only post method
                     } else if (pathItem.getDelete() != null) {
                         operation = pathItem.getDelete();
                     } else if (pathItem.getOptions() != null) {
@@ -95,83 +86,59 @@ public class SvcDocConfiguration {
     }
 
     private void buildPathItem(ModelConverters instance, OpenAPI openApi, Operation operation, SvcBinderComponent.SvcBinderModel v) {
+        operation.operationId(v.getSvcPath());
         operation.setTags(Arrays.asList(v.getSvc().tags()));
         operation.setSummary(v.getSvc().summary());
-        operation.setDescription(v.getSvc().desc());
-        if (!v.isReqCustom()) {
-            ResolvedSchema reqModelSchema = instance.readAllAsResolvedSchema(v.getReqModelClass());
-            operation.setRequestBody(new RequestBody()
-                    .content(new Content()
-                            .addMediaType("application/json", new MediaType().schema(reqModelSchema.schema))));
-            if (operation.getParameters() != null) {
-                operation.getParameters().clear();
-            }
-            openApi.schema(reqModelSchema.schema.getName(), reqModelSchema.schema);
-            buildSchema(openApi, reqModelSchema.referencedSchemas);
+        operation.setDescription(v.getSvc().description());
+        ResolvedSchema requestSchema = instance.readAllAsResolvedSchema(v.getRequestClass());
+        operation.setRequestBody(new RequestBody()
+                .content(new Content()
+                        .addMediaType("application/json", new MediaType().schema(requestSchema.schema))));
+        if (operation.getParameters() != null) {
+            operation.getParameters().clear();
         }
-        if (!v.isResCustom()) {
-            ResolvedSchema resModelSchema = instance.readAllAsResolvedSchema(v.getResModelClass());
-            ResolvedSchema mainSvcResSchema = buildMainSvcResSchema(instance, v.getResModelClass());
-            operation.setResponses(new ApiResponses()
-                    .addApiResponse("200", new ApiResponse()
-                            .description("successful operation")
-                            .content(new Content()
-                                    .addMediaType("application/json", new MediaType().schema(mainSvcResSchema.schema)))));
-            openApi.schema(resModelSchema.schema.getName(), resModelSchema.schema);
-            buildSchema(openApi, mainSvcResSchema.referencedSchemas);
-            buildSchema(openApi, resModelSchema.referencedSchemas);
+        openApi.schema(requestSchema.schema.getName(), requestSchema.schema);
+        buildSchema(openApi, requestSchema.referencedSchemas);
+        ResolvedSchema responseSchema = instance.readAllAsResolvedSchema(v.getResponseClass());
+        ResolvedSchema fullResponseSchema = buildMainSvcResSchema(instance, responseSchema);
+        ApiResponses defaultApiResponses = buildResponse(fullResponseSchema);
+        ApiResponses operationResponses = operation.getResponses();
+        if(operationResponses.containsKey("200")) {
+            operationResponses.addApiResponse("200", defaultApiResponses.get("200"));
         }
-    }
-
-    private void buildConverter(ModelConverters instance) {
-        ModelConverter modelConverter = null;
-        for (ModelConverter converter : instance.getConverters()) {
-            modelConverter = converter;
-        }
-        instance.removeConverter(modelConverter);
-        instance.addConverter(new ModelResolver(Json.mapper(), new SvcDocTypeNameResolver(true)));
+        openApi.schema(responseSchema.schema.getName(), responseSchema.schema);
+        buildSchema(openApi, responseSchema.referencedSchemas);
     }
 
     private void buildSchema(OpenAPI openAPI, Map<String, Schema> schemaMap) {
         schemaMap.forEach(openAPI::schema);
     }
 
-    private ResolvedSchema buildMainSvcResSchema(ModelConverters instance, Class<?> clazz) {
-        ResolvedSchema mainSvcResModel = instance.readAllAsResolvedSchema(svcResModelHandler.getClass());
-        Schema<?> schema = new Schema<>();
-        schema.name(clazz.getName());
-        schema.$ref("#/components/schemas/" + clazz.getSimpleName());
-        for (Method method : svcResModelHandler.getClass().getMethods()) {
-            if (method.getName().equals("getResBody")) {
-                String filedName = method.getAnnotation(JsonProperty.class).value();
-                mainSvcResModel.schema.getProperties().remove("resBody");
-                mainSvcResModel.schema.addProperty(filedName, schema);
-            }
-        }
+    private ResolvedSchema buildMainSvcResSchema(ModelConverters instance, ResolvedSchema resModelSchema) {
+        ResolvedSchema mainSvcResModel = instance.readAllAsResolvedSchema(svcResponseHandler.getClass());
+        mainSvcResModel.schema.addProperty(responseBodyFiledName, resModelSchema.schema);
         return mainSvcResModel;
     }
 
-    protected static class SvcDocTypeNameResolver extends TypeNameResolver {
-        private final boolean useFqn;
-
-        public SvcDocTypeNameResolver(boolean useFqn) {
-            this.useFqn = useFqn;
-        }
-
-        @Override
-        protected String getNameOfClass(Class<?> cls) {
-            return this.useFqn ? cls.getName().replace("$", "_") : cls.getSimpleName();
-        }
-
+    private ApiResponses buildResponse(ResolvedSchema resolvedSchema) {
+        return new ApiResponses()
+                .addApiResponse("200", new ApiResponse()
+                        .description("successful operation")
+                        .content(new Content()
+                                .addMediaType("application/json", new MediaType().schema(resolvedSchema.schema))));
     }
 
-    @PostConstruct
     private void init() {
         ArrayList<Class<?>> classes = new ArrayList<>();
         svcBinderComponent.getSvcBinderModelMap().forEach((k, v) -> {
             classes.add(v.getSvcClass());
         });
         AbstractOpenApiResource.addRestControllers(classes.toArray(new Class[0]));
+        for (Method method : svcResponseHandler.getClass().getDeclaredMethods()) {
+            if (method.getName().equals("getResponseBody") && method.getReturnType().equals(JsonNode.class)) {
+                this.responseBodyFiledName = method.getAnnotation(JsonProperty.class) != null ? method.getAnnotation(JsonProperty.class).value() : "responseBody";
+            }
+        }
     }
 
 }

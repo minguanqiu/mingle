@@ -1,33 +1,21 @@
 package io.github.amings.mingle.svc.redis.aspect;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.github.amings.mingle.svc.filter.SvcInfo;
-import io.github.amings.mingle.svc.log.LogUtils;
-import io.github.amings.mingle.svc.log.SvcLogModel;
+import io.github.amings.mingle.svc.concurrent.SvcAttribute;
+import io.github.amings.mingle.svc.concurrent.SvcThreadLocal;
+import io.github.amings.mingle.svc.handler.SerialNumberGeneratorHandler;
 import io.github.amings.mingle.svc.redis.handler.RedisLogHandler;
-import io.github.amings.mingle.svc.redis.handler.model.RedisLogBeginModel;
-import io.github.amings.mingle.svc.redis.handler.model.RedisLogEndModel;
-import io.github.amings.mingle.utils.DateUtils;
-import io.github.amings.mingle.utils.JacksonUtils;
-import io.github.amings.mingle.utils.UUIDUtils;
+import io.github.amings.mingle.svc.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
- * Redis logging aspect
+ * {@link Aspect} for redis logging for {@link io.github.amings.mingle.svc.redis.RedisDao} all method
  *
  * @author Ming
  */
@@ -36,15 +24,16 @@ import java.util.Optional;
 @Aspect
 public class RedisLogAspect {
 
-    @Autowired
-    SvcInfo svcInfo;
-    @Autowired
-    RedisLogHandler redisLogHandler;
-    @Autowired
-    @Qualifier("redisLogJacksonUtils")
-    JacksonUtils jacksonUtils;
+    private final RedisLogHandler redisLogHandler;
 
-    @Pointcut("within(io.github.amings.mingle.svc.redis.Redis+)")
+    private final SerialNumberGeneratorHandler serialNumberGeneratorHandler;
+
+    public RedisLogAspect(RedisLogHandler redisLogHandler, SerialNumberGeneratorHandler serialNumberGeneratorHandler) {
+        this.redisLogHandler = redisLogHandler;
+        this.serialNumberGeneratorHandler = serialNumberGeneratorHandler;
+    }
+
+    @Pointcut("within(io.github.amings.mingle.svc.redis.RedisDao+)")
     public void doPoint() {
     }
 
@@ -54,93 +43,30 @@ public class RedisLogAspect {
     }
 
     private Object processAround(ProceedingJoinPoint joinPoint) throws Throwable {
-        String uuid = UUIDUtils.generateUuid();
-        LocalDateTime start = DateUtils.getNowLocalDateTime();
-        SvcLogModel svcLogModel = LogUtils.getSvcLogModel(svcInfo);
+        Optional<SvcAttribute> svcAttributeOptional = SvcThreadLocal.get();
+        if(svcAttributeOptional.isEmpty()) {
+            return joinPoint.proceed();
+        }
+        SvcAttribute svcAttribute = svcAttributeOptional.get();
+        String svcSerialNum = (String) svcAttribute.getAttributes(SvcAttribute.Name.SVC_SERIAL_NUMBER);
+        String actSerialNum = serialNumberGeneratorHandler.generate("redis");
+        LocalDateTime startTime = DateUtils.getNowLocalDateTime();
         try {
             try {
-                if (svcLogModel != null) {
-                    redisLogHandler.writeBeginLog(processBeginLog(svcLogModel, uuid, start, joinPoint));
-                }
+                redisLogHandler.writeBeginLog(svcSerialNum, actSerialNum, DateUtils.getNowLocalDateTime(), joinPoint);
             } catch (Exception e) {
                 log.error("", e);
             }
-            Object proceed = joinPoint.proceed();
+            Object proceedObject = joinPoint.proceed();
             try {
-                if (svcLogModel != null) {
-                    redisLogHandler.writeEndLog(processEndLog(svcLogModel, uuid, start, proceed));
-                }
+                redisLogHandler.writeEndLog(svcSerialNum, actSerialNum, startTime, joinPoint, proceedObject);
             } catch (Exception e) {
                 log.error("", e);
             }
-            return proceed;
+            return proceedObject;
         } catch (Throwable t) {
-            if (svcLogModel != null) {
-                redisLogHandler.afterThrowing(t, processEndLog(svcLogModel, uuid, start, null));
-            }
+            redisLogHandler.afterThrowing(t, svcSerialNum, actSerialNum, startTime, joinPoint);
             throw t;
-        }
-    }
-
-    private RedisLogBeginModel processBeginLog(SvcLogModel svcLogModel, String uuid, LocalDateTime start, ProceedingJoinPoint joinPoint) {
-        RedisLogBeginModel model = new RedisLogBeginModel();
-        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        Method method = signature.getMethod();
-        ObjectNode reqModel = jacksonUtils.getObjectNode();
-        for (int i = 0; i < method.getParameters().length; i++) {
-            Parameter parameter = method.getParameters()[i];
-            Object object = joinPoint.getArgs()[i];
-            if (joinPoint.getArgs()[i] instanceof Optional) {
-                Optional<Object> objectOptional = ((Optional<Object>) joinPoint.getArgs()[i]);
-                if (objectOptional.isPresent()) {
-                    object = objectOptional.get();
-                }
-                parseObject(reqModel,parameter,object);
-            } else if (joinPoint.getArgs()[i] instanceof String) {
-                reqModel.put(parameter.getName(), object.toString());
-            } else {
-                parseObject(reqModel,parameter,object);
-            }
-        }
-        model.setSvcUuid(svcLogModel.getSvcUuid());
-        model.setUuid(uuid);
-        model.setName(joinPoint.getTarget().getClass().getSimpleName() + "_" + method.getName());
-        model.setStartDateTime(start);
-        model.setRequestBody(reqModel.toString());
-        return model;
-    }
-
-    private RedisLogEndModel processEndLog(SvcLogModel svcLogModel, String uuid, LocalDateTime start, Object proceed) {
-        RedisLogEndModel model = new RedisLogEndModel();
-        LocalDateTime end = DateUtils.getNowLocalDateTime();
-        model.setSvcUuid(svcLogModel.getSvcUuid());
-        model.setUuid(uuid);
-        model.setEndDateTime(end);
-        if (proceed != null) {
-            Object object = checkOptional(proceed);
-            jacksonUtils.readTree(object).ifPresent(node -> model.setResponseBody(node.toString()));
-        } else {
-            model.setResponseBody(jacksonUtils.getObjectNode().toString());
-        }
-        model.setRunTime(String.valueOf(Duration.between(start, end).toMillis()));
-        return model;
-    }
-
-    @SuppressWarnings("unchecked")
-    private Object checkOptional(Object resModel) {
-        if (resModel instanceof Optional) {
-            Optional<Object> option = (Optional<Object>) resModel;
-            return option.orElse(null);
-        }
-        return resModel;
-    }
-
-    private void parseObject(ObjectNode reqModel, Parameter parameter, Object object) {
-        Optional<JsonNode> jsonNodeOptional = jacksonUtils.readTree(object);
-        if (jsonNodeOptional.isPresent()) {
-            reqModel.set(parameter.getName(), jsonNodeOptional.get());
-        } else {
-            reqModel.set(parameter.getName(), null);
         }
     }
 

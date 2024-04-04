@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Request model to build uri path parameter
+ * Annotation Help build uri path variable for restful action
  *
  * @author Ming
  */

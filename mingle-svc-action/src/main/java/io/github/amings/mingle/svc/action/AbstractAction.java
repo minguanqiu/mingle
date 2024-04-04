@@ -1,45 +1,38 @@
 package io.github.amings.mingle.svc.action;
 
-import com.google.common.reflect.TypeToken;
+import io.github.amings.mingle.svc.action.concurrent.ActionAttribute;
+import io.github.amings.mingle.svc.action.concurrent.ActionThreadLocal;
 import io.github.amings.mingle.svc.action.configuration.properties.ActionProperties;
 import io.github.amings.mingle.svc.action.enums.AutoBreak;
 import io.github.amings.mingle.svc.action.exception.ActionAutoBreakException;
-import io.github.amings.mingle.svc.action.exception.BreakActionLogicException;
-import io.github.amings.mingle.svc.action.exception.handler.model.ActionExceptionModel;
 import io.github.amings.mingle.svc.action.exception.resolver.ActionExceptionHandlerResolver;
-import io.github.amings.mingle.svc.action.interceptor.ActionInterceptor;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
 
 /**
+ * Base class for all action
+ *
  * <pre>
- * Base Action class for all Action logic
+ * Action is a module,help uniform usage and logging
  *
  * Generic:
- * Req - Action request model (like body)
- * Res - Action response model (like body)
- * ReqData - Action Request data (like header)
- * ResData - Action Response data (like header)
+ * Req - action request
+ * Res - action response body
  * </pre>
  *
  * @author Ming
  */
-
-public abstract class AbstractAction<Req extends ActionReqModel, ResData extends ActionResData, Res extends ActionResModel> {
+public abstract non-sealed class AbstractAction<Req extends ActionRequest, ResB extends ActionResponseBody> implements Action<Req, ResB> {
 
     protected final ActionProperties actionProperties;
-    private final ActionExceptionHandlerResolver actionExceptionHandlerResolver;
-    private final List<ActionInterceptor> actionInterceptors;
-    private Class<ResData> resDataClass;
+    private List<ActionInterceptor> actionInterceptors;
 
     public AbstractAction(ActionProperties actionProperties, ActionExceptionHandlerResolver actionExceptionHandlerResolver, List<ActionInterceptor> actionInterceptors) {
         this.actionProperties = actionProperties;
-        this.actionExceptionHandlerResolver = actionExceptionHandlerResolver;
         this.actionInterceptors = actionInterceptors;
-        init();
+        buildInterceptor(actionInterceptors, actionExceptionHandlerResolver);
     }
 
     /**
@@ -48,83 +41,34 @@ public abstract class AbstractAction<Req extends ActionReqModel, ResData extends
      * @param reqModel Action request model
      * @return ResData
      */
-    public ActionResponse<ResData, Res> doAction(Req reqModel) {
-        List<ActionInterceptor> interceptors = processInterceptorBefore(reqModel);
-        ActionResponse<ResData, Res> actionResponse = new ActionResponse<>();
+    @SuppressWarnings("unchecked")
+    public final ActionResponse<ResB> doAction(Req reqModel) {
+        ActionResponse<ActionResponseBody> response = new ActionResponse<>();
+        response.setCode(actionProperties.getSuccessCode());
+        response.setMsg(actionProperties.getSuccessMsg());
+        initActionAttributes();
         try {
-            actionResponse.setCode(actionProperties.getSuccessCode());
-            actionResponse.setDesc(actionProperties.getSuccessDesc());
-            ResData resData = initResData();
-            actionResponse.setResData(resData);
-            actionResponse.setResModel(processLogic(reqModel, resData));
-        } catch (BreakActionLogicException e1) {
-            actionResponse.setCode(e1.getCode());
-            actionResponse.setDesc(e1.getDesc());
-            if (e1.getResModel() != null) {
-                actionResponse.setResModel((Res) e1.getResModel());
-            }
-        } catch (Exception e) {
-            if (actionExceptionHandlerResolver == null) {
-                throw e;
-            }
-            ActionExceptionModel actionExceptionModel = actionExceptionHandlerResolver.resolver(e);
-            actionResponse.setCode(actionExceptionModel.getCode());
-            actionResponse.setDesc(actionExceptionModel.getDesc());
-        }
-        actionResponse.setMsgType(getMsgType());
-        checkSuccess(reqModel.getAutoBreak(), actionResponse);
-        processInterceptorAfter(interceptors, actionResponse);
-        return actionResponse;
-    }
-
-    private List<ActionInterceptor> processInterceptorBefore(Req reqModel) {
-        ArrayList<ActionInterceptor> interceptors = new ArrayList<>();
-        actionInterceptors.forEach(actionInterceptor -> {
-            if (actionInterceptor.supported(this)) {
-                interceptors.add(actionInterceptor);
-                actionInterceptor.before(this, reqModel);
-            }
-        });
-        return interceptors;
-    }
-
-    private void processInterceptorAfter(List<ActionInterceptor> actionInterceptors, ActionResponse<ResData, Res> actionResponse) {
-        actionInterceptors.forEach(actionInterceptor -> {
-            actionInterceptor.after(this, actionResponse);
-        });
-    }
-
-    protected ResData initResData() {
-        try {
-            return resDataClass.getDeclaredConstructor().newInstance();
-        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
-                 IllegalAccessException e) {
-            throw new RuntimeException(e);
+            ActionChain actionChain = new ActionChain(actionInterceptors, this, reqModel, response, 0);
+            actionChain.proceed();
+            return (ActionResponse<ResB>) actionChain.response();
+        } finally {
+            ActionThreadLocal.remove();
         }
     }
 
-    /**
-     * Process action logic
-     *
-     * @param reqModel Action request model
-     * @param resData
-     * @return Res
-     */
-    protected abstract Res processLogic(Req reqModel, ResData resData);
+    private void initActionAttributes() {
+        ActionThreadLocal.set(new ActionAttribute());
+    }
 
-    /**
-     * Defined action type
-     *
-     * @return String
-     */
-    public abstract String getType();
+
+    protected abstract ActionInfo<ResB> processLogic(Req request, ActionInfo<ResB> actionInfo);
 
     /**
      * Defined action msg type
      *
      * @return String
      */
-    protected String getMsgType() {
+    public String getMsgType() {
         return actionProperties.getMsgType();
     }
 
@@ -134,7 +78,7 @@ public abstract class AbstractAction<Req extends ActionReqModel, ResData extends
      * @param autoBreak      autoBreak
      * @param actionResponse action response data
      */
-    private void checkSuccess(AutoBreak autoBreak, ActionResponse<ResData, Res> actionResponse) {
+    protected final void checkSuccess(AutoBreak autoBreak, ActionResponse<ResB> actionResponse) {
         if (!actionProperties.getSuccessCode().equals(actionResponse.getCode())) {
             switch (autoBreak) {
                 case GLOBAL:
@@ -142,7 +86,7 @@ public abstract class AbstractAction<Req extends ActionReqModel, ResData extends
                         throw new ActionAutoBreakException(actionResponse);
                     }
                     break;
-                case TURE:
+                case TRUE:
                     throw new ActionAutoBreakException(actionResponse);
             }
         } else {
@@ -150,32 +94,11 @@ public abstract class AbstractAction<Req extends ActionReqModel, ResData extends
         }
     }
 
-    /**
-     * Break action logic
-     *
-     * @param code msg code
-     * @param desc msg desc
-     */
-    protected void breakActionLogic(String code, String desc) {
-        breakActionLogic(code, desc, null);
+    private void buildInterceptor(List<ActionInterceptor> actionInterceptors, ActionExceptionHandlerResolver actionExceptionHandlerResolver) {
+        this.actionInterceptors = new ArrayList<>(actionInterceptors);
+//        this.actionInterceptors.add(0, new ActionProcessInterceptor());
+        this.actionInterceptors.add(new ActionResponseInterceptor(actionExceptionHandlerResolver));
     }
 
-    /**
-     * Break action logic
-     *
-     * @param code     msg code
-     * @param desc     msg desc
-     * @param resModel Res
-     */
-    protected void breakActionLogic(String code, String desc, Res resModel) {
-        throw new BreakActionLogicException(code, desc, resModel);
-    }
-
-
-    @SuppressWarnings("unchecked")
-    private void init() {
-        resDataClass = (Class<ResData>) new TypeToken<ResData>(getClass()) {
-        }.getRawType();
-    }
 
 }

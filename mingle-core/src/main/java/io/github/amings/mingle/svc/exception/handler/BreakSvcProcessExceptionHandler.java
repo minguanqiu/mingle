@@ -1,33 +1,29 @@
 package io.github.amings.mingle.svc.exception.handler;
 
-import io.github.amings.mingle.svc.AbstractSvcLogic;
-import io.github.amings.mingle.svc.annotation.ExceptionHandler;
-import io.github.amings.mingle.svc.configuration.properties.SvcProperties;
+import io.github.amings.mingle.svc.SvcResponse;
 import io.github.amings.mingle.svc.exception.BreakSvcProcessException;
 import io.github.amings.mingle.svc.exception.handler.abs.AbstractExceptionHandler;
 import io.github.amings.mingle.svc.filter.SvcInfo;
-import io.github.amings.mingle.svc.handler.SvcMsgHandler;
-import io.github.amings.mingle.svc.handler.SvcResModelHandler;
-import io.github.amings.mingle.svc.utils.SvcResUtils;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 
 /**
- * Break Svc Process Exception Handler
+ * Default handler will catch {@link BreakSvcProcessException}
  *
  * @author Ming
- * @see AbstractSvcLogic
  */
-
-@ExceptionHandler
+@Component
+@Order(Integer.MIN_VALUE)
 public class BreakSvcProcessExceptionHandler extends AbstractExceptionHandler<BreakSvcProcessException> {
 
-    public BreakSvcProcessExceptionHandler(SvcInfo svcInfo, SvcResUtils svcResUtils, SvcMsgHandler svcMsgHandler, SvcProperties svcProperties) {
-        super(svcInfo, svcResUtils, svcMsgHandler, svcProperties);
+    public BreakSvcProcessExceptionHandler(SvcInfo svcInfo) {
+        super(svcInfo);
     }
 
     @Override
-    public ResponseEntity<SvcResModelHandler> handle(BreakSvcProcessException e) {
-        return build(e.getCode(), e.getDesc(), e.getSvcResModel());
+    public ResponseEntity<SvcResponse> handle(BreakSvcProcessException e) {
+        return build(e.getCode(), e.getMsg(), e.getSvcResponse());
     }
 
 }

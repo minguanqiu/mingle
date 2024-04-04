@@ -1,7 +1,7 @@
 package io.github.amings.mingle.svc.action.rest.annotation;
 
 import io.github.amings.mingle.svc.action.annotation.Action;
-import io.github.amings.mingle.utils.enums.HttpMethod;
+import io.github.amings.mingle.svc.action.rest.enums.HttpMethod;
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.http.MediaType;
 
@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
  * @author Ming
  */
 
-@Action(desc = "")
+@Action
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RestAction {

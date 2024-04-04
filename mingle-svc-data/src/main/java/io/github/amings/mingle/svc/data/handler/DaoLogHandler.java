@@ -1,27 +1,22 @@
 package io.github.amings.mingle.svc.data.handler;
 
-import io.github.amings.mingle.svc.data.handler.model.DaoLogBeginModel;
-import io.github.amings.mingle.svc.data.handler.model.DaoLogEndModel;
+import org.aspectj.lang.ProceedingJoinPoint;
 
 import java.time.LocalDateTime;
 
 /**
- * Dao logging handler
+ * Handler for dao logging
  *
  * @author Ming
  */
 
 public interface DaoLogHandler {
 
-    void writeBeginLog(DaoLogBeginModel model);
+    void writeBeginLog(String svcSerialNum, String actSerialNum, LocalDateTime startDateTime, ProceedingJoinPoint joinPoint);
 
-    void writeEndLog(DaoLogEndModel model);
+    void writeEndLog(String svcSerialNum, String actSerialNum, LocalDateTime startDateTime, ProceedingJoinPoint joinPoint, Object proceedObject);
 
-    @Deprecated
-    void afterThrowing(Throwable t, String uuid, LocalDateTime endDateTime, String runTime);
+    void afterThrowing(Throwable throwable, String svcSerialNum, String actSerialNum, LocalDateTime startTime, ProceedingJoinPoint joinPoint);
 
-    default void afterThrowing(Throwable t, DaoLogEndModel model) {
-
-    }
 
 }

@@ -5,6 +5,8 @@ import io.github.amings.mingle.svc.action.exception.handler.model.ActionExceptio
 import lombok.Getter;
 
 /**
+ * Base class for action exception handler
+ *
  * @author Ming
  */
 @Getter

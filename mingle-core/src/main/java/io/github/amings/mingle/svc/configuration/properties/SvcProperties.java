@@ -6,9 +6,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 /**
+ * {@link ConfigurationProperties} mapping service properties
+ *
  * @author Ming
  */
-
 @Getter
 @Setter
 @Configuration
@@ -21,6 +22,6 @@ public class SvcProperties {
 
     private String successCode = "0";
 
-    private String successDesc = "successful";
+    private String successMsg = "successful";
 
 }

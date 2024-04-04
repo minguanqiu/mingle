@@ -4,7 +4,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
- * Mingle auto configuration
+ * {@link AutoConfiguration} for mingle service
  *
  * @author Ming
  */

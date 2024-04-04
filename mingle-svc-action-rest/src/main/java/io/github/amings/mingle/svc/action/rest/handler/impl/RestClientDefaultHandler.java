@@ -7,6 +7,9 @@ import okhttp3.OkHttpClient;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * {@inheritDoc}
+ * Default impl for {@link RestClientHandler}
+ *
  * @author Ming
  */
 

@@ -1,29 +1,16 @@
 package io.github.amings.mingle.svc.redis;
 
-import io.github.amings.mingle.utils.ReflectionUtils;
-import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Service;
-
 /**
- * Base class for all redis dao class
+ * {@inheritDoc}
+ * RedisDao impl for {@link RedisKeyTemplate}
  *
  * @author Ming
  */
 
-@Service
-public abstract class AbstractRedisDao<R extends Redis> {
+public abstract class AbstractRedisDao<E extends RedisEntity> extends RedisDao<RedisKey, E> {
 
-    @Autowired
-    ApplicationContext applicationContext;
-
-    protected R redis;
-
-    @PostConstruct
-    @SuppressWarnings("unchecked")
-    private void init() {
-        redis = (R) applicationContext.getBean(ReflectionUtils.getGenericClassWithGeneric(this.getClass(), 0));
+    public AbstractRedisDao(RedisKeyTemplate<E> redisTemplate) {
+        super(redisTemplate);
     }
 
 }

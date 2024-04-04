@@ -1,34 +1,60 @@
-# mingle
+# Mingle
 
-基於Spring boot framework的Java Web架構
+In a project, architecture is very important, especially when multiple people develop.
 
-## 主要目標
+**Mingle** is a java web architecture, based on spring boot framework, helps build a architecture on your project
 
-* 專注於商業邏輯
+primary goals:
 
-* 好維護
+* Simple and easy to use and configuration
+* Unified development and maintenance process
+* Spring boot powerful feature to use
 
-* 快速開發
+#### Requirements
 
-## 環境需求
+mingle works on spring boot 3 and java 17+
 
-* Java 8
+#### Concept
 
-* Maven
+In mingle, there are two very important roles, Service and Action, follow introduce below:
 
-## 技術要求
+##### Service
+Alias svc, is a API. Your business logic and process place, provide for receiving and responding to client messages
 
-* Spring boot 2 ([Spring Boot](https://spring.io/projects/spring-boot))
+![service](docs/images/service.jpg)
 
-* Jackson ([GitHub - FasterXML/jackson: Main Portal page for the Jackson project](https://github.com/FasterXML/jackson))
+##### Action
+Is a module or component. Everyone logic can be a Action, provide for Service logic and reuse
 
-## 模組
+![service](docs/images/action.jpg)
 
-| module                                           | description     |
-| ------------------------------------------------ | --------------- |
-| [mingle-core](mingle-core)                       | 核心              |
-| [mingle-svc-action-rest](mingle-svc-action-rest) | Action模組-Client |
-| [mingle-svc-session](mingle-svc-session)         | Session模組       |
-| [mingle-svc-data](mingle-svc-data)               | Dao模組           |
-| [mingle-svc-redis](mingle-svc-redis)             | Redis模組         |
-| [mingle-utils](mingle-utils)                     | 基礎工具            |
+## Modules
+
+There are several modules in Mingle. Here is a quick overview:
+
+### mingle-core
+
+Core of mingle module. Is a Service role, based on spring boot web feature.
+
+### mingle-svc-action
+
+Is a Action role, provide request and response design, unfied Action logic development and maintenance process
+
+### mingle-svc-action-rest
+
+Action implements for restful client feature
+
+### mingle-svc-session
+
+Provide session authentication and authority feature on service, based on spring security
+
+### mingle-svc-data
+
+Provide dao layout, based on spring data jpa
+
+### mingle-svc-redis
+
+Provide redis layout, based on spring data redis
+
+
+

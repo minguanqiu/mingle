@@ -4,6 +4,8 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigurationPackage;
 
 /**
+ * {@link AutoConfiguration} for action
+ *
  * @author Ming
  */
 

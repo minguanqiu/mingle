@@ -2,27 +2,30 @@ package io.github.amings.mingle.svc.exception;
 
 import lombok.Getter;
 
+import java.io.Serial;
+
 /**
- * for Svc Filter break logic Exception
+ * Exception for break filter process logic
  *
  * @author Ming
  */
 @Getter
 public class BreakFilterProcessException extends RuntimeException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String code;
 
-    private final String desc;
+    private final String msg;
 
     /**
      * @param code response code
-     * @param desc response desc
+     * @param msg response desc
      */
-    public BreakFilterProcessException(String code, String desc) {
+    public BreakFilterProcessException(String code, String msg) {
         this.code = code;
-        this.desc = desc;
+        this.msg = msg;
     }
 
 }

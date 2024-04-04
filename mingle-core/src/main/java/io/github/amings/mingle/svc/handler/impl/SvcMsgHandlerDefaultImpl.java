@@ -2,7 +2,7 @@ package io.github.amings.mingle.svc.handler.impl;
 
 import io.github.amings.mingle.svc.handler.SvcMsgHandler;
 import io.github.amings.mingle.svc.handler.SvcMsgListHandler;
-import io.github.amings.mingle.utils.StringUtils;
+import io.github.amings.mingle.svc.utils.StringUtils;
 import jakarta.annotation.PostConstruct;
 
 import java.util.HashMap;
@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * {@link SvcMsgHandler} impl
+ * {@inheritDoc}
+ * Default impl for {@link SvcMsgHandler}
  *
  * @author Ming
  */
@@ -41,10 +42,10 @@ public class SvcMsgHandlerDefaultImpl implements SvcMsgHandler {
      * Get type msg desc
      */
     @Override
-    public String getMsg(String type, String code, Map<String, String> values) {
+    public String getMsg(String type, String code, Map<String, String> convertMap) {
         String msg = getMsg(type, code);
-        if (msg != null) {
-            return StringUtils.templateConvert(msg, values, "{", "}");
+        if (msg != null && convertMap != null) {
+            return StringUtils.templateConvert(msg, convertMap, "{", "}");
         }
         return null;
     }
@@ -53,7 +54,7 @@ public class SvcMsgHandlerDefaultImpl implements SvcMsgHandler {
         handlers.forEach(handler -> handler.getMsgList()
                 .forEach(node -> msgMap
                         .computeIfAbsent(node.getMsgType(), k -> new HashMap<>())
-                        .put(node.getCode(), node.getDesc())));
+                        .put(node.getCode(), node.getMsg())));
     }
 
     @PostConstruct

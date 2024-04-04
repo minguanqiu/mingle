@@ -1,7 +1,7 @@
 package io.github.amings.mingle.svc.exception;
 
 /**
- * for spring boot run Svc configuration fail
+ * Exception for check mingle rules
  *
  * @author Ming
  */

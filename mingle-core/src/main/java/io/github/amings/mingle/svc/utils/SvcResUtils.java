@@ -1,53 +1,44 @@
 package io.github.amings.mingle.svc.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import io.github.amings.mingle.svc.SvcResModel;
-import io.github.amings.mingle.svc.filter.SvcInfo;
-import io.github.amings.mingle.svc.handler.SvcResModelHandler;
-import io.github.amings.mingle.utils.JacksonUtils;
-import io.github.amings.mingle.utils.ReflectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.Optional;
+import io.github.amings.mingle.svc.SvcResponse;
+import io.github.amings.mingle.svc.handler.SvcResponseHandler;
+import org.springframework.objenesis.SpringObjenesis;
 
 /**
- * Utils for Svc response template process
+ * Utils for service response template
  *
  * @author Ming
  */
-
-@Service
 public class SvcResUtils {
 
-    @Autowired
-    SvcResModelHandler svcResModelHandler;
-    @Autowired
-    SvcInfo svcInfo;
-    @Autowired
-    JacksonUtils jacksonUtils;
+    private final SpringObjenesis springObjenesis = new SpringObjenesis();
+    private final SvcResponseHandler svcResponseHandler;
+    private final JacksonUtils jacksonUtils;
 
-    public SvcResModelHandler build(String code, String desc) {
-        return build(code, desc, new SvcResModel());
+    public SvcResUtils(SvcResponseHandler svcResponseHandler, JacksonUtils jacksonUtils) {
+        this.svcResponseHandler = svcResponseHandler;
+        this.jacksonUtils = jacksonUtils;
     }
 
-    public SvcResModelHandler build(SvcResModel svcResModel) {
-        return build(svcInfo.getCode(), svcInfo.getDesc(), svcResModel);
+    public SvcResponseHandler build(String code, String msg) {
+        return build(code, msg, new SvcResponse());
     }
 
-    public SvcResModelHandler build(String code, String desc, SvcResModel svcResModel) {
-        return build(code, desc, svcResModel, jacksonUtils);
+    public SvcResponseHandler build(String code, String msg, SvcResponse svcResponse) {
+        return build(code, msg, svcResponse, jacksonUtils);
     }
 
-    public SvcResModelHandler build(String code, String desc, SvcResModel svcResModel, JacksonUtils jacksonUtils) {
-        SvcResModelHandler svcResModelHandlerImpl = ReflectionUtils.newInstance(svcResModelHandler.getClass());
-        svcResModelHandlerImpl.setCode(code);
-        svcResModelHandlerImpl.setDesc(desc);
-        if (svcResModel != null) {
-            Optional<JsonNode> jsonNodeOptional = jacksonUtils.readTree(svcResModel);
-            jsonNodeOptional.ifPresent(svcResModelHandlerImpl::setResBody);
-        }
-        return svcResModelHandlerImpl;
+    public SvcResponseHandler build(String code, String msg, SvcResponse svcResponse, JacksonUtils jacksonUtils) {
+        return build(code, msg, jacksonUtils.readTree(svcResponse).orElse(null));
+    }
+
+    public SvcResponseHandler build(String code, String msg, JsonNode jsonNode) {
+        SvcResponseHandler svcResponseHandlerImpl = springObjenesis.newInstance(svcResponseHandler.getClass(), true);
+        svcResponseHandlerImpl.setCode(code);
+        svcResponseHandlerImpl.setMsg(msg);
+        svcResponseHandlerImpl.setResponseBody(jsonNode);
+        return svcResponseHandlerImpl;
     }
 
 }

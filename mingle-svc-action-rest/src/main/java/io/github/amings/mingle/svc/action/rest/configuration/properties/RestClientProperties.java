@@ -5,6 +5,11 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * {@link ConfigurationProperties} mapping action rest client properties
+ *
+ * @author Ming
+ */
 @Getter
 @Setter
 @Configuration

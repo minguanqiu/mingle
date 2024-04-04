@@ -1,11 +1,10 @@
 package io.github.amings.mingle.svc.exception.handler.abs;
 
-import io.github.amings.mingle.svc.SvcResModel;
-import io.github.amings.mingle.svc.configuration.properties.SvcProperties;
+import com.google.common.reflect.TypeToken;
+import io.github.amings.mingle.svc.SvcResponse;
+import io.github.amings.mingle.svc.SvcResponseHeader;
 import io.github.amings.mingle.svc.filter.SvcInfo;
-import io.github.amings.mingle.svc.handler.SvcMsgHandler;
-import io.github.amings.mingle.svc.handler.SvcResModelHandler;
-import io.github.amings.mingle.svc.utils.SvcResUtils;
+import lombok.Getter;
 import org.springframework.http.ResponseEntity;
 
 /**
@@ -13,57 +12,53 @@ import org.springframework.http.ResponseEntity;
  *
  * @author Ming
  */
-
 public abstract class AbstractExceptionHandler<E extends Exception> {
 
     protected final SvcInfo svcInfo;
-    protected final SvcResUtils svcResUtils;
-    protected final SvcMsgHandler svcMsgHandler;
-    protected final SvcProperties svcProperties;
+
+    @Getter
+    protected final Class<E> eClass;
 
 
-    public AbstractExceptionHandler(SvcInfo svcInfo, SvcResUtils svcResUtils, SvcMsgHandler svcMsgHandler, SvcProperties svcProperties) {
+    public AbstractExceptionHandler(SvcInfo svcInfo) {
         this.svcInfo = svcInfo;
-        this.svcResUtils = svcResUtils;
-        this.svcMsgHandler = svcMsgHandler;
-        this.svcProperties = svcProperties;
+        eClass = (Class<E>) new TypeToken<E>(getClass()){}.getRawType();
     }
 
     /**
-     * Handle exception logic
+     * Handle service exception logic
      * @param ex Exception
-     * @return ResponseEntity
      */
-    public abstract ResponseEntity<SvcResModelHandler> handle(E ex);
+    public abstract ResponseEntity<SvcResponse> handle(E ex);
 
     /**
-     * Build response body
-     * @param code response code
-     * @return ResponseEntity
+     * Return ResponseEntity for SvcResponse
+     * @param code service response code
      */
-    protected ResponseEntity<SvcResModelHandler> build(String code) {
-        return build(code, svcMsgHandler.getMsg(svcProperties.getMsgType(), code));
+    protected ResponseEntity<SvcResponse> build(String code) {
+        return build(code, null);
     }
 
     /**
-     * Build response body
-     * @param code response code
-     * @param desc response desc
-     * @return ResponseEntity
+     * Return ResponseEntity for SvcResponse
+     * @param code service response code
+     * @param msg service response message
      */
-    protected ResponseEntity<SvcResModelHandler> build(String code, String desc) {
-        return build(code, desc, new SvcResModel());
+    protected ResponseEntity<SvcResponse> build(String code, String msg) {
+        return build(code, msg, new SvcResponse());
     }
 
     /**
-     * Build response body
-     * @param code response code
-     * @param desc response desc
-     * @param svcResModel Svc response model
-     * @return ResponseEntity
+     * Return ResponseEntity for SvcResponse
+     * @param code service response code
+     * @param msg service response message
+     * @param svcResponse service response
      */
-    protected ResponseEntity<SvcResModelHandler> build(String code, String desc, SvcResModel svcResModel) {
-        return ResponseEntity.ok(svcResUtils.build(code, desc, svcResModel));
+    protected ResponseEntity<SvcResponse> build(String code, String msg, SvcResponse svcResponse) {
+        SvcResponseHeader svcResponseHeader = svcInfo.getSvcResponseHeader();
+        svcResponseHeader.setCode(code);
+        svcResponseHeader.setMsg(msg);
+        return ResponseEntity.ok(svcResponse);
     }
 
 }

@@ -5,7 +5,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
 
 /**
- * Redis auto configuration
+ * {@link AutoConfiguration} for redis module
  *
  * @author Ming
  */

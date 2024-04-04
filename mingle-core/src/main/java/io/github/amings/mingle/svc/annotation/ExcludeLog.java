@@ -10,9 +10,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * {@link JsonView} for exclude logging serialization
+ *
  * @author Ming
  */
-
 @JacksonAnnotationsInside
 @JsonView(Views.ExcludeLog.class)
 @Target(ElementType.FIELD)

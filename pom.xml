@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.0</version>
+        <version>3.2.3</version>
     </parent>
     <groupId>io.github.amings</groupId>
     <artifactId>mingle</artifactId>
@@ -49,16 +49,16 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <org.springframework.boot.version>3.2.3</org.springframework.boot.version>
         <com.google.guava.version>33.0.0-jre</com.google.guava.version>
     </properties>
     <modules>
         <module>mingle-core</module>
+        <module>mingle-svc-action</module>
+        <module>mingle-svc-action-rest</module>
         <module>mingle-svc-session</module>
         <module>mingle-svc-redis</module>
         <module>mingle-svc-data</module>
-        <module>mingle-svc-action-rest</module>
-        <module>mingle-utils</module>
-        <module>mingle-svc-action</module>
     </modules>
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
@@ -67,6 +67,13 @@
             <artifactId>lombok</artifactId>
             <version>1.18.26</version>
             <scope>provided</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>${org.springframework.boot.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -100,11 +107,6 @@
             <dependency>
                 <groupId>io.github.amings</groupId>
                 <artifactId>mingle-svc-action-rest</artifactId>
-                <version>2.0.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.amings</groupId>
-                <artifactId>mingle-utils</artifactId>
                 <version>2.0.0-SNAPSHOT</version>
             </dependency>
             <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
@@ -150,7 +152,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.0.1</version>
+                        <version>3.2.1</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>

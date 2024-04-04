@@ -1,12 +1,10 @@
 package io.github.amings.mingle.svc.filter;
 
-import io.github.amings.mingle.svc.configuration.properties.SvcProperties;
 import io.github.amings.mingle.svc.exception.BreakFilterProcessException;
-import io.github.amings.mingle.svc.handler.SvcMsgHandler;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
- * base class for all custom Svc filter
+ * Base class for all service filter
  *
  * @author Ming
  */
@@ -14,30 +12,30 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public abstract class AbstractSvcFilter extends OncePerRequestFilter {
 
     protected final SvcInfo svcInfo;
-    protected final SvcMsgHandler svcMsgHandler;
-    protected final SvcProperties svcProperties;
 
-    public AbstractSvcFilter(SvcInfo svcInfo, SvcMsgHandler svcMsgHandler, SvcProperties svcProperties) {
+    public AbstractSvcFilter(SvcInfo svcInfo) {
         this.svcInfo = svcInfo;
-        this.svcMsgHandler = svcMsgHandler;
-        this.svcProperties = svcProperties;
     }
 
     /**
-     * @param code system code
-     *             break filter method
+     * Interrupt logic in filter
+     *
+     * @param code service response code
+     * @throws BreakFilterProcessException if call this method
      */
     protected void breakFilterProcess(String code) {
-        throw new BreakFilterProcessException(code, svcMsgHandler.getMsg(svcProperties.getMsgType(), code));
+        throw new BreakFilterProcessException(code, null);
     }
 
     /**
-     * @param code system code
-     * @param desc desc
-     *             break filter method
+     * Interrupt logic in filter
+     *
+     * @param code service response code
+     * @param msg  service response message
+     * @throws BreakFilterProcessException if call this method
      */
-    protected void breakFilterProcess(String code, String desc) {
-        throw new BreakFilterProcessException(code, desc);
+    protected void breakFilterProcess(String code, String msg) {
+        throw new BreakFilterProcessException(code, msg);
     }
 
 }

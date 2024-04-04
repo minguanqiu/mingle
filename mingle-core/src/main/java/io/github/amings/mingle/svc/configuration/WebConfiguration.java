@@ -1,13 +1,13 @@
 package io.github.amings.mingle.svc.configuration;
 
-import io.github.amings.mingle.svc.SvcReqArgumentResolver;
-import io.github.amings.mingle.svc.SvcResArgumentResolver;
-import io.github.amings.mingle.svc.SvcReturnValueResolver;
-import io.github.amings.mingle.svc.json.converter.JacksonMessageConverter;
-import io.github.amings.mingle.utils.JacksonUtils;
+import io.github.amings.mingle.svc.SvcRequestArgumentResolver;
+import io.github.amings.mingle.svc.SvcResponseResolver;
+import io.github.amings.mingle.svc.filter.SvcInfo;
+import io.github.amings.mingle.svc.utils.JacksonUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -16,24 +16,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Svc Web configuration
+ * Configuration for spring web
  *
  * @author Ming
  */
-
 @Configuration
 public class WebConfiguration implements WebMvcConfigurer {
 
+    private final SvcInfo svcInfo;
     private final JacksonUtils jacksonUtils;
 
-    public WebConfiguration(JacksonUtils jacksonUtils) {
+    public WebConfiguration(SvcInfo svcInfo, JacksonUtils jacksonUtils) {
+        this.svcInfo = svcInfo;
         this.jacksonUtils = jacksonUtils;
     }
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(svcReqArgumentResolver());
-        resolvers.add(svcResArgumentResolver());
     }
 
     @Override
@@ -42,25 +42,16 @@ public class WebConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public SvcReqArgumentResolver svcReqArgumentResolver() {
-        return new SvcReqArgumentResolver();
+    public SvcRequestArgumentResolver svcReqArgumentResolver() {
+        return new SvcRequestArgumentResolver(svcInfo);
     }
 
     @Bean
-    public SvcResArgumentResolver svcResArgumentResolver() {
-        return new SvcResArgumentResolver();
-    }
-
-    @Bean
-    public SvcReturnValueResolver svcReturnValueResolver() {
+    public SvcResponseResolver svcReturnValueResolver() {
         List<HttpMessageConverter<?>> converters = new ArrayList<>();
-        converters.add(jacksonMessageConverter());
-        return new SvcReturnValueResolver(converters);
+        converters.add(new MappingJackson2HttpMessageConverter(jacksonUtils.getObjectMapper()));
+        return new SvcResponseResolver(converters);
     }
 
-    @Bean
-    public JacksonMessageConverter jacksonMessageConverter() {
-        return new JacksonMessageConverter(jacksonUtils.getObjectMapper());
-    }
 
 }

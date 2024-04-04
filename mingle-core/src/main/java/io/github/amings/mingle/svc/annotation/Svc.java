@@ -1,16 +1,15 @@
 package io.github.amings.mingle.svc.annotation;
 
-import io.github.amings.mingle.svc.handler.PayLoadDecryptionHandler;
+import org.springframework.core.annotation.AliasFor;
 import org.springframework.stereotype.Controller;
 
 import java.lang.annotation.*;
 
 /**
- * Main annotation for configuration Svc feature
+ * Annotation for service register and configuration feature
  *
  * @author Ming
  */
-
 @Documented
 @Controller
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
@@ -18,44 +17,40 @@ import java.lang.annotation.*;
 public @interface Svc {
 
     /**
-     * @return String[]
-     * Tag
+     * Spring bean name
+     **/
+    @AliasFor(
+            annotation = Controller.class
+    )
+    String value() default "";
+
+    /**
+     * Spring doc tags
      **/
     String[] tags() default {};
 
     /**
-     * @return String
-     * Summary
+     * Spring doc summary
      **/
     String summary() default "";
 
     /**
-     * @return String
-     * Description
+     * Spring doc description
      **/
-    String desc() default "";
+    String description() default "";
 
     /**
-     * @return String
-     * Path
+     * If enable will pass {@link io.github.amings.mingle.svc.filter.SvcLogFilter}
      **/
-    String path() default "";
+    boolean logging() default true;
 
     /**
-     * @return boolean
-     * Logging Svc request and response body
+     * If enable will pass {@link io.github.amings.mingle.svc.filter.SvcRequestBodyProcessFilter}
      **/
-    boolean log() default true;
+    boolean bodyProcess() default false;
 
     /**
-     * @return boolean
-     * Request body must encryption , implement {@link PayLoadDecryptionHandler} to decryption
-     **/
-    boolean encryption() default false;
-
-    /**
-     * @return boolean
-     * If set ture,must configuration in properties
+     * If enable will pass {@link io.github.amings.mingle.svc.filter.SvcIPSecureFilter}
      **/
     boolean ipSecure() default false;
 

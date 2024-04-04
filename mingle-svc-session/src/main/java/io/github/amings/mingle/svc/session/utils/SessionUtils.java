@@ -1,122 +1,65 @@
 package io.github.amings.mingle.svc.session.utils;
 
-import com.nimbusds.jose.JOSEException;
 import io.github.amings.mingle.svc.redis.RedisKey;
+import io.github.amings.mingle.svc.session.SessionInfo;
 import io.github.amings.mingle.svc.session.dao.SessionDao;
-import io.github.amings.mingle.svc.session.dao.entity.SessionEntity;
-import io.github.amings.mingle.svc.session.security.Session;
-import io.github.amings.mingle.svc.session.security.model.SessionInfo;
-import io.github.amings.mingle.utils.JacksonUtils;
-import io.github.amings.mingle.utils.UUIDUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import io.github.amings.mingle.svc.session.dao.entity.Session;
+import io.github.amings.mingle.svc.session.exception.SessionTokenEncryptionErrorException;
+import io.github.amings.mingle.svc.session.handler.SessionTokenHandler;
+import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.text.ParseException;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
- * Control session utils
+ * Utils for session feature
  *
  * @author Ming
  */
-
-@Component
 public class SessionUtils {
 
-    @Autowired
-    Session session;
-    @Autowired
-    SessionDao sessionDao;
-    @Autowired
-    JwtUtils jwtUtils;
+    private final SessionDao sessionDao;
+    private final SessionTokenHandler sessionTokenHandler;
 
-    @Autowired
-    JacksonUtils jacksonUtils;
-
-    public String createSession(List<String> keyParams, String sessionType, Duration timeToLive) {
-        return createSession(keyParams, sessionType, timeToLive, new HashMap<>());
+    public SessionUtils(SessionDao sessionDao, SessionTokenHandler sessionTokenHandler) {
+        this.sessionDao = sessionDao;
+        this.sessionTokenHandler = sessionTokenHandler;
     }
 
-    public String createSession(List<String> keyParams, String sessionType, Duration timeToLive, Map<String, Object> sessionValue) {
-        return createSession(keyParams, sessionType, timeToLive, sessionValue, new ArrayList<>());
-    }
-
-    public String createSession(List<String> keyParams, String sessionType, Duration timeToLive, Map<String, Object> sessionValue, ArrayList<String> authorities) {
-        return createSession(keyParams, sessionType, timeToLive, sessionValue, authorities, false);
-    }
-
-    public String createSession(List<String> keyParams, String sessionType, Duration timeToLive, Map<String, Object> sessionValue, ArrayList<String> authorities, boolean single) {
-        RedisKey redisKey = new RedisKey(SessionEntity.class);
-        redisKey.addParam(sessionType);
-        redisKey.addParams(keyParams);
-        String sessionId = UUIDUtils.generateUuid();
-        if (!single) {
-            redisKey.addParam(sessionId);
+    public String generateToken(RedisKey redisKey, Session session) {
+        String encryption;
+        try {
+            encryption = sessionTokenHandler.encryption(redisKey.toString());
+        } catch (Exception e) {
+            throw new SessionTokenEncryptionErrorException("Session token encryption error");
         }
-        SessionEntity sessionEntity = new SessionEntity();
-        sessionEntity.setId(sessionId);
-        sessionEntity.setType(sessionType);
-        sessionEntity.setAuthorities(authorities);
-        sessionEntity.setSessionValue(sessionValue);
-        sessionDao.set(redisKey, sessionEntity, timeToLive);
-
-        SessionInfo sessionInfo = new SessionInfo();
-        sessionInfo.setKey(redisKey.format());
-        sessionInfo.setId(sessionId);
-        sessionInfo.setType(sessionType);
-        sessionInfo.setTimeToLive(timeToLive.toString());
-        sessionInfo.setSingle(single);
-
-        return generateJWEToken(jacksonUtils.readTree(sessionInfo).get().toString()).get();
+        sessionDao.set(redisKey, session, session.getTimeToLive());
+        return encryption;
     }
+
 
     @SuppressWarnings("unchecked")
     public <T> Optional<T> getSessionValue(String name) {
-        return (Optional<T>) Optional.ofNullable(session.getSessionEntity().getSessionValue().get(name));
+        return (Optional<T>) Optional.ofNullable(getCurrentSession().session().getSessionValue().get(name));
     }
 
     public void setSessionValue(String key, Object value) {
-        session.getSessionEntity().getSessionValue().put(key,value);
-        updateSession();
+        getCurrentSession().session().getSessionValue().put(key, value);
     }
 
     public void removeSessionValue(String key) {
-        session.getSessionEntity().getSessionValue().remove(key);
-        updateSession();
-    }
-
-    public void removeSessionValue(String key, Object value) {
-        session.getSessionEntity().getSessionValue().remove(key,value);
-        updateSession();
+        getCurrentSession().session().getSessionValue().remove(key);
     }
 
     private void updateSession() {
-        sessionDao.set(RedisKey.of(session.getSessionInfo().getKey()), session.getSessionEntity(), Duration.parse(session.getSessionInfo().getTimeToLive()));
+        sessionDao.set(getCurrentSession().sessionHeader().redisKey(), getCurrentSession().session(), getCurrentSession().session().getTimeToLive());
     }
 
     public void cleanSession() {
-        sessionDao.del(RedisKey.of(session.getSessionInfo().getKey()));
+        sessionDao.del(getCurrentSession().sessionHeader().redisKey());
     }
 
-    public Optional<String> generateJWEToken(String body) {
-        try {
-            return Optional.ofNullable(jwtUtils.encryptionJWEToken(body));
-        } catch (JOSEException e) {
-            return Optional.empty();
-        }
-    }
-
-    public Optional<String> decryptionJWEToken(String token) {
-        try {
-            return Optional.ofNullable(jwtUtils.decryptJWEToken(token));
-        } catch (JOSEException | ParseException e) {
-            return Optional.empty();
-        }
+    public SessionInfo getCurrentSession() {
+        return (SessionInfo) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
 }

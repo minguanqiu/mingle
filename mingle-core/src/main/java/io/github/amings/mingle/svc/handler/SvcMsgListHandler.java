@@ -1,17 +1,17 @@
 package io.github.amings.mingle.svc.handler;
 
-import io.github.amings.mingle.svc.handler.model.MsgModel;
+import io.github.amings.mingle.svc.handler.model.SvcMsgModel;
 
 import java.util.List;
 
 /**
- * Implements to build message list to change response desc
+ * Handler for service message,provide custom message list
  *
  * @author Ming
  */
 
 public interface SvcMsgListHandler {
 
-    List<MsgModel> getMsgList();
+    List<SvcMsgModel> getMsgList();
 
 }

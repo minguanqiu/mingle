@@ -4,7 +4,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
- * Session auto configuration
+ * {@link AutoConfiguration} for session module
  *
  * @author Ming
  */

@@ -4,7 +4,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
- * Doa auto configuration
+ * {@link AutoConfiguration} for data module
  *
  * @author Ming
  */

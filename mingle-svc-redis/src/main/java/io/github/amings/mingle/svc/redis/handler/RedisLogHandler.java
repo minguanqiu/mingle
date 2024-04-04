@@ -1,28 +1,21 @@
 package io.github.amings.mingle.svc.redis.handler;
 
-import io.github.amings.mingle.svc.redis.handler.model.RedisLogBeginModel;
-import io.github.amings.mingle.svc.redis.handler.model.RedisLogEndModel;
+import org.aspectj.lang.ProceedingJoinPoint;
 
 import java.time.LocalDateTime;
 
 /**
- * Redis logging handler
+ * Handler for redis logging
  *
  * @author Ming
  */
 
 public interface RedisLogHandler {
 
-    void writeBeginLog(RedisLogBeginModel model);
+    void writeBeginLog(String svcSerialNum, String actSerialNum, LocalDateTime startDateTime, ProceedingJoinPoint joinPoint);
 
-    void writeEndLog(RedisLogEndModel model);
+    void writeEndLog(String svcSerialNum, String actSerialNum, LocalDateTime startDateTime, ProceedingJoinPoint joinPoint, Object proceedObject);
 
-    @Deprecated
-    void afterThrowing(Throwable t, String uuid, LocalDateTime endDateTime, String runTime);
-
-    default void afterThrowing(Throwable t, RedisLogEndModel model) {
-
-    }
-
+    void afterThrowing(Throwable throwable, String svcSerialNum, String actSerialNum, LocalDateTime startTime, ProceedingJoinPoint joinPoint);
 
 }

@@ -6,6 +6,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 /**
+ * {@link ConfigurationProperties} mapping action properties
+ *
  * @author Ming
  */
 @Getter
@@ -16,7 +18,7 @@ public class ActionProperties {
 
     private String successCode = "0000";
 
-    private String successDesc = "successful";
+    private String successMsg = "successful";
 
     private boolean autoBreak;
 

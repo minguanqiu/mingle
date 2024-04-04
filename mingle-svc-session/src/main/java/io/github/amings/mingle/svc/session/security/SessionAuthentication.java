@@ -6,7 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import java.util.Collection;
 
 /**
- * Session authentication
+ * {@link AbstractAuthenticationToken} for session
  *
  * @author Ming
  */
@@ -16,12 +16,6 @@ public class SessionAuthentication extends AbstractAuthenticationToken {
     private final Object principal;
 
     private final Object credentials;
-
-    public SessionAuthentication(Object principal, Object credentials) {
-        super(null);
-        this.principal = principal;
-        this.credentials = credentials;
-    }
 
     public SessionAuthentication(Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities) {
         super(authorities);

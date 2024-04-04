@@ -4,6 +4,8 @@ import io.github.amings.mingle.svc.action.exception.handler.abs.AbstractActionEx
 import io.github.amings.mingle.svc.action.exception.handler.model.ActionExceptionModel;
 
 /**
+ * Default handler will catch {@link Exception} or unknown exception
+ *
  * @author Ming
  */
 
@@ -11,8 +13,8 @@ public class AllActionExceptionHandler extends AbstractActionExceptionHandler<Ex
 
     @Override
     public ActionExceptionModel handle(Exception ex, ActionExceptionModel actionExceptionModel) {
-        actionExceptionModel.setCode("MGA01");
-        actionExceptionModel.setDesc("exception message : " + ex.getMessage());
+        actionExceptionModel.setCode("error");
+        actionExceptionModel.setMsg("action exception message : " + ex.getMessage());
         return actionExceptionModel;
     }
 }

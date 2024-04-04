@@ -1,10 +1,10 @@
 package io.github.amings.mingle.svc.filter;
 
-import io.github.amings.mingle.svc.configuration.properties.SvcProperties;
+import io.github.amings.mingle.svc.SvcResponseHeader;
+import io.github.amings.mingle.svc.concurrent.SvcAttribute;
+import io.github.amings.mingle.svc.concurrent.SvcThreadLocal;
+import io.github.amings.mingle.svc.handler.SerialNumberGeneratorHandler;
 import io.github.amings.mingle.svc.handler.SvcLogHandler;
-import io.github.amings.mingle.svc.handler.SvcMsgHandler;
-import io.github.amings.mingle.svc.handler.model.SvcBeginModel;
-import io.github.amings.mingle.utils.JacksonUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * Logging filter
+ * Filter for service logging
  *
  * @author Ming
  */
@@ -21,74 +21,32 @@ import java.io.IOException;
 public class SvcLogFilter extends AbstractSvcFilter {
 
     private final SvcLogHandler svcLogHandler;
-    private final JacksonUtils jacksonUtils;
+    private final SerialNumberGeneratorHandler serialNumberGeneratorHandler;
 
-    public SvcLogFilter(SvcInfo svcInfo, SvcMsgHandler svcMsgHandler, SvcProperties svcProperties, SvcLogHandler svcLogHandler, JacksonUtils jacksonUtils) {
-        super(svcInfo, svcMsgHandler, svcProperties);
+    public SvcLogFilter(SvcInfo svcInfo, SvcLogHandler svcLogHandler, SerialNumberGeneratorHandler serialNumberGeneratorHandler) {
+        super(svcInfo);
         this.svcLogHandler = svcLogHandler;
-        this.jacksonUtils = jacksonUtils;
+        this.serialNumberGeneratorHandler = serialNumberGeneratorHandler;
     }
 
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        svcInfo.setSvcSerialNum(serialNumberGeneratorHandler.generate("svc"));
+        svcInfo.setSvcResponseHeaderLog(SvcResponseHeader.builder(null).build());
+        SvcThreadLocal.set(buildSvcLogModel());
         writeSvcBegin();
-        try {
-            filterChain.doFilter(request, response);
-        } catch (Exception e) {
-            writeSvcBeginBack();
-            throw e;
-        }
-        writeSvcBeginBack();
+        filterChain.doFilter(request, response);
     }
 
     private void writeSvcBegin() {
-        if (svcInfo.getSvcBinderModel() != null && !svcInfo.getSvcBinderModel().isReqCustom()) {
-            svcInfo.setWriteBegin(true);
-            svcLogHandler.writeBeginLog(buildSvcBeginModel());
-        }
+        svcLogHandler.writeBeginLog(svcInfo);
     }
 
-    private void writeSvcBeginBack() {
-        if (svcInfo.getSvcBinderModel() != null && svcInfo.getSvcBinderModel().isReqCustom()) {
-            svcInfo.setWriteBegin(true);
-            svcLogHandler.writeBeginLog(buildSvcBeginBackModel());
-        }
-    }
-
-    private SvcBeginModel buildSvcBeginModel() {
-        SvcBeginModel model = new SvcBeginModel();
-        model.setHttpServletRequest(svcInfo.getHttpServletRequest());
-        model.setUuid(svcInfo.getUuid());
-        model.setName(svcInfo.getSvcName());
-        model.setStartDateTime(svcInfo.getStartDateTime());
-        jacksonUtils.readTree(svcInfo.getValidReqModel()).ifPresent(node -> {
-            model.setModelBody(node.toString());
-        });
-        model.setPayloadBody(svcInfo.getPayLoadNode().toString());
-        model.setIp(svcInfo.getIp());
-        if (svcInfo.getSvcReqModelValidFailException() == null) {
-            model.setValid(true);
-        }
-        return model;
-    }
-
-    private SvcBeginModel buildSvcBeginBackModel() {
-        SvcBeginModel model = new SvcBeginModel();
-        model.setHttpServletRequest(svcInfo.getHttpServletRequest());
-        model.setUuid(svcInfo.getUuid());
-        model.setName(svcInfo.getSvcName());
-        model.setStartDateTime(svcInfo.getStartDateTime());
-        jacksonUtils.readTree(svcInfo.getBackReqModel()).ifPresent(node -> {
-            model.setModelBody(node.toString());
-            model.setPayloadBody(node.toString());
-        });
-        model.setIp(svcInfo.getIp());
-        if (svcInfo.getSvcReqModelValidFailException() == null) {
-            model.setValid(true);
-        }
-        model.setBack(true);
-        return model;
+    private SvcAttribute buildSvcLogModel() {
+        SvcAttribute svcAttribute = new SvcAttribute();
+        svcAttribute.setAttributes(SvcAttribute.Name.SVC_SERIAL_NUMBER, svcInfo.getSvcSerialNum());
+        return svcAttribute;
     }
 
 }

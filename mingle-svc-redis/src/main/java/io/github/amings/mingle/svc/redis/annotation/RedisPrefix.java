@@ -1,24 +1,19 @@
 package io.github.amings.mingle.svc.redis.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
- * Redis key prefix
+ * Define redis prefix key on redis entity
  *
  * @author Ming
  */
-
-
+@Inherited
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RedisPrefix {
 
     /**
-     * key prefix value
-     * @return String
+     * Prefix of key
      */
     String value();
 

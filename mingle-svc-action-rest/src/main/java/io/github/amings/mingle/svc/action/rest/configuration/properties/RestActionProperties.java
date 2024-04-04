@@ -6,9 +6,10 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
+ * {@link ConfigurationProperties} mapping action properties
+ *
  * @author Ming
  */
-
 @Getter
 @Setter
 @ConfigurationProperties("mingle.svc.action.rest")

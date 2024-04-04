@@ -1,10 +1,10 @@
 package io.github.amings.mingle.svc.exception;
 
-import io.github.amings.mingle.svc.SvcResModel;
+import io.github.amings.mingle.svc.SvcResponse;
 import lombok.Getter;
 
 /**
- * for Svc break logic Exception
+ * Exception for break service process logic
  *
  * @author Ming
  */
@@ -16,20 +16,20 @@ public class BreakSvcProcessException extends RuntimeException {
 
     private final String code;
 
-    private final String desc;
+    private final String msg;
 
-    private SvcResModel svcResModel = new SvcResModel();
+    private SvcResponse svcResponse = new SvcResponse();
 
     /**
      * @param code        response code
-     * @param desc        response msg
-     * @param svcResModel Svc response model
+     * @param msg        response msg
+     * @param svcResponse Svc response model
      */
-    public BreakSvcProcessException(String code, String desc, SvcResModel svcResModel) {
+    public BreakSvcProcessException(String code, String msg, SvcResponse svcResponse) {
         this.code = code;
-        this.desc = desc;
-        if(svcResModel != null) {
-            this.svcResModel = svcResModel;
+        this.msg = msg;
+        if(svcResponse != null) {
+            this.svcResponse = svcResponse;
         }
     }
 
