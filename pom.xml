@@ -8,13 +8,13 @@
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.2.3</version>
     </parent>
-    <groupId>io.github.amings</groupId>
+    <groupId>io.github.minguanq</groupId>
     <artifactId>mingle</artifactId>
     <version>2.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>mingle</name>
     <description>mingle parent</description>
-    <url>https://github.com/amings/mingle</url>
+    <url>https://github.com/minguanq/mingle</url>
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
@@ -24,15 +24,15 @@
     <developers>
         <developer>
             <name>Ming</name>
-            <email>amings0622@gmail.com</email>
-            <organization>io.github.amings</organization>
-            <organizationUrl>https://github.com/amings</organizationUrl>
+            <email>minguanq22@gmail.com</email>
+            <organization>io.github.minguanq</organization>
+            <organizationUrl>https://github.com/minguanq</organizationUrl>
         </developer>
     </developers>
     <scm>
-        <connection>scm:git:https://github.com/amings/mingle.git</connection>
-        <developerConnection>scm:git:https://github.com/amings/mingle.git</developerConnection>
-        <url>https://github.com/amings/mingle</url>
+        <connection>scm:git:https://github.com/minguanq/mingle.git</connection>
+        <developerConnection>scm:git:https://github.com/minguanq/mingle.git</developerConnection>
+        <url>https://github.com/minguanq/mingle</url>
     </scm>
     <distributionManagement>
         <snapshotRepository>
@@ -80,32 +80,32 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>io.github.amings</groupId>
+                <groupId>io.github.minguanq</groupId>
                 <artifactId>mingle-core</artifactId>
                 <version>2.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>io.github.amings</groupId>
+                <groupId>io.github.minguanq</groupId>
                 <artifactId>mingle-svc-action</artifactId>
                 <version>2.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>io.github.amings</groupId>
+                <groupId>io.github.minguanq</groupId>
                 <artifactId>mingle-svc-session</artifactId>
                 <version>2.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>io.github.amings</groupId>
+                <groupId>io.github.minguanq</groupId>
                 <artifactId>mingle-svc-redis</artifactId>
                 <version>2.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>io.github.amings</groupId>
+                <groupId>io.github.minguanq</groupId>
                 <artifactId>mingle-svc-data</artifactId>
                 <version>2.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>io.github.amings</groupId>
+                <groupId>io.github.minguanq</groupId>
                 <artifactId>mingle-svc-action-rest</artifactId>
                 <version>2.0.0-SNAPSHOT</version>
             </dependency>
