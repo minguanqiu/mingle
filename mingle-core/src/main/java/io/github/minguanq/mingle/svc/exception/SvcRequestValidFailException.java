@@ -9,12 +9,14 @@ import lombok.Getter;
  * @author Ming
  */
 @Getter
-public class SvcReqModelValidFailException extends RuntimeException {
+public class SvcRequestValidFailException extends RuntimeException {
 
     private final ConstraintViolationException constraintViolationException;
 
-    public SvcReqModelValidFailException(String message,ConstraintViolationException constraintViolationException) {
-        super(message);
+    public final static String MSG = "Request valid fail";
+
+    public SvcRequestValidFailException(ConstraintViolationException constraintViolationException) {
+        super(MSG);
         this.constraintViolationException = constraintViolationException;
     }
 

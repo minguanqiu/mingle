@@ -39,12 +39,12 @@ public class SvcRequestBodyProcessFilter extends AbstractSvcFilter {
 
     private void processRequestBody() throws IOException {
         String body = getBody((ContentCachingRequestWrapper) svcInfo.getHttpServletRequest());
-        String payLoadBody =  svcRequestBodyProcessHandler.processBody(body);
+        String payLoadBody = svcInfo.getSvcDefinition().getFeature().isBodyProcess() ? svcRequestBodyProcessHandler.processBody(body) : body;
         boolean isJson = jacksonUtils.isJson(payLoadBody);
         if (!isJson) {
-            throw new ReqBodyNotJsonFormatException("Request body not json format");
+            throw new ReqBodyNotJsonFormatException();
         }
-        svcInfo.setPayLoadString(payLoadBody);
+        svcInfo.setRequestBody(payLoadBody);
     }
 
     private String getBody(ContentCachingRequestWrapper reqWrapper) throws IOException {

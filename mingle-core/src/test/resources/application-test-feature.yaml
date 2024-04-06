@@ -1,0 +1,7 @@
+mingle:
+  svc:
+    feature:
+      SimpleSvc:
+        logging: false
+        body-process: true
+        ip-secure: 0.0.0.0, 0.0.1.1

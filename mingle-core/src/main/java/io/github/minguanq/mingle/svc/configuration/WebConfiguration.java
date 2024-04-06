@@ -1,8 +1,7 @@
 package io.github.minguanq.mingle.svc.configuration;
 
-import io.github.minguanq.mingle.svc.SvcRequestArgumentResolver;
-import io.github.minguanq.mingle.svc.SvcResponseResolver;
 import io.github.minguanq.mingle.svc.filter.SvcInfo;
+import io.github.minguanq.mingle.svc.filter.SvcRequestResponseBodyMethodProcessor;
 import io.github.minguanq.mingle.svc.utils.JacksonUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,24 +32,19 @@ public class WebConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(svcReqArgumentResolver());
+        resolvers.add(svcRequestResponseBodyMethodProcessor());
     }
 
     @Override
     public void addReturnValueHandlers(List<HandlerMethodReturnValueHandler> handlers) {
-        handlers.add(svcReturnValueResolver());
+        handlers.add(svcRequestResponseBodyMethodProcessor());
     }
 
     @Bean
-    public SvcRequestArgumentResolver svcReqArgumentResolver() {
-        return new SvcRequestArgumentResolver(svcInfo);
-    }
-
-    @Bean
-    public SvcResponseResolver svcReturnValueResolver() {
+    public SvcRequestResponseBodyMethodProcessor svcRequestResponseBodyMethodProcessor() {
         List<HttpMessageConverter<?>> converters = new ArrayList<>();
         converters.add(new MappingJackson2HttpMessageConverter(jacksonUtils.getObjectMapper()));
-        return new SvcResponseResolver(converters);
+        return new SvcRequestResponseBodyMethodProcessor(converters, svcInfo);
     }
 
 

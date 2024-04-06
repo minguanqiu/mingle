@@ -1,0 +1,4 @@
+mingle:
+  svc:
+    properties:
+      logging: true

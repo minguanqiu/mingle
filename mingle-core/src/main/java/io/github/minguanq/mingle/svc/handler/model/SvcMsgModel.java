@@ -1,6 +1,6 @@
 package io.github.minguanq.mingle.svc.handler.model;
 
-import lombok.Data;
+import lombok.Getter;
 
 /**
  * Model for service message
@@ -8,13 +8,19 @@ import lombok.Data;
  * @author Ming
  */
 
-@Data
+@Getter
 public class SvcMsgModel {
 
-    private String msgType;
+    public SvcMsgModel(String msgType, String code, String msg) {
+        this.msgType = msgType;
+        this.code = code;
+        this.msg = msg;
+    }
 
-    private String code;
+    private final String msgType;
 
-    private String msg;
+    private final String code;
+
+    private final String msg;
 
 }

@@ -5,10 +5,12 @@ package io.github.minguanq.mingle.svc.exception;
  *
  * @author Ming
  */
-public class IPAuthenticationFailException extends RuntimeException{
+public class IPAuthenticationFailException extends RuntimeException {
 
-    public IPAuthenticationFailException(String msg) {
-       super(msg);
+    public static final String MSG = "IP authentication fail";
+
+    public IPAuthenticationFailException() {
+        super(MSG);
     }
 
 }

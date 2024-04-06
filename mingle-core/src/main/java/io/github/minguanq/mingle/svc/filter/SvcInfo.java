@@ -2,9 +2,7 @@ package io.github.minguanq.mingle.svc.filter;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.github.minguanq.mingle.svc.SvcResponseHeader;
-import io.github.minguanq.mingle.svc.component.SvcBinderComponent;
-import io.github.minguanq.mingle.svc.exception.SvcReqModelValidFailException;
-import io.github.minguanq.mingle.svc.handler.SvcResponseHandler;
+import io.github.minguanq.mingle.svc.component.SvcRegisterComponent;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
@@ -37,22 +35,17 @@ public class SvcInfo {
 
     private HttpServletResponse httpServletResponse;
 
-    private SvcBinderComponent.SvcBinderModel svcBinderModel;
+    private SvcRegisterComponent.SvcDefinition svcDefinition;
 
+    @Setter(AccessLevel.PUBLIC)
     private SvcResponseHeader svcResponseHeader;
 
-    private SvcResponseHeader svcResponseHeaderLog;
+    private String requestBody;
 
-    private SvcResponseHandler svcResponseHandler;
-
-    private String payLoadString;
-
-    private JsonNode payLoadNode;
+    private Object svcRequest;
 
     private JsonNode responseBody;
 
-    private SvcReqModelValidFailException svcReqModelValidFailException;
-
-    private Object svcRequest;
+    private Object svcResponseBody;
 
 }

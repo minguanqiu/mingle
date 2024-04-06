@@ -2,7 +2,6 @@ package io.github.minguanq.mingle.svc.handler.impl;
 
 import io.github.minguanq.mingle.svc.handler.SvcMsgHandler;
 import io.github.minguanq.mingle.svc.handler.SvcMsgListHandler;
-import io.github.minguanq.mingle.svc.utils.StringUtils;
 import jakarta.annotation.PostConstruct;
 
 import java.util.HashMap;
@@ -26,7 +25,7 @@ public class SvcMsgHandlerDefaultImpl implements SvcMsgHandler {
     }
 
     /**
-     * Get msg desc
+     * Get map mapping message
      */
     @Override
     public String getMsg(String type, String code) {
@@ -34,18 +33,6 @@ public class SvcMsgHandlerDefaultImpl implements SvcMsgHandler {
             if (msgMap.get(type).containsKey(code)) {
                 return msgMap.get(type).get(code);
             }
-        }
-        return null;
-    }
-
-    /**
-     * Get type msg desc
-     */
-    @Override
-    public String getMsg(String type, String code, Map<String, String> convertMap) {
-        String msg = getMsg(type, code);
-        if (msg != null && convertMap != null) {
-            return StringUtils.templateConvert(msg, convertMap, "{", "}");
         }
         return null;
     }

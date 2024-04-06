@@ -1,6 +1,6 @@
 package io.github.minguanq.mingle.svc.filter;
 
-import io.github.minguanq.mingle.svc.component.SvcBinderComponent;
+import io.github.minguanq.mingle.svc.component.SvcRegisterComponent;
 import io.github.minguanq.mingle.svc.exception.IPAuthenticationFailException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -27,9 +27,9 @@ public class SvcIPSecureFilter extends AbstractSvcFilter {
     }
 
     private void checkSecure() {
-        SvcBinderComponent.SvcBinderModel svcBinderModel = svcInfo.getSvcBinderModel();
-        if (!checkIpAddress(svcBinderModel.getIpSecureList(), svcInfo.getHttpServletRequest().getRemoteAddr())) {
-            throw new IPAuthenticationFailException("IP Authentication Fail");
+        SvcRegisterComponent.SvcDefinition svcDefinition = svcInfo.getSvcDefinition();
+        if (!checkIpAddress(svcDefinition.getFeature().getIpSecure(), svcInfo.getHttpServletRequest().getRemoteAddr())) {
+            throw new IPAuthenticationFailException();
         }
     }
 

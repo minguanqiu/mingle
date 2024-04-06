@@ -12,8 +12,7 @@ import lombok.Getter;
  *
  * @author Ming
  */
-
-public abstract non-sealed class AbstractService<Req extends SvcRequest, Res extends SvcResponse> implements Service<Req, Res> {
+public abstract non-sealed class AbstractService<Req extends SvcRequest, Res extends SvcResponseBody> implements Service<Req, Res> {
 
     protected final SvcInfo svcInfo;
 
@@ -37,15 +36,30 @@ public abstract non-sealed class AbstractService<Req extends SvcRequest, Res ext
      * Interrupt service logic
      *
      * @param svcResponseHeader service response header
-     * @param svcResponse       service response
-     * @throws BreakSvcProcessException if call this method
+     * @throws BreakSvcProcessException will throw
      **/
-    protected void breakSvcLogic(SvcResponseHeader svcResponseHeader, Res svcResponse) throws BreakSvcProcessException {
-        SvcResponseHeader svcInfoSvcResponseHeader = svcInfo.getSvcResponseHeader();
-        svcInfoSvcResponseHeader.setCode(svcResponseHeader.getCode());
-        svcInfoSvcResponseHeader.setMsg(svcResponseHeader.getMsg());
-        svcInfoSvcResponseHeader.setConvertMap(svcResponseHeader.getConvertMap());
-        throw new BreakSvcProcessException(svcResponseHeader.getCode(), svcResponseHeader.getMsg(), svcResponse);
+    protected void throwLogic(SvcResponseHeader svcResponseHeader) throws BreakSvcProcessException {
+        throwLogic(svcResponseHeader, null);
+    }
+
+    /**
+     * Interrupt service logic
+     *
+     * @param svcResponseHeader service response header
+     * @param svcResponse       service response
+     * @throws BreakSvcProcessException will throw
+     **/
+    protected void throwLogic(SvcResponseHeader svcResponseHeader, Res svcResponse) throws BreakSvcProcessException {
+        throw new BreakSvcProcessException(svcResponseHeader, svcResponse);
+    }
+
+    /**
+     * Return service logic
+     *
+     * @param svcResponseHeader service response header
+     **/
+    protected Res returnLogic(SvcResponseHeader svcResponseHeader) {
+        return returnLogic(svcResponseHeader, null);
     }
 
     /**
@@ -54,11 +68,8 @@ public abstract non-sealed class AbstractService<Req extends SvcRequest, Res ext
      * @param svcResponseHeader service response header
      * @param svcResponse       service response
      **/
-    protected Res returnSvcLogic(SvcResponseHeader svcResponseHeader, Res svcResponse) {
-        SvcResponseHeader svcInfoSvcResponseHeader = svcInfo.getSvcResponseHeader();
-        svcInfoSvcResponseHeader.setCode(svcResponseHeader.getCode());
-        svcInfoSvcResponseHeader.setMsg(svcResponseHeader.getMsg());
-        svcInfoSvcResponseHeader.setConvertMap(svcResponseHeader.getConvertMap());
+    protected Res returnLogic(SvcResponseHeader svcResponseHeader, Res svcResponse) {
+        svcInfo.setSvcResponseHeader(svcResponseHeader);
         return svcResponse;
     }
 

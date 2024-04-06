@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import io.github.minguanq.mingle.svc.Service;
-import io.github.minguanq.mingle.svc.component.SvcBinderComponent;
+import io.github.minguanq.mingle.svc.component.SvcRegisterComponent;
 import io.github.minguanq.mingle.svc.configuration.properties.SvcProperties;
-import io.github.minguanq.mingle.svc.exception.handler.abs.AbstractExceptionHandler;
+import io.github.minguanq.mingle.svc.exception.handler.AbstractExceptionHandler;
 import io.github.minguanq.mingle.svc.exception.handler.resolver.ExceptionHandlerResolver;
 import io.github.minguanq.mingle.svc.handler.*;
 import io.github.minguanq.mingle.svc.handler.impl.*;
@@ -17,6 +17,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.util.List;
@@ -30,17 +31,17 @@ import java.util.List;
 public class SvcBeanConfiguration {
 
     @Bean
-    public SvcBinderComponent svcBinderComponent(SvcProperties svcProperties, List<Service<?, ?>> services, RequestMappingHandlerMapping requestMappingHandlerMapping, SvcPathHandler svcPathHandler) {
-        return new SvcBinderComponent(svcProperties, services, requestMappingHandlerMapping, svcPathHandler);
+    public SvcRegisterComponent svcBinderComponent(Environment environment, SvcProperties svcProperties, List<Service<?, ?>> services, RequestMappingHandlerMapping requestMappingHandlerMapping, SvcPathHandler svcPathHandler) {
+        return new SvcRegisterComponent(environment, svcProperties, services, requestMappingHandlerMapping, svcPathHandler);
     }
 
     /**
-     * Create and return instance,implements {@link SvcLogHandler} to override default impl
+     * Create and return instance,implements {@link SvcLoggingHandler} to override default impl
      */
     @Bean
     @ConditionalOnMissingBean
-    public SvcLogHandler svcLogHandler() {
-        return new SvcLogHandlerDefaultImpl(svcLogJacksonUtils());
+    public SvcLoggingHandler svcLogHandler() {
+        return new SvcLoggingHandlerDefaultImpl(svcLogJacksonUtils());
     }
 
     /**
@@ -48,7 +49,7 @@ public class SvcBeanConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean
-    public SvcRequestBodyProcessHandler payLoadDecryptionHandler() {
+    public SvcRequestBodyProcessHandler svcRequestBodyProcessHandler() {
         return new SvcSvcRequestBodyProcessHandlerDefaultImpl();
     }
 

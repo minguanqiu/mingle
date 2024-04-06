@@ -13,15 +13,19 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @Setter
 @Configuration
-@ConfigurationProperties("mingle.svc")
+@ConfigurationProperties("mingle.svc.properties")
 public class SvcProperties {
 
-    private String rootPath = "/svc";
+    private String msg_type = "svc";
 
-    private String msgType = "svc";
+    private String code = "0";
 
-    private String successCode = "0";
+    private String msg = "successful";
 
-    private String successMsg = "successful";
+    private boolean logging = true;
+
+    private boolean body_process;
+
+    private String[] ip_secure = {};
 
 }

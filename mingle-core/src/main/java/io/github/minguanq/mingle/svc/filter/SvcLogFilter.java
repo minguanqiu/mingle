@@ -1,10 +1,9 @@
 package io.github.minguanq.mingle.svc.filter;
 
-import io.github.minguanq.mingle.svc.SvcResponseHeader;
 import io.github.minguanq.mingle.svc.concurrent.SvcAttribute;
 import io.github.minguanq.mingle.svc.concurrent.SvcThreadLocal;
 import io.github.minguanq.mingle.svc.handler.SerialNumberGeneratorHandler;
-import io.github.minguanq.mingle.svc.handler.SvcLogHandler;
+import io.github.minguanq.mingle.svc.handler.SvcLoggingHandler;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,12 +19,12 @@ import java.io.IOException;
 
 public class SvcLogFilter extends AbstractSvcFilter {
 
-    private final SvcLogHandler svcLogHandler;
+    private final SvcLoggingHandler svcLoggingHandler;
     private final SerialNumberGeneratorHandler serialNumberGeneratorHandler;
 
-    public SvcLogFilter(SvcInfo svcInfo, SvcLogHandler svcLogHandler, SerialNumberGeneratorHandler serialNumberGeneratorHandler) {
+    public SvcLogFilter(SvcInfo svcInfo, SvcLoggingHandler svcLoggingHandler, SerialNumberGeneratorHandler serialNumberGeneratorHandler) {
         super(svcInfo);
-        this.svcLogHandler = svcLogHandler;
+        this.svcLoggingHandler = svcLoggingHandler;
         this.serialNumberGeneratorHandler = serialNumberGeneratorHandler;
     }
 
@@ -33,14 +32,13 @@ public class SvcLogFilter extends AbstractSvcFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         svcInfo.setSvcSerialNum(serialNumberGeneratorHandler.generate("svc"));
-        svcInfo.setSvcResponseHeaderLog(SvcResponseHeader.builder(null).build());
         SvcThreadLocal.set(buildSvcLogModel());
         writeSvcBegin();
         filterChain.doFilter(request, response);
     }
 
     private void writeSvcBegin() {
-        svcLogHandler.writeBeginLog(svcInfo);
+        svcLoggingHandler.writeBeginLog(svcInfo);
     }
 
     private SvcAttribute buildSvcLogModel() {

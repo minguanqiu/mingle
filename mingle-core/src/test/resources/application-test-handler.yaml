@@ -1,0 +1,6 @@
+mingle:
+  svc:
+    feature:
+      SimpleSvc:
+        logging: true
+        body-process: true

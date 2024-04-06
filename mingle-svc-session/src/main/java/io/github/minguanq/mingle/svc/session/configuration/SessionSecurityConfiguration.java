@@ -1,6 +1,6 @@
 package io.github.minguanq.mingle.svc.session.configuration;
 
-import io.github.minguanq.mingle.svc.component.SvcBinderComponent;
+import io.github.minguanq.mingle.svc.component.SvcRegisterComponent;
 import io.github.minguanq.mingle.svc.session.annotation.SvcSession;
 import io.github.minguanq.mingle.svc.session.configuration.properties.SessionProperties;
 import io.github.minguanq.mingle.svc.session.dao.SessionDao;
@@ -31,10 +31,10 @@ import java.util.ArrayList;
 public class SessionSecurityConfiguration {
 
     @Bean
-    public SecurityFilterChain sessionSecurityFilterChain(HttpSecurity httpSecurity, SvcBinderComponent svcBinderComponent, SvcAuthenticationFilter svcAuthenticationFilter) throws Exception {
-        ArrayList<SvcBinderComponent.SvcBinderModel> svcBinderModels = svcBinderComponent.findSvcBinderModel(svcBinderModel -> svcBinderModel.getSvcClass().getAnnotation(SvcSession.class) != null);
+    public SecurityFilterChain sessionSecurityFilterChain(HttpSecurity httpSecurity, SvcRegisterComponent svcRegisterComponent, SvcAuthenticationFilter svcAuthenticationFilter) throws Exception {
+        ArrayList<SvcRegisterComponent.SvcDefinition> svcDefinitions = svcRegisterComponent.getSvcDefinition(svcBinderModel -> svcBinderModel.getSvcClass().getAnnotation(SvcSession.class) != null);
         httpSecurity
-                .securityMatcher(svcBinderModels.stream().map(SvcBinderComponent.SvcBinderModel::getSvcPath).toList().toArray(new String[0]))
+                .securityMatcher(svcDefinitions.stream().map(SvcRegisterComponent.SvcDefinition::getSvcPath).toList().toArray(new String[0]))
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
@@ -45,7 +45,7 @@ public class SessionSecurityConfiguration {
                 .sessionManagement(sessionStrategy -> sessionStrategy.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(svcAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(authorizeRequests -> {
-                    svcBinderModels.stream().filter(svcBinderModel -> svcBinderModel.getSvcClass().getAnnotation(SvcSession.class).authority()).forEach(svcBinderModel -> {
+                    svcDefinitions.stream().filter(svcBinderModel -> svcBinderModel.getSvcClass().getAnnotation(SvcSession.class).authority()).forEach(svcBinderModel -> {
                         authorizeRequests.requestMatchers(svcBinderModel.getSvcPath()).hasAuthority(svcBinderModel.getSvcName());
                     });
                     authorizeRequests.anyRequest().authenticated();
@@ -80,8 +80,8 @@ public class SessionSecurityConfiguration {
     }
 
     @Bean
-    public SvcAuthenticationFilter svcAuthenticationFilter(SvcBinderComponent svcBinderComponent, SessionProperties sessionProperties, SessionDao sessionDao, SessionTokenHandler sessionTokenHandler) {
-        return new SvcAuthenticationFilter(svcBinderComponent, sessionProperties, sessionDao, sessionTokenHandler);
+    public SvcAuthenticationFilter svcAuthenticationFilter(SvcRegisterComponent svcRegisterComponent, SessionProperties sessionProperties, SessionDao sessionDao, SessionTokenHandler sessionTokenHandler) {
+        return new SvcAuthenticationFilter(svcRegisterComponent, sessionProperties, sessionDao, sessionTokenHandler);
     }
 
 

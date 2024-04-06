@@ -2,7 +2,7 @@ package io.github.minguanq.mingle.svc.configuration;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
-import io.github.minguanq.mingle.svc.component.SvcBinderComponent;
+import io.github.minguanq.mingle.svc.component.SvcRegisterComponent;
 import io.github.minguanq.mingle.svc.handler.SvcResponseHandler;
 import io.swagger.v3.core.converter.ModelConverters;
 import io.swagger.v3.core.converter.ResolvedSchema;
@@ -34,13 +34,13 @@ import java.util.Map;
 @Configuration
 public class SvcDocConfiguration {
 
-    private final SvcBinderComponent svcBinderComponent;
+    private final SvcRegisterComponent svcRegisterComponent;
     private final SvcResponseHandler svcResponseHandler;
     private String responseBodyFiledName;
     private final ModelConverters instance = ModelConverters.getInstance();
 
-    public SvcDocConfiguration(SvcBinderComponent svcBinderComponent, SvcResponseHandler svcResponseHandler) {
-        this.svcBinderComponent = svcBinderComponent;
+    public SvcDocConfiguration(SvcRegisterComponent svcRegisterComponent, SvcResponseHandler svcResponseHandler) {
+        this.svcRegisterComponent = svcRegisterComponent;
         this.svcResponseHandler = svcResponseHandler;
         init();
     }
@@ -56,7 +56,7 @@ public class SvcDocConfiguration {
     @Bean
     public OpenApiCustomizer svcOpenApiCustomizer() {
         return openApi -> {
-            svcBinderComponent.getSvcBinderModelMap().forEach((k, v) -> {
+            svcRegisterComponent.getSvcDefinitionMap().forEach((k, v) -> {
                 PathItem pathItem = openApi.getPaths().get(v.getSvcPath());
                 if (pathItem != null) {
                     Operation operation = null;
@@ -85,7 +85,7 @@ public class SvcDocConfiguration {
         };
     }
 
-    private void buildPathItem(ModelConverters instance, OpenAPI openApi, Operation operation, SvcBinderComponent.SvcBinderModel v) {
+    private void buildPathItem(ModelConverters instance, OpenAPI openApi, Operation operation, SvcRegisterComponent.SvcDefinition v) {
         operation.operationId(v.getSvcPath());
         operation.setTags(Arrays.asList(v.getSvc().tags()));
         operation.setSummary(v.getSvc().summary());
@@ -103,7 +103,10 @@ public class SvcDocConfiguration {
         ResolvedSchema fullResponseSchema = buildMainSvcResSchema(instance, responseSchema);
         ApiResponses defaultApiResponses = buildResponse(fullResponseSchema);
         ApiResponses operationResponses = operation.getResponses();
-        if(operationResponses.containsKey("200")) {
+        if (operationResponses.containsKey("200")) {
+            operationResponses.get("200").content(new Content()
+                    .addMediaType("application/json", new MediaType().schema(fullResponseSchema.schema)));
+        } else {
             operationResponses.addApiResponse("200", defaultApiResponses.get("200"));
         }
         openApi.schema(responseSchema.schema.getName(), responseSchema.schema);
@@ -130,7 +133,7 @@ public class SvcDocConfiguration {
 
     private void init() {
         ArrayList<Class<?>> classes = new ArrayList<>();
-        svcBinderComponent.getSvcBinderModelMap().forEach((k, v) -> {
+        svcRegisterComponent.getSvcDefinitionMap().forEach((k, v) -> {
             classes.add(v.getSvcClass());
         });
         AbstractOpenApiResource.addRestControllers(classes.toArray(new Class[0]));

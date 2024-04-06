@@ -1,6 +1,6 @@
 package io.github.minguanq.mingle.svc.response;
 
-import io.github.minguanq.mingle.svc.SvcResponse;
+import io.github.minguanq.mingle.svc.SvcResponseBody;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,7 +9,7 @@ import lombok.Setter;
  */
 @Setter
 @Getter
-public class SimpleSvcRes extends SvcResponse {
+public class SimpleSvcRes extends SvcResponseBody {
 
     private String text1;
 

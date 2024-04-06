@@ -1,8 +1,7 @@
 package io.github.minguanq.mingle.svc.exception.handler;
 
-import io.github.minguanq.mingle.svc.SvcResponse;
+import io.github.minguanq.mingle.svc.SvcResponseBody;
 import io.github.minguanq.mingle.svc.exception.BreakSvcProcessException;
-import io.github.minguanq.mingle.svc.exception.handler.abs.AbstractExceptionHandler;
 import io.github.minguanq.mingle.svc.filter.SvcInfo;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +21,8 @@ public class BreakSvcProcessExceptionHandler extends AbstractExceptionHandler<Br
     }
 
     @Override
-    public ResponseEntity<SvcResponse> handle(BreakSvcProcessException e) {
-        return build(e.getCode(), e.getMsg(), e.getSvcResponse());
+    public ResponseEntity<SvcResponseBody> handle(BreakSvcProcessException e) {
+        return build(e.getSvcResponseHeader(), e.getSvcResponseBody());
     }
 
 }

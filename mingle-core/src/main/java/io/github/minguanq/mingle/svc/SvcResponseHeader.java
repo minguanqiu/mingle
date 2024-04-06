@@ -1,7 +1,7 @@
 package io.github.minguanq.mingle.svc;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 
 import java.util.Map;
 
@@ -10,7 +10,7 @@ import java.util.Map;
  *
  * @author Ming
  */
-@Data
+@Getter
 @Builder
 public class SvcResponseHeader {
 
@@ -19,6 +19,13 @@ public class SvcResponseHeader {
     private String msg;
 
     private Map<String, String> convertMap;
+
+    private SvcResponseHeader(String code, String msg, Map<String, String> convertMap) {
+        assert code != null;
+        this.code = code;
+        this.msg = msg;
+        this.convertMap = convertMap;
+    }
 
     public static SvcResponseHeaderBuilder builder(String code) {
         return new SvcResponseHeaderBuilder().code(code);

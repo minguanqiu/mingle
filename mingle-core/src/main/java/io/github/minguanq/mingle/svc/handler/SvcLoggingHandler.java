@@ -8,7 +8,7 @@ import io.github.minguanq.mingle.svc.filter.SvcInfo;
  * @author Ming
  */
 
-public interface SvcLogHandler {
+public interface SvcLoggingHandler {
 
     void writeBeginLog(SvcInfo svcInfo);
 

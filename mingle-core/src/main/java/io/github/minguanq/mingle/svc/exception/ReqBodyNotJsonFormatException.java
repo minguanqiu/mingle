@@ -7,7 +7,10 @@ package io.github.minguanq.mingle.svc.exception;
  */
 public class ReqBodyNotJsonFormatException extends RuntimeException {
 
-    public ReqBodyNotJsonFormatException(String message) {
-        super(message);
+    public static final String MSG = "Request model deserialize fail";
+
+    public ReqBodyNotJsonFormatException() {
+        super(MSG);
     }
+
 }

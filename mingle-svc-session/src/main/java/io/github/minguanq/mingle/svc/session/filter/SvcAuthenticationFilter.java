@@ -1,6 +1,6 @@
 package io.github.minguanq.mingle.svc.session.filter;
 
-import io.github.minguanq.mingle.svc.component.SvcBinderComponent;
+import io.github.minguanq.mingle.svc.component.SvcRegisterComponent;
 import io.github.minguanq.mingle.svc.redis.RedisKey;
 import io.github.minguanq.mingle.svc.session.annotation.SvcSession;
 import io.github.minguanq.mingle.svc.session.configuration.properties.SessionProperties;
@@ -29,13 +29,13 @@ import java.util.List;
  * @author Ming
  */
 public class SvcAuthenticationFilter extends OncePerRequestFilter {
-    private final SvcBinderComponent svcBinderComponent;
+    private final SvcRegisterComponent svcRegisterComponent;
     private final SessionProperties sessionProperties;
     private final SessionDao sessionDao;
     private final SessionTokenHandler sessionTokenHandler;
 
-    public SvcAuthenticationFilter(SvcBinderComponent svcBinderComponent, SessionProperties sessionProperties, SessionDao sessionDao, SessionTokenHandler sessionTokenHandler) {
-        this.svcBinderComponent = svcBinderComponent;
+    public SvcAuthenticationFilter(SvcRegisterComponent svcRegisterComponent, SessionProperties sessionProperties, SessionDao sessionDao, SessionTokenHandler sessionTokenHandler) {
+        this.svcRegisterComponent = svcRegisterComponent;
         this.sessionProperties = sessionProperties;
         this.sessionDao = sessionDao;
         this.sessionTokenHandler = sessionTokenHandler;
@@ -56,7 +56,7 @@ public class SvcAuthenticationFilter extends OncePerRequestFilter {
         }
         RedisKey redisKey = new RedisKey(List.of(plainText.split(RedisKey.KEY_DELIMITER)));
         Session session = sessionDao.get(redisKey).orElseThrow(() -> new SessionNotExistException("Session not exist"));
-        String[] types = svcBinderComponent.getSvcBinderModel(request).get().getSvcClass().getAnnotation(SvcSession.class).type();
+        String[] types = svcRegisterComponent.getSvcDefinition(request).get().getSvcClass().getAnnotation(SvcSession.class).type();
         if (!checkType(types, session.getType())) {
             throw new SessionTypeIncorrectException("Session type incorrect");
         }

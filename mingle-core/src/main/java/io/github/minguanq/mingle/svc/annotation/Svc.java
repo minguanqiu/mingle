@@ -1,8 +1,5 @@
 package io.github.minguanq.mingle.svc.annotation;
 
-import io.github.minguanq.mingle.svc.filter.SvcIPSecureFilter;
-import io.github.minguanq.mingle.svc.filter.SvcLogFilter;
-import io.github.minguanq.mingle.svc.filter.SvcRequestBodyProcessFilter;
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.stereotype.Controller;
 
@@ -41,20 +38,5 @@ public @interface Svc {
      * Spring doc description
      **/
     String description() default "";
-
-    /**
-     * If enable will pass {@link SvcLogFilter}
-     **/
-    boolean logging() default true;
-
-    /**
-     * If enable will pass {@link SvcRequestBodyProcessFilter}
-     **/
-    boolean bodyProcess() default false;
-
-    /**
-     * If enable will pass {@link SvcIPSecureFilter}
-     **/
-    boolean ipSecure() default false;
 
 }

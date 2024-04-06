@@ -5,7 +5,7 @@ package io.github.minguanq.mingle.svc;
  *
  * @author Ming
  */
-public sealed interface Service<Req extends SvcRequest, Res extends SvcResponse> permits AbstractService {
+public sealed interface Service<Req extends SvcRequest, Res extends SvcResponseBody> permits AbstractService {
 
     Res doService(Req request);
 

@@ -1,9 +1,9 @@
 package io.github.minguanq.mingle.svc.action.exception.handler;
 
-import io.github.minguanq.mingle.svc.SvcResponse;
+import io.github.minguanq.mingle.svc.SvcResponseBody;
 import io.github.minguanq.mingle.svc.action.ActionResponse;
 import io.github.minguanq.mingle.svc.action.exception.ActionAutoBreakException;
-import io.github.minguanq.mingle.svc.exception.handler.abs.AbstractExceptionHandler;
+import io.github.minguanq.mingle.svc.exception.handler.AbstractExceptionHandler;
 import io.github.minguanq.mingle.svc.filter.SvcInfo;
 import io.github.minguanq.mingle.svc.handler.SvcMsgHandler;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,7 @@ public class ActionAutoBreakExceptionHandler extends AbstractExceptionHandler<Ac
     }
 
     @Override
-    public ResponseEntity<SvcResponse> handle(ActionAutoBreakException e) {
+    public ResponseEntity<SvcResponseBody> handle(ActionAutoBreakException e) {
         ActionResponse<?> actionResponse = e.getActionResponse();
         return build(actionResponse.getCode(), svcMsgHandler.getMsg(actionResponse.getMsgType(), actionResponse.getCode()));
     }

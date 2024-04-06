@@ -5,10 +5,12 @@ package io.github.minguanq.mingle.svc.exception;
  *
  * @author Ming
  */
-public class SvcNotFoundException extends RuntimeException{
+public class SvcNotFoundException extends RuntimeException {
 
-    public SvcNotFoundException(String msg) {
-       super(msg);
+    public static final String MSG = "Service not found";
+
+    public SvcNotFoundException() {
+        super(MSG);
     }
 
 }

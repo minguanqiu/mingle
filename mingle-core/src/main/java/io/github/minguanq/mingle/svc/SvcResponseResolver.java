@@ -1,8 +1,6 @@
 package io.github.minguanq.mingle.svc;
 
-import io.github.minguanq.mingle.svc.annotation.Svc;
 import org.springframework.core.MethodParameter;
-import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -17,7 +15,6 @@ import java.util.List;
  *
  * @author Ming
  */
-
 public class SvcResponseResolver extends RequestResponseBodyMethodProcessor {
 
     public SvcResponseResolver(List<HttpMessageConverter<?>> converters) {
@@ -26,7 +23,7 @@ public class SvcResponseResolver extends RequestResponseBodyMethodProcessor {
 
     @Override
     public boolean supportsReturnType(MethodParameter returnType) {
-        return SvcResponse.class.isAssignableFrom(returnType.getParameterType()) && AnnotatedElementUtils.hasAnnotation(returnType.getContainingClass(), Svc.class);
+        return SvcResponseBody.class.isAssignableFrom(returnType.getParameterType()) && returnType.getContainingClass().isAssignableFrom(Service.class);
     }
 
     @Override

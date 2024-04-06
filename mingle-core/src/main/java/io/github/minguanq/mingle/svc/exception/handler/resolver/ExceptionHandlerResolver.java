@@ -1,7 +1,7 @@
 package io.github.minguanq.mingle.svc.exception.handler.resolver;
 
-import io.github.minguanq.mingle.svc.SvcResponse;
-import io.github.minguanq.mingle.svc.exception.handler.abs.AbstractExceptionHandler;
+import io.github.minguanq.mingle.svc.SvcResponseBody;
+import io.github.minguanq.mingle.svc.exception.handler.AbstractExceptionHandler;
 import jakarta.annotation.PostConstruct;
 import org.springframework.http.ResponseEntity;
 
@@ -23,7 +23,7 @@ public class ExceptionHandlerResolver {
         this.abstractExceptionHandlers = abstractExceptionHandlers;
     }
 
-    public ResponseEntity<SvcResponse> resolver(Exception e) {
+    public ResponseEntity<SvcResponseBody> resolver(Exception e) {
         return exceptionHandlerMap.getOrDefault(e.getClass(), exceptionHandlerMap.get(Exception.class)).handle(e);
     }
 

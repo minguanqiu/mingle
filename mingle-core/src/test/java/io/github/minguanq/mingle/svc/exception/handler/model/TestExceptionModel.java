@@ -5,16 +5,15 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Exception message response model
- *
  * @author Ming
  */
 @Getter
 @Setter
-public class AllExceptionModel extends SvcResponseBody {
+public class TestExceptionModel extends SvcResponseBody {
+    public TestExceptionModel(String exceptionMsg) {
+        this.exceptionMsg = exceptionMsg;
+    }
 
-    private String exception;
-    private String causeException;
-    private String msg;
+    private String exceptionMsg;
 
 }

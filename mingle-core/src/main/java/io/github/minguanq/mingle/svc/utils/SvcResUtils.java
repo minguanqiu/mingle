@@ -1,7 +1,7 @@
 package io.github.minguanq.mingle.svc.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import io.github.minguanq.mingle.svc.SvcResponse;
+import io.github.minguanq.mingle.svc.SvcResponseBody;
 import io.github.minguanq.mingle.svc.handler.SvcResponseHandler;
 import org.springframework.objenesis.SpringObjenesis;
 
@@ -22,15 +22,15 @@ public class SvcResUtils {
     }
 
     public SvcResponseHandler build(String code, String msg) {
-        return build(code, msg, new SvcResponse());
+        return build(code, msg, new SvcResponseBody());
     }
 
-    public SvcResponseHandler build(String code, String msg, SvcResponse svcResponse) {
-        return build(code, msg, svcResponse, jacksonUtils);
+    public SvcResponseHandler build(String code, String msg, SvcResponseBody svcResponseBody) {
+        return build(code, msg, svcResponseBody, jacksonUtils);
     }
 
-    public SvcResponseHandler build(String code, String msg, SvcResponse svcResponse, JacksonUtils jacksonUtils) {
-        return build(code, msg, jacksonUtils.readTree(svcResponse).orElse(null));
+    public SvcResponseHandler build(String code, String msg, SvcResponseBody svcResponseBody, JacksonUtils jacksonUtils) {
+        return build(code, msg, jacksonUtils.readTree(svcResponseBody).orElse(null));
     }
 
     public SvcResponseHandler build(String code, String msg, JsonNode jsonNode) {

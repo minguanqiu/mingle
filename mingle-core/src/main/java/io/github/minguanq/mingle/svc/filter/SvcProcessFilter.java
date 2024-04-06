@@ -3,18 +3,19 @@ package io.github.minguanq.mingle.svc.filter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.minguanq.mingle.svc.SvcResponse;
+import io.github.minguanq.mingle.svc.SvcResponseBody;
 import io.github.minguanq.mingle.svc.SvcResponseHeader;
-import io.github.minguanq.mingle.svc.component.SvcBinderComponent;
+import io.github.minguanq.mingle.svc.component.SvcRegisterComponent;
 import io.github.minguanq.mingle.svc.concurrent.SvcThreadLocal;
 import io.github.minguanq.mingle.svc.configuration.properties.SvcProperties;
 import io.github.minguanq.mingle.svc.exception.SvcNotFoundException;
 import io.github.minguanq.mingle.svc.exception.handler.resolver.ExceptionHandlerResolver;
-import io.github.minguanq.mingle.svc.handler.SvcLogHandler;
+import io.github.minguanq.mingle.svc.handler.SvcLoggingHandler;
 import io.github.minguanq.mingle.svc.handler.SvcMsgHandler;
 import io.github.minguanq.mingle.svc.handler.SvcResponseHandler;
 import io.github.minguanq.mingle.svc.utils.DateUtils;
 import io.github.minguanq.mingle.svc.utils.JacksonUtils;
+import io.github.minguanq.mingle.svc.utils.StringUtils;
 import io.github.minguanq.mingle.svc.utils.SvcResUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -38,19 +39,19 @@ public class SvcProcessFilter extends AbstractSvcFilter {
 
     private final SvcMsgHandler svcMsgHandler;
     private final SvcProperties svcProperties;
-    private final SvcLogHandler svcLogHandler;
+    private final SvcLoggingHandler svcLoggingHandler;
     private final ExceptionHandlerResolver exceptionHandlerResolver;
-    private final SvcBinderComponent svcBinderComponent;
+    private final SvcRegisterComponent svcRegisterComponent;
     private final JacksonUtils jacksonUtils;
     private final SvcResUtils svcResUtils;
 
-    public SvcProcessFilter(SvcInfo svcInfo, SvcMsgHandler svcMsgHandler, SvcProperties svcProperties, SvcLogHandler svcLogHandler, ExceptionHandlerResolver exceptionHandlerResolver, SvcBinderComponent svcBinderComponent, JacksonUtils jacksonUtils, SvcResUtils svcResUtils) {
+    public SvcProcessFilter(SvcInfo svcInfo, SvcMsgHandler svcMsgHandler, SvcProperties svcProperties, SvcLoggingHandler svcLoggingHandler, ExceptionHandlerResolver exceptionHandlerResolver, SvcRegisterComponent svcRegisterComponent, JacksonUtils jacksonUtils, SvcResUtils svcResUtils) {
         super(svcInfo);
         this.svcMsgHandler = svcMsgHandler;
         this.svcProperties = svcProperties;
-        this.svcLogHandler = svcLogHandler;
+        this.svcLoggingHandler = svcLoggingHandler;
         this.exceptionHandlerResolver = exceptionHandlerResolver;
-        this.svcBinderComponent = svcBinderComponent;
+        this.svcRegisterComponent = svcRegisterComponent;
         this.jacksonUtils = jacksonUtils;
         this.svcResUtils = svcResUtils;
     }
@@ -71,23 +72,22 @@ public class SvcProcessFilter extends AbstractSvcFilter {
             SvcThreadLocal.remove();
         }
         end((ContentCachingResponseWrapper) svcInfo.getHttpServletResponse());
-        if (svcInfo.getSvcBinderModel() != null) {
-            if (svcInfo.getSvcBinderModel().getSvc().logging()) {
-                convertLogMsg();
-                svcLogHandler.writeEndLog(svcInfo);
+        if (svcInfo.getSvcDefinition() != null) {
+            if (svcInfo.getSvcDefinition().getFeature().isLogging()) {
+                svcLoggingHandler.writeEndLog(svcInfo);
             }
         }
     }
 
     private void start() {
         svcInfo.setStartDateTime(DateUtils.getNowLocalDateTime());
-        svcInfo.setSvcResponseHeader(SvcResponseHeader.builder(svcProperties.getSuccessCode()).msg(svcProperties.getSuccessMsg()).build());
-        Optional<SvcBinderComponent.SvcBinderModel> optionalSvcBinderModel = svcBinderComponent.getSvcBinderModel(svcInfo.getHttpServletRequest());
+        svcInfo.setSvcResponseHeader(SvcResponseHeader.builder(svcProperties.getCode()).msg(svcProperties.getMsg()).build());
+        Optional<SvcRegisterComponent.SvcDefinition> optionalSvcBinderModel = svcRegisterComponent.getSvcDefinition(svcInfo.getHttpServletRequest());
         if (optionalSvcBinderModel.isEmpty()) {
-            throw new SvcNotFoundException("Can't found Svc in SvcBinderModel");
+            throw new SvcNotFoundException();
         }
-        SvcBinderComponent.SvcBinderModel svcBinderModel = optionalSvcBinderModel.get();
-        svcInfo.setSvcBinderModel(svcBinderModel);
+        SvcRegisterComponent.SvcDefinition svcDefinition = optionalSvcBinderModel.get();
+        svcInfo.setSvcDefinition(svcDefinition);
     }
 
     private void end(ContentCachingResponseWrapper responseWrapper) throws IOException {
@@ -95,13 +95,15 @@ public class SvcProcessFilter extends AbstractSvcFilter {
         SvcResponseHandler svcResponseHandler = svcResUtils.build(svcInfo.getSvcResponseHeader().getCode(), convertMsg(svcInfo.getSvcResponseHeader()), svcInfo.getResponseBody());
         ObjectMapper objectMapper = jacksonUtils.getObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(objectMapper.writeValueAsString(svcResponseHandler));
-        svcInfo.setSvcResponseHandler(svcResponseHandler);
         writeResponse(responseWrapper, jsonNode);
     }
 
     private void processResponseBody(ContentCachingResponseWrapper responseWrapper) throws JsonProcessingException {
         ObjectMapper objectMapper = jacksonUtils.getObjectMapper();
-        svcInfo.setResponseBody(objectMapper.readTree(new String(responseWrapper.getContentAsByteArray(), StandardCharsets.UTF_8)));
+        JsonNode node = objectMapper.readTree(new String(responseWrapper.getContentAsByteArray(), StandardCharsets.UTF_8));
+        if (!node.isMissingNode()) {
+            svcInfo.setResponseBody(node);
+        }
     }
 
     private void processExceptionBody(Exception e, ContentCachingResponseWrapper responseWrapper) throws IOException {
@@ -109,11 +111,13 @@ public class SvcProcessFilter extends AbstractSvcFilter {
         if (e instanceof ServletException servletException) {
             exception = (Exception) servletException.getRootCause();
         }
-        ResponseEntity<SvcResponse> resolver = exceptionHandlerResolver.resolver(exception);
+        ResponseEntity<SvcResponseBody> resolver = exceptionHandlerResolver.resolver(exception);
         ObjectMapper objectMapper = jacksonUtils.getObjectMapper();
         responseWrapper.setStatus(resolver.getStatusCode().value());
         resolver.getHeaders().forEach((s, strings) -> strings.forEach(node -> responseWrapper.setHeader(s, node)));
-        svcInfo.setResponseBody(objectMapper.readTree(objectMapper.writeValueAsString(resolver.getBody())));
+        if (resolver.getBody() != null) {
+            svcInfo.setResponseBody(objectMapper.readTree(objectMapper.writeValueAsString(resolver.getBody())));
+        }
     }
 
     private void writeResponse(ContentCachingResponseWrapper responseWrapper, JsonNode jsonNode) throws IOException {
@@ -124,23 +128,19 @@ public class SvcProcessFilter extends AbstractSvcFilter {
         responseWrapper.copyBodyToResponse();
     }
 
-    private void convertLogMsg() {
-        if(svcInfo.getSvcResponseHeaderLog() != null) {
-            if (svcInfo.getSvcResponseHeaderLog().getCode() != null) {
-                svcInfo.getSvcResponseHeaderLog().setMsg(convertMsg(svcInfo.getSvcResponseHeaderLog()));
-            }
+    private String getMsg(SvcResponseHeader svcResponseHeader) {
+        if (svcResponseHeader.getMsg() == null) {
+            return svcMsgHandler.getMsg(svcProperties.getMsg_type(), svcResponseHeader.getCode());
         }
+        return svcResponseHeader.getMsg();
     }
 
     private String convertMsg(SvcResponseHeader svcResponseHeader) {
-        if (svcResponseHeader.getMsg() != null) {
-            if (svcResponseHeader.getConvertMap() != null) {
-                return svcMsgHandler.getMsg(svcProperties.getMsgType(), svcResponseHeader.getCode(), svcResponseHeader.getConvertMap());
-            }
-        } else {
-            return svcMsgHandler.getMsg(svcProperties.getMsgType(), svcResponseHeader.getCode());
+        String msg = getMsg(svcResponseHeader);
+        if (msg != null && svcResponseHeader.getConvertMap() != null) {
+            return StringUtils.templateConvert(msg, svcResponseHeader.getConvertMap(), "{", "}");
         }
-        return svcResponseHeader.getMsg();
+        return msg;
     }
 
 }

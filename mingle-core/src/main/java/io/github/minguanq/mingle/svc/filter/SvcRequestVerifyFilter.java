@@ -1,7 +1,7 @@
 package io.github.minguanq.mingle.svc.filter;
 
-import io.github.minguanq.mingle.svc.exception.ReqModelDeserializeFailException;
-import io.github.minguanq.mingle.svc.exception.SvcReqModelValidFailException;
+import io.github.minguanq.mingle.svc.exception.SvcRequestDeserializeFailException;
+import io.github.minguanq.mingle.svc.exception.SvcRequestValidFailException;
 import io.github.minguanq.mingle.svc.utils.JacksonUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -34,14 +34,14 @@ public class SvcRequestVerifyFilter extends AbstractSvcFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        Optional<?> reqModelOptional = jacksonUtils.readValue(svcInfo.getPayLoadString(), svcInfo.getSvcBinderModel().getRequestClass());
+        Optional<?> reqModelOptional = jacksonUtils.readValue(svcInfo.getRequestBody(), svcInfo.getSvcDefinition().getRequestClass());
         if (reqModelOptional.isEmpty()) {
-            throw new ReqModelDeserializeFailException("Request model deserialize fail");
+            throw new SvcRequestDeserializeFailException();
         }
         Object object = reqModelOptional.get();
         Set<ConstraintViolation<Object>> set = validator.validate(object);
         if (!set.isEmpty()) {
-            svcInfo.setSvcReqModelValidFailException(new SvcReqModelValidFailException("Request model valid error", new ConstraintViolationException(set)));
+            throw new SvcRequestValidFailException(new ConstraintViolationException(set));
         }
         svcInfo.setSvcRequest(object);
         filterChain.doFilter(request, response);

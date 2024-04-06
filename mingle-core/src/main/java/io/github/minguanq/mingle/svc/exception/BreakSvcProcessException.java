@@ -1,6 +1,7 @@
 package io.github.minguanq.mingle.svc.exception;
 
-import io.github.minguanq.mingle.svc.SvcResponse;
+import io.github.minguanq.mingle.svc.SvcResponseBody;
+import io.github.minguanq.mingle.svc.SvcResponseHeader;
 import lombok.Getter;
 
 /**
@@ -12,25 +13,17 @@ import lombok.Getter;
 @Getter
 public class BreakSvcProcessException extends RuntimeException {
 
-    private static final long serialVersionUID = 1L;
+    private final SvcResponseHeader svcResponseHeader;
 
-    private final String code;
-
-    private final String msg;
-
-    private SvcResponse svcResponse = new SvcResponse();
+    private final SvcResponseBody svcResponseBody;
 
     /**
-     * @param code        response code
-     * @param msg        response msg
-     * @param svcResponse Svc response model
+     * @param svcResponseHeader service response header
+     * @param svcResponseBody       service response body
      */
-    public BreakSvcProcessException(String code, String msg, SvcResponse svcResponse) {
-        this.code = code;
-        this.msg = msg;
-        if(svcResponse != null) {
-            this.svcResponse = svcResponse;
-        }
+    public BreakSvcProcessException(SvcResponseHeader svcResponseHeader, SvcResponseBody svcResponseBody) {
+        this.svcResponseHeader = svcResponseHeader;
+        this.svcResponseBody = svcResponseBody;
     }
 
 }
