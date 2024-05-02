@@ -9,12 +9,10 @@ import org.springframework.security.core.AuthenticationException;
  */
 public class SessionTypeIncorrectException extends AuthenticationException {
 
-    public SessionTypeIncorrectException(String msg, Throwable cause) {
-        super(msg, cause);
-    }
+    public static final String MSG = "Session type incorrect";
 
-    public SessionTypeIncorrectException(String msg) {
-        super(msg);
+    public SessionTypeIncorrectException() {
+        super(MSG);
     }
 
 }

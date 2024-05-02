@@ -2,7 +2,7 @@ package io.github.minguanq.mingle.svc.exception.handler;
 
 import io.github.minguanq.mingle.svc.SvcResponseBody;
 import io.github.minguanq.mingle.svc.SvcResponseHeader;
-import io.github.minguanq.mingle.svc.TestUtils;
+import io.github.minguanq.mingle.svc.SvcTestUtils;
 import io.github.minguanq.mingle.svc.exception.handler.model.TestExceptionModel;
 import io.github.minguanq.mingle.svc.filter.SvcInfo;
 import org.springframework.context.annotation.Profile;
@@ -21,7 +21,7 @@ public class AllExceptionHandlerImpl extends AbstractExceptionHandler<Exception>
 
     @Override
     public ResponseEntity<SvcResponseBody> handle(Exception ex) {
-        return build(SvcResponseHeader.builder(TestUtils.X003).msg("X003-fail").build(), new TestExceptionModel("X003-fail"));
+        return build(SvcResponseHeader.builder(SvcTestUtils.X003).msg("X003-fail").build(), new TestExceptionModel("X003-fail"));
     }
 
 }

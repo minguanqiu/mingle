@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
 
-import java.util.Map;
-
 /**
  * {@inheritDoc}
  * Action request for rest type
@@ -19,7 +17,5 @@ import java.util.Map;
 public class RestActionRequest extends ActionRequest {
 
     private OkHttpClient.Builder okHttpClientBuilder;
-
-    private Map<String, String> headerValueMap;
 
 }

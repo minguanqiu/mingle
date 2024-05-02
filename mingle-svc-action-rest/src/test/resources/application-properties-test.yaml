@@ -1,0 +1,23 @@
+mingle:
+  svc:
+    action:
+      rest:
+        server:
+          Simple:
+            scheme: https
+            host: 127.0.0.1
+            port: 8080
+            path-segments:
+              - test1
+              - test2
+        mock:
+          SimpleAction:
+            code: 400
+            header:
+              test: test
+              test1: test1
+            response-body:
+              media_type: application/xml
+              content: '{"test":"test","test1":"test1"}'
+            message: 400 OK
+            delay: 5000

@@ -4,6 +4,9 @@ mingle:
       code: "0000"
       msg-type: test
       msg: success
-      logging: false
-      body-process: true
-      ip-secure: 0.0.0.0
+      feature:
+        logging: false
+        body-process: true
+        ip-secure:
+          - 0.0.0.0
+          - 1.1.1.1

@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -23,7 +24,7 @@ public class ActionResponse<ResB extends ActionResponseBody> {
 
     private String msg;
 
-    private Map<String, Object> values;
+    private final Map<String, Object> values = new HashMap<>();
 
     private ResB responseBody;
 

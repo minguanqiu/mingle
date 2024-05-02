@@ -1,13 +1,14 @@
 package io.github.minguanq.mingle.svc.configuration;
 
-import io.github.minguanq.mingle.svc.component.SvcRegisterComponent;
 import io.github.minguanq.mingle.svc.configuration.properties.SvcProperties;
 import io.github.minguanq.mingle.svc.exception.handler.resolver.ExceptionHandlerResolver;
 import io.github.minguanq.mingle.svc.filter.*;
+import io.github.minguanq.mingle.svc.handler.CodeMessageHandler;
 import io.github.minguanq.mingle.svc.handler.SerialNumberGeneratorHandler;
 import io.github.minguanq.mingle.svc.handler.SvcLoggingHandler;
-import io.github.minguanq.mingle.svc.handler.SvcMsgHandler;
 import io.github.minguanq.mingle.svc.handler.SvcRequestBodyProcessHandler;
+import io.github.minguanq.mingle.svc.handler.model.SvcFeature;
+import io.github.minguanq.mingle.svc.register.SvcRegister;
 import io.github.minguanq.mingle.svc.utils.JacksonUtils;
 import io.github.minguanq.mingle.svc.utils.SvcResUtils;
 import jakarta.validation.Validator;
@@ -27,11 +28,11 @@ public class FilterConfiguration {
      * Create and return {@link FilterRegistrationBean} for {@link SvcProcessFilter}
      */
     @Bean
-    public FilterRegistrationBean<SvcProcessFilter> svcPreProcessFilterFilterRegistrationBean(SvcRegisterComponent svcRegisterComponent, SvcProcessFilter svcProcessFilter) {
+    public FilterRegistrationBean<SvcProcessFilter> svcPreProcessFilterFilterRegistrationBean(SvcRegister svcRegister, SvcProcessFilter svcProcessFilter) {
         FilterRegistrationBean<SvcProcessFilter> registration = new FilterRegistrationBean<>();
         registration.setFilter(svcProcessFilter);
         registration.setName("svcPreProcessFilter");
-        registration.addUrlPatterns(svcRegisterComponent.getSvcPath(svcDefinition -> true));
+        registration.addUrlPatterns(svcRegister.getSvcPath(svcDefinition -> true));
         registration.setOrder(0);
         return registration;
     }
@@ -40,11 +41,11 @@ public class FilterConfiguration {
      * Create and return {@link FilterRegistrationBean} for {@link SvcRequestBodyProcessFilter}
      */
     @Bean
-    public FilterRegistrationBean<SvcRequestBodyProcessFilter> svcRequestBodyProcessFilterFilterRegistrationBean(SvcRegisterComponent svcRegisterComponent, SvcRequestBodyProcessFilter svcRequestBodyProcessFilter) {
+    public FilterRegistrationBean<SvcRequestBodyProcessFilter> svcRequestBodyProcessFilterFilterRegistrationBean(SvcRegister svcRegister, SvcRequestBodyProcessFilter svcRequestBodyProcessFilter) {
         FilterRegistrationBean<SvcRequestBodyProcessFilter> registration = new FilterRegistrationBean<>();
         registration.setFilter(svcRequestBodyProcessFilter);
         registration.setName("svcRequestBodyProcessFilter");
-        registration.addUrlPatterns(svcRegisterComponent.getSvcPath(svcDefinition -> true));
+        registration.addUrlPatterns(svcRegister.getSvcPath(svcDefinition -> true));
         registration.setOrder(1);
         return registration;
     }
@@ -53,11 +54,11 @@ public class FilterConfiguration {
      * Create and return {@link FilterRegistrationBean} for {@link SvcIPSecureFilter}
      */
     @Bean
-    public FilterRegistrationBean<SvcIPSecureFilter> svcIPSecureFilterFilterRegistrationBean(SvcRegisterComponent svcRegisterComponent, SvcIPSecureFilter svcIpSecureFilter) {
+    public FilterRegistrationBean<SvcIPSecureFilter> svcIPSecureFilterFilterRegistrationBean(SvcRegister svcRegister, SvcIPSecureFilter svcIpSecureFilter) {
         FilterRegistrationBean<SvcIPSecureFilter> registration = new FilterRegistrationBean<>();
         registration.setFilter(svcIpSecureFilter);
         registration.setName("svcIpSecureFilter");
-        String[] svcPath = svcRegisterComponent.getSvcPath(svcDefinition -> svcDefinition.getFeature().getIpSecure().length > 0);
+        String[] svcPath = svcRegister.getSvcPath(svcDefinition -> svcDefinition.getFeature(SvcFeature.class).get().ip_secure().length > 0);
         if (svcPath.length == 0) {
             registration.setEnabled(false);
         } else {
@@ -71,11 +72,11 @@ public class FilterConfiguration {
      * Create and return {@link FilterRegistrationBean} for {@link SvcRequestVerifyFilter}
      */
     @Bean
-    public FilterRegistrationBean<SvcRequestVerifyFilter> svcRequestVerifyFilterFilterRegistrationBean(SvcRegisterComponent svcRegisterComponent, SvcRequestVerifyFilter svcRequestVerifyFilter) {
+    public FilterRegistrationBean<SvcRequestVerifyFilter> svcRequestVerifyFilterFilterRegistrationBean(SvcRegister svcRegister, SvcRequestVerifyFilter svcRequestVerifyFilter) {
         FilterRegistrationBean<SvcRequestVerifyFilter> registration = new FilterRegistrationBean<>();
         registration.setFilter(svcRequestVerifyFilter);
         registration.setName("svcReqModelValidFilter");
-        String[] svcPath = svcRegisterComponent.getSvcPath(svcDefinition -> true);
+        String[] svcPath = svcRegister.getSvcPath(svcDefinition -> true);
         if (svcPath.length == 0) {
             registration.setEnabled(false);
         } else {
@@ -89,11 +90,11 @@ public class FilterConfiguration {
      * Create and return {@link FilterRegistrationBean} for {@link SvcLogFilter}
      */
     @Bean
-    public FilterRegistrationBean<SvcLogFilter> svcLogFilterFilterRegistrationBean(SvcRegisterComponent svcRegisterComponent, SvcLogFilter svcLogFilter) {
+    public FilterRegistrationBean<SvcLogFilter> svcLogFilterFilterRegistrationBean(SvcRegister svcRegister, SvcLogFilter svcLogFilter) {
         FilterRegistrationBean<SvcLogFilter> registration = new FilterRegistrationBean<>();
         registration.setFilter(svcLogFilter);
         registration.setName("svcLogFilter");
-        String[] svcPath = svcRegisterComponent.getSvcPath(svcDefinition -> svcDefinition.getFeature().isLogging());
+        String[] svcPath = svcRegister.getSvcPath(svcDefinition -> svcDefinition.getFeature(SvcFeature.class).get().logging());
         if (svcPath.length == 0) {
             registration.setEnabled(false);
         } else {
@@ -107,8 +108,8 @@ public class FilterConfiguration {
      * Create and return SvcPreProcessFilter instance
      */
     @Bean
-    public SvcProcessFilter svcPreProcessFilter(SvcInfo svcInfo, SvcMsgHandler svcMsgHandler, SvcProperties svcProperties, SvcLoggingHandler svcLoggingHandler, ExceptionHandlerResolver exceptionHandlerResolver, SvcRegisterComponent svcRegisterComponent, JacksonUtils jacksonUtils, SvcResUtils svcResUtils) {
-        return new SvcProcessFilter(svcInfo, svcMsgHandler, svcProperties, svcLoggingHandler, exceptionHandlerResolver, svcRegisterComponent, jacksonUtils, svcResUtils);
+    public SvcProcessFilter svcPreProcessFilter(SvcInfo svcInfo, CodeMessageHandler codeMessageHandler, SvcProperties svcProperties, SvcLoggingHandler svcLoggingHandler, ExceptionHandlerResolver exceptionHandlerResolver, SvcRegister svcRegister, JacksonUtils jacksonUtils, SvcResUtils svcResUtils) {
+        return new SvcProcessFilter(svcInfo, codeMessageHandler, svcProperties, svcLoggingHandler, exceptionHandlerResolver, svcRegister, jacksonUtils, svcResUtils);
     }
 
     /**

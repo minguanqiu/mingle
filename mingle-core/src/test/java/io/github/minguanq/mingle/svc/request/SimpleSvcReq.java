@@ -1,6 +1,7 @@
 package io.github.minguanq.mingle.svc.request;
 
 import io.github.minguanq.mingle.svc.SvcRequest;
+import io.github.minguanq.mingle.svc.annotation.ExcludeLog;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,5 +21,8 @@ public class SimpleSvcReq extends SvcRequest {
 
     @NotEmpty
     private String text2;
+
+    @ExcludeLog
+    private String text3;
 
 }

@@ -7,7 +7,6 @@ import io.github.minguanq.mingle.svc.filter.SvcInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 
 /**
  * Default handler will catch {@link Exception} or unknown exception
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Component;
  * @author Ming
  */
 @Slf4j
-@Component
 @Order(Integer.MIN_VALUE)
 public class AllExceptionHandler extends AbstractExceptionHandler<Exception> {
 
@@ -32,7 +30,7 @@ public class AllExceptionHandler extends AbstractExceptionHandler<Exception> {
         }
         model.setMsg(e.getMessage());
         log.error("Exception by " + e);
-        return build(SvcResponseHeader.builder("error").build(), model);
+        return build(SvcResponseHeader.builder("error").msg(e.getMessage()).build(), model);
     }
 
 }

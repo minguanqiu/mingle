@@ -7,8 +7,10 @@ package io.github.minguanq.mingle.svc.action.rest.exception;
  */
 public class ActionRequestSerializeErrorException extends RuntimeException {
 
-    public ActionRequestSerializeErrorException(String message) {
-        super(message);
+    public static final String MSG = "request model serialize error";
+
+    public ActionRequestSerializeErrorException() {
+        super(MSG);
     }
 
 }

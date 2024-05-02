@@ -5,14 +5,12 @@ import io.github.minguanq.mingle.svc.exception.BreakSvcProcessException;
 import io.github.minguanq.mingle.svc.filter.SvcInfo;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 
 /**
  * Default handler will catch {@link BreakSvcProcessException}
  *
  * @author Ming
  */
-@Component
 @Order(Integer.MIN_VALUE)
 public class BreakSvcProcessExceptionHandler extends AbstractExceptionHandler<BreakSvcProcessException> {
 

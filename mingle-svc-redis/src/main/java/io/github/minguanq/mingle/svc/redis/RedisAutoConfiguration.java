@@ -1,8 +1,6 @@
 package io.github.minguanq.mingle.svc.redis;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.PropertySource;
 
 /**
  * {@link AutoConfiguration} for redis module
@@ -11,7 +9,5 @@ import org.springframework.context.annotation.PropertySource;
  */
 
 @AutoConfiguration
-@ComponentScan(basePackageClasses = RedisAutoConfiguration.class)
-@PropertySource("classpath:svc-redis.properties")
 public class RedisAutoConfiguration {
 }

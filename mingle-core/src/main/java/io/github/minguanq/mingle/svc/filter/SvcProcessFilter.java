@@ -5,14 +5,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.minguanq.mingle.svc.SvcResponseBody;
 import io.github.minguanq.mingle.svc.SvcResponseHeader;
-import io.github.minguanq.mingle.svc.component.SvcRegisterComponent;
 import io.github.minguanq.mingle.svc.concurrent.SvcThreadLocal;
 import io.github.minguanq.mingle.svc.configuration.properties.SvcProperties;
 import io.github.minguanq.mingle.svc.exception.SvcNotFoundException;
 import io.github.minguanq.mingle.svc.exception.handler.resolver.ExceptionHandlerResolver;
+import io.github.minguanq.mingle.svc.handler.CodeMessageHandler;
 import io.github.minguanq.mingle.svc.handler.SvcLoggingHandler;
-import io.github.minguanq.mingle.svc.handler.SvcMsgHandler;
 import io.github.minguanq.mingle.svc.handler.SvcResponseHandler;
+import io.github.minguanq.mingle.svc.register.SvcRegister;
 import io.github.minguanq.mingle.svc.utils.DateUtils;
 import io.github.minguanq.mingle.svc.utils.JacksonUtils;
 import io.github.minguanq.mingle.svc.utils.StringUtils;
@@ -37,21 +37,21 @@ import java.util.Optional;
 
 public class SvcProcessFilter extends AbstractSvcFilter {
 
-    private final SvcMsgHandler svcMsgHandler;
+    private final CodeMessageHandler codeMessageHandler;
     private final SvcProperties svcProperties;
     private final SvcLoggingHandler svcLoggingHandler;
     private final ExceptionHandlerResolver exceptionHandlerResolver;
-    private final SvcRegisterComponent svcRegisterComponent;
+    private final SvcRegister svcRegister;
     private final JacksonUtils jacksonUtils;
     private final SvcResUtils svcResUtils;
 
-    public SvcProcessFilter(SvcInfo svcInfo, SvcMsgHandler svcMsgHandler, SvcProperties svcProperties, SvcLoggingHandler svcLoggingHandler, ExceptionHandlerResolver exceptionHandlerResolver, SvcRegisterComponent svcRegisterComponent, JacksonUtils jacksonUtils, SvcResUtils svcResUtils) {
+    public SvcProcessFilter(SvcInfo svcInfo, CodeMessageHandler codeMessageHandler, SvcProperties svcProperties, SvcLoggingHandler svcLoggingHandler, ExceptionHandlerResolver exceptionHandlerResolver, SvcRegister svcRegister, JacksonUtils jacksonUtils, SvcResUtils svcResUtils) {
         super(svcInfo);
-        this.svcMsgHandler = svcMsgHandler;
+        this.codeMessageHandler = codeMessageHandler;
         this.svcProperties = svcProperties;
         this.svcLoggingHandler = svcLoggingHandler;
         this.exceptionHandlerResolver = exceptionHandlerResolver;
-        this.svcRegisterComponent = svcRegisterComponent;
+        this.svcRegister = svcRegister;
         this.jacksonUtils = jacksonUtils;
         this.svcResUtils = svcResUtils;
     }
@@ -72,21 +72,19 @@ public class SvcProcessFilter extends AbstractSvcFilter {
             SvcThreadLocal.remove();
         }
         end((ContentCachingResponseWrapper) svcInfo.getHttpServletResponse());
-        if (svcInfo.getSvcDefinition() != null) {
-            if (svcInfo.getSvcDefinition().getFeature().isLogging()) {
-                svcLoggingHandler.writeEndLog(svcInfo);
-            }
+        if (svcInfo.getSvcSerialNum() != null) {
+            svcLoggingHandler.writeEndLog(svcInfo);
         }
     }
 
     private void start() {
         svcInfo.setStartDateTime(DateUtils.getNowLocalDateTime());
         svcInfo.setSvcResponseHeader(SvcResponseHeader.builder(svcProperties.getCode()).msg(svcProperties.getMsg()).build());
-        Optional<SvcRegisterComponent.SvcDefinition> optionalSvcBinderModel = svcRegisterComponent.getSvcDefinition(svcInfo.getHttpServletRequest());
+        Optional<SvcRegister.SvcDefinition> optionalSvcBinderModel = svcRegister.getSvcDefinition(svcInfo.getHttpServletRequest());
         if (optionalSvcBinderModel.isEmpty()) {
             throw new SvcNotFoundException();
         }
-        SvcRegisterComponent.SvcDefinition svcDefinition = optionalSvcBinderModel.get();
+        SvcRegister.SvcDefinition svcDefinition = optionalSvcBinderModel.get();
         svcInfo.setSvcDefinition(svcDefinition);
     }
 
@@ -130,7 +128,7 @@ public class SvcProcessFilter extends AbstractSvcFilter {
 
     private String getMsg(SvcResponseHeader svcResponseHeader) {
         if (svcResponseHeader.getMsg() == null) {
-            return svcMsgHandler.getMsg(svcProperties.getMsg_type(), svcResponseHeader.getCode());
+            return codeMessageHandler.getMsg(svcProperties.getMsg_type(), svcResponseHeader.getCode()).orElse(null);
         }
         return svcResponseHeader.getMsg();
     }

@@ -6,7 +6,10 @@ package io.github.minguanq.mingle.svc.session.exception;
  * @author Ming
  */
 public class SessionTokenEncryptionErrorException extends RuntimeException {
-    public SessionTokenEncryptionErrorException(String message) {
-        super(message);
+
+    public static final String MSG = "Session token encryption error";
+
+    public SessionTokenEncryptionErrorException(Exception e) {
+        super(MSG, e);
     }
 }

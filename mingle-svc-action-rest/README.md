@@ -61,7 +61,7 @@ public abstract class AbstractRestDemoAction<Req extends ActionReqModel, Res ext
 
 `getType()`
 
-定義目標`server`名稱
+定義目標`serverProperties`名稱
 
 `再建立`sub class`繼承`parent class
 

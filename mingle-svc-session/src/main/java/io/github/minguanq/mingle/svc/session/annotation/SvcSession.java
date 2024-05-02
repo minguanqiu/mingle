@@ -18,7 +18,7 @@ public @interface SvcSession {
     /**
      * Type of session,make sure session independence
      **/
-    String[] type();
+    String[] types();
 
     /**
      * Enable authority for service

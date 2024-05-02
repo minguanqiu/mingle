@@ -15,6 +15,7 @@ public interface ActionInterceptor {
      * @author Ming
      */
     interface Chain {
+
         void proceed();
 
         AbstractAction<? extends ActionRequest, ? extends ActionResponseBody> actionTarget();

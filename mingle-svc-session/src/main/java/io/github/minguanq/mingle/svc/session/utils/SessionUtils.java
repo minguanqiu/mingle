@@ -1,11 +1,13 @@
 package io.github.minguanq.mingle.svc.session.utils;
 
 import io.github.minguanq.mingle.svc.redis.RedisKey;
+import io.github.minguanq.mingle.svc.session.SessionHeader;
 import io.github.minguanq.mingle.svc.session.SessionInfo;
 import io.github.minguanq.mingle.svc.session.dao.SessionDao;
-import io.github.minguanq.mingle.svc.session.dao.entity.Session;
+import io.github.minguanq.mingle.svc.session.dao.entity.SessionEntity;
 import io.github.minguanq.mingle.svc.session.exception.SessionTokenEncryptionErrorException;
 import io.github.minguanq.mingle.svc.session.handler.SessionTokenHandler;
+import io.github.minguanq.mingle.svc.utils.JacksonUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
@@ -19,20 +21,23 @@ public class SessionUtils {
 
     private final SessionDao sessionDao;
     private final SessionTokenHandler sessionTokenHandler;
+    private final JacksonUtils jacksonUtils;
 
-    public SessionUtils(SessionDao sessionDao, SessionTokenHandler sessionTokenHandler) {
+    public SessionUtils(SessionDao sessionDao, SessionTokenHandler sessionTokenHandler, JacksonUtils jacksonUtils) {
         this.sessionDao = sessionDao;
         this.sessionTokenHandler = sessionTokenHandler;
+        this.jacksonUtils = jacksonUtils;
     }
 
-    public String generateToken(RedisKey redisKey, Session session) {
+    public String createSessionToken(RedisKey redisKey, SessionEntity session) {
         String encryption;
         try {
-            encryption = sessionTokenHandler.encryption(redisKey.toString());
+            SessionHeader sessionHeader = new SessionHeader(redisKey, String.valueOf(session.getTimeToLive()));
+            encryption = sessionTokenHandler.encryption(jacksonUtils.readTree(sessionHeader).get().toString());
         } catch (Exception e) {
-            throw new SessionTokenEncryptionErrorException("Session token encryption error");
+            throw new SessionTokenEncryptionErrorException(e);
         }
-        sessionDao.set(redisKey, session, session.getTimeToLive());
+        sessionDao.save(session);
         return encryption;
     }
 
@@ -51,11 +56,11 @@ public class SessionUtils {
     }
 
     private void updateSession() {
-        sessionDao.set(getCurrentSession().sessionHeader().redisKey(), getCurrentSession().session(), getCurrentSession().session().getTimeToLive());
+        sessionDao.save(getCurrentSession().session());
     }
 
     public void cleanSession() {
-        sessionDao.del(getCurrentSession().sessionHeader().redisKey());
+        sessionDao.delete(getCurrentSession().session());
     }
 
     public SessionInfo getCurrentSession() {

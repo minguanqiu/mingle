@@ -1,6 +1,5 @@
 package io.github.minguanq.mingle.svc.action.rest.handler.impl;
 
-import io.github.minguanq.mingle.svc.action.rest.configuration.properties.RestClientProperties;
 import io.github.minguanq.mingle.svc.action.rest.handler.RestClientHandler;
 import okhttp3.OkHttpClient;
 
@@ -17,10 +16,10 @@ public class RestClientDefaultHandler implements RestClientHandler {
 
     private final OkHttpClient okHttpClient;
 
-    public RestClientDefaultHandler(RestClientProperties restClientProperties) {
+    public RestClientDefaultHandler() {
         OkHttpClient.Builder builder = new OkHttpClient().newBuilder();
-        builder.connectTimeout(restClientProperties.getConnectTimeOut(), TimeUnit.MILLISECONDS)
-                .readTimeout(restClientProperties.getReadTimeOut(),TimeUnit.MILLISECONDS);
+        builder.connectTimeout(5000, TimeUnit.MILLISECONDS)
+                .readTimeout(70000,TimeUnit.MILLISECONDS);
         this.okHttpClient = builder.build();
     }
 

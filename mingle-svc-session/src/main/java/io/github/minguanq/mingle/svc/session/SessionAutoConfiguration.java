@@ -1,7 +1,6 @@
 package io.github.minguanq.mingle.svc.session;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.context.annotation.ComponentScan;
 
 /**
  * {@link AutoConfiguration} for session module
@@ -10,6 +9,5 @@ import org.springframework.context.annotation.ComponentScan;
  */
 
 @AutoConfiguration
-@ComponentScan(basePackageClasses = SessionAutoConfiguration.class)
 public class SessionAutoConfiguration {
 }

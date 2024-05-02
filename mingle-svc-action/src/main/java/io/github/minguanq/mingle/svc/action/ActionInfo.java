@@ -1,6 +1,8 @@
 package io.github.minguanq.mingle.svc.action;
 
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Setter;
 
 import java.util.Map;
 
@@ -10,14 +12,13 @@ import java.util.Map;
  * @author Ming
  */
 @Data
-public class ActionInfo<ResB extends ActionResponseBody> {
+public class ActionInfo {
 
     private String code;
 
     private String msg;
 
+    @Setter(AccessLevel.PROTECTED)
     private Map<String, Object> values;
-
-    private ResB responseBody;
 
 }

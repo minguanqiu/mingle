@@ -8,7 +8,9 @@ package io.github.minguanq.mingle.svc.action.rest.exception;
 
 public class ActionResponseBodyDeserializeErrorException extends RuntimeException {
 
-    public ActionResponseBodyDeserializeErrorException(String message) {
-        super(message);
+    public static final String MSG = "resModel deserialize error";
+
+    public ActionResponseBodyDeserializeErrorException() {
+        super(MSG);
     }
 }

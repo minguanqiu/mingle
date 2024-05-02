@@ -10,7 +10,6 @@ import java.util.List;
 public class ActionChain implements ActionInterceptor.Chain {
 
     private final List<ActionInterceptor> actionInterceptors;
-
     private final AbstractAction<? extends ActionRequest, ? extends ActionResponseBody> action;
     private final ActionRequest actionRequest;
     private final ActionResponse<ActionResponseBody> actionResponse;
@@ -28,7 +27,7 @@ public class ActionChain implements ActionInterceptor.Chain {
 
     @Override
     public void proceed() {
-        if (index > actionInterceptors.size()) throw new IllegalStateException("");
+        if (index > actionInterceptors.size()) throw new IllegalStateException("interceptor error");
         callTimes++;
         if (callTimes == 1) { // prevention chain call twice
             actionInterceptors.get(index).intercept(new ActionChain(actionInterceptors, action, actionRequest, actionResponse, index + 1));

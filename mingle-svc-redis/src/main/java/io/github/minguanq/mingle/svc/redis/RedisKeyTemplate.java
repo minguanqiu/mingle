@@ -7,6 +7,6 @@ import org.springframework.data.redis.core.RedisTemplate;
  *
  * @author Ming
  */
-public class RedisKeyTemplate<Entity extends RedisEntity> extends RedisTemplate<RedisKey, Entity> {
+public class RedisKeyTemplate<E> extends RedisTemplate<RedisKey, E> {
 
 }

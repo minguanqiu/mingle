@@ -7,7 +7,9 @@ package io.github.minguanq.mingle.svc.session.exception;
  */
 public class SessionHeaderMissingException extends RuntimeException {
 
-    public SessionHeaderMissingException(String message) {
-        super(message);
+    public static final String MSG = "session header missing";
+
+    public SessionHeaderMissingException() {
+        super(MSG);
     }
 }

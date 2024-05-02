@@ -14,7 +14,7 @@ public class AllActionExceptionHandler extends AbstractActionExceptionHandler<Ex
     @Override
     public ActionExceptionModel handle(Exception ex, ActionExceptionModel actionExceptionModel) {
         actionExceptionModel.setCode("error");
-        actionExceptionModel.setMsg("action exception message : " + ex.getMessage());
+        actionExceptionModel.setMsg(ex.getMessage());
         return actionExceptionModel;
     }
 }

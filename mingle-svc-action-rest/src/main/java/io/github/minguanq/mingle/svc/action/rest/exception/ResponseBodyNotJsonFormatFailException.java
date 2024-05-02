@@ -8,7 +8,9 @@ package io.github.minguanq.mingle.svc.action.rest.exception;
 
 public class ResponseBodyNotJsonFormatFailException extends RuntimeException {
 
-    public ResponseBodyNotJsonFormatFailException(String message) {
-        super(message);
+    public static final String MSG = "response body not a json";
+
+    public ResponseBodyNotJsonFormatFailException() {
+        super(MSG);
     }
 }

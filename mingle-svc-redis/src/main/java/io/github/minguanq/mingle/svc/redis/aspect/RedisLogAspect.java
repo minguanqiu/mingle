@@ -3,7 +3,7 @@ package io.github.minguanq.mingle.svc.redis.aspect;
 import io.github.minguanq.mingle.svc.concurrent.SvcAttribute;
 import io.github.minguanq.mingle.svc.concurrent.SvcThreadLocal;
 import io.github.minguanq.mingle.svc.handler.SerialNumberGeneratorHandler;
-import io.github.minguanq.mingle.svc.redis.RedisDao;
+import io.github.minguanq.mingle.svc.redis.RedisTemplateDao;
 import io.github.minguanq.mingle.svc.redis.handler.RedisLogHandler;
 import io.github.minguanq.mingle.svc.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
- * {@link Aspect} for redis logging for {@link RedisDao} all method
+ * {@link Aspect} for redis logging for {@link RedisTemplateDao} all method
  *
  * @author Ming
  */

@@ -3,7 +3,6 @@ package io.github.minguanq.mingle.svc.configuration.properties;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * {@link ConfigurationProperties} mapping service properties
@@ -12,8 +11,6 @@ import org.springframework.context.annotation.Configuration;
  */
 @Getter
 @Setter
-@Configuration
-@ConfigurationProperties("mingle.svc.properties")
 public class SvcProperties {
 
     private String msg_type = "svc";
@@ -22,10 +19,17 @@ public class SvcProperties {
 
     private String msg = "successful";
 
-    private boolean logging = true;
+    private Feature feature = new Feature();
 
-    private boolean body_process;
+    @Getter
+    @Setter
+    public static class Feature {
 
-    private String[] ip_secure = {};
+        boolean logging;
+
+        boolean bodyProcess;
+
+        String[] ipSecure = new String[]{};
+    }
 
 }

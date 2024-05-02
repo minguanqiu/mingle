@@ -9,11 +9,9 @@ import org.springframework.security.core.AuthenticationException;
  */
 public class SessionNotExistException extends AuthenticationException {
 
-    public SessionNotExistException(String msg, Throwable cause) {
-        super(msg, cause);
-    }
+    public static final String MSG = "Session not exist";
 
-    public SessionNotExistException(String msg) {
-        super(msg);
+    public SessionNotExistException() {
+        super(MSG);
     }
 }

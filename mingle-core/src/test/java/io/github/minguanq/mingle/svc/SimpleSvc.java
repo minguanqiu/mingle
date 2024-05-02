@@ -24,24 +24,25 @@ public class SimpleSvc extends AbstractService<SimpleSvcReq, SimpleSvcRes> {
             case "throw" -> {
                 HashMap<String, String> hashMap = new HashMap<>();
                 hashMap.put("var", "test var");
-                throwLogic(SvcResponseHeader.builder(TestUtils.X001).msg("x001-fail {var}").convertMap(hashMap).build(), simpleSvcRes);
+                throwLogic(SvcResponseHeader.builder(SvcTestUtils.X001).msg("x001-fail {var}").convertMap(hashMap).build(), simpleSvcRes);
             }
             case "throwWithoutMsg" -> {
                 HashMap<String, String> hashMap = new HashMap<>();
                 hashMap.put("var", "test var");
-                throwLogic(SvcResponseHeader.builder(TestUtils.X001).convertMap(hashMap).build(), simpleSvcRes);
+                throwLogic(SvcResponseHeader.builder(SvcTestUtils.X001).convertMap(hashMap).build(), simpleSvcRes);
             }
             case "return" -> {
                 HashMap<String, String> hashMap = new HashMap<>();
                 hashMap.put("var", "test var");
-                return returnLogic(SvcResponseHeader.builder(TestUtils.X002).msg("x002-fail {var}").convertMap(hashMap).build(), simpleSvcRes);
+                return returnLogic(SvcResponseHeader.builder(SvcTestUtils.X002).msg("x002-fail {var}").convertMap(hashMap).build(), simpleSvcRes);
             }
             case "returnWithoutMsg" -> {
                 HashMap<String, String> hashMap = new HashMap<>();
                 hashMap.put("var", "test var");
-                return returnLogic(SvcResponseHeader.builder(TestUtils.X002).convertMap(hashMap).build());
+                return returnLogic(SvcResponseHeader.builder(SvcTestUtils.X002).convertMap(hashMap).build());
             }
             case "throwNullException" -> simpleSvcRes.getText2().substring(9);
+            case "unknownCode" -> throwLogic(SvcResponseHeader.builder(SvcTestUtils.X003).build(), simpleSvcRes);
         }
         simpleSvcRes.setText2(request.getText2());
         return simpleSvcRes;

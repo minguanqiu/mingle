@@ -116,7 +116,7 @@ public class Test extends AbstractSvcLogic<TestReq, SvcNoRes> {
 
 #### JwtKeyHandler
 
-當`server`啟動，預設將會產生一組新的`aes-256 key`，如要更改請覆蓋此`handler`
+當`serverProperties`啟動，預設將會產生一組新的`aes-256 key`，如要更改請覆蓋此`handler`
 
 ## Provide Svc
 

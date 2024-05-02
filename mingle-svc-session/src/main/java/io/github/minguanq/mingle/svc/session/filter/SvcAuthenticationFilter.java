@@ -1,17 +1,15 @@
 package io.github.minguanq.mingle.svc.session.filter;
 
-import io.github.minguanq.mingle.svc.component.SvcRegisterComponent;
-import io.github.minguanq.mingle.svc.redis.RedisKey;
-import io.github.minguanq.mingle.svc.session.annotation.SvcSession;
-import io.github.minguanq.mingle.svc.session.configuration.properties.SessionProperties;
+import io.github.minguanq.mingle.svc.register.SvcRegister;
+import io.github.minguanq.mingle.svc.session.SessionHeader;
+import io.github.minguanq.mingle.svc.session.configuration.properties.SvcSessionProperties;
 import io.github.minguanq.mingle.svc.session.dao.SessionDao;
-import io.github.minguanq.mingle.svc.session.dao.entity.Session;
-import io.github.minguanq.mingle.svc.session.exception.SessionHeaderMissingException;
-import io.github.minguanq.mingle.svc.session.exception.SessionNotExistException;
-import io.github.minguanq.mingle.svc.session.exception.SessionTokenDecryptionErrorException;
-import io.github.minguanq.mingle.svc.session.exception.SessionTypeIncorrectException;
+import io.github.minguanq.mingle.svc.session.dao.entity.SessionEntity;
+import io.github.minguanq.mingle.svc.session.exception.*;
 import io.github.minguanq.mingle.svc.session.handler.SessionTokenHandler;
+import io.github.minguanq.mingle.svc.session.handler.model.SvcSessionFeature;
 import io.github.minguanq.mingle.svc.session.security.SessionAuthentication;
+import io.github.minguanq.mingle.svc.utils.JacksonUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,7 +19,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Check and decryption token after create authentication
@@ -29,38 +26,43 @@ import java.util.List;
  * @author Ming
  */
 public class SvcAuthenticationFilter extends OncePerRequestFilter {
-    private final SvcRegisterComponent svcRegisterComponent;
-    private final SessionProperties sessionProperties;
+    private final SvcRegister svcRegister;
+    private final SvcSessionProperties svcSessionProperties;
     private final SessionDao sessionDao;
     private final SessionTokenHandler sessionTokenHandler;
+    private final JacksonUtils jacksonUtils;
 
-    public SvcAuthenticationFilter(SvcRegisterComponent svcRegisterComponent, SessionProperties sessionProperties, SessionDao sessionDao, SessionTokenHandler sessionTokenHandler) {
-        this.svcRegisterComponent = svcRegisterComponent;
-        this.sessionProperties = sessionProperties;
+    public SvcAuthenticationFilter(SvcRegister svcRegister, SvcSessionProperties svcSessionProperties, SessionDao sessionDao, SessionTokenHandler sessionTokenHandler, JacksonUtils jacksonUtils) {
+        this.svcRegister = svcRegister;
+        this.svcSessionProperties = svcSessionProperties;
         this.sessionDao = sessionDao;
         this.sessionTokenHandler = sessionTokenHandler;
+        this.jacksonUtils = jacksonUtils;
     }
 
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String cipherText = request.getHeader(sessionProperties.getHeader());
+        String cipherText = request.getHeader(svcSessionProperties.getHeader());
         if (cipherText == null) {
-            throw new SessionHeaderMissingException("session header missing");
+            throw new SessionHeaderMissingException();
         }
         String plainText;
         try {
             plainText = sessionTokenHandler.decryption(cipherText);
         } catch (Exception e) {
-            throw new SessionTokenDecryptionErrorException("Session token decryption error");
+            throw new SessionTokenDecryptionErrorException();
         }
-        RedisKey redisKey = new RedisKey(List.of(plainText.split(RedisKey.KEY_DELIMITER)));
-        Session session = sessionDao.get(redisKey).orElseThrow(() -> new SessionNotExistException("Session not exist"));
-        String[] types = svcRegisterComponent.getSvcDefinition(request).get().getSvcClass().getAnnotation(SvcSession.class).type();
+        SessionHeader sessionHeader = jacksonUtils.readValue(plainText, SessionHeader.class).orElseThrow(SessionHeaderDeserializeErrorException::new);
+        SessionEntity session = sessionDao.findById(sessionHeader.redisKey()).orElseThrow(SessionNotExistException::new);
+        session.setTimeToLive(Long.parseLong(sessionHeader.refreshTime()));
+        SvcRegister.SvcDefinition svcDefinition = svcRegister.getSvcDefinition(request).get();
+        SvcSessionFeature svcSessionFeature = svcDefinition.getFeature(SvcSessionFeature.class).get();
+        String[] types = svcSessionFeature.types();
         if (!checkType(types, session.getType())) {
-            throw new SessionTypeIncorrectException("Session type incorrect");
+            throw new SessionTypeIncorrectException();
         }
-        sessionDao.set(redisKey, session, session.getTimeToLive()); // refresh session with origin live time
+        sessionDao.save(session); // refresh session with origin live time
         SessionAuthentication authentication = new SessionAuthentication(session, null, AuthorityUtils.createAuthorityList(session.getAuthorities().toArray(new String[0])));
         authentication.setAuthenticated(true);
         SecurityContextHolder.getContext().setAuthentication(authentication);

@@ -2,7 +2,7 @@ package io.github.minguanq.mingle.svc.filter;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.github.minguanq.mingle.svc.SvcResponseHeader;
-import io.github.minguanq.mingle.svc.component.SvcRegisterComponent;
+import io.github.minguanq.mingle.svc.register.SvcRegister;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
@@ -35,7 +35,7 @@ public class SvcInfo {
 
     private HttpServletResponse httpServletResponse;
 
-    private SvcRegisterComponent.SvcDefinition svcDefinition;
+    private SvcRegister.SvcDefinition svcDefinition;
 
     @Setter(AccessLevel.PUBLIC)
     private SvcResponseHeader svcResponseHeader;

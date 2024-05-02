@@ -8,7 +8,9 @@ package io.github.minguanq.mingle.svc.action.rest.exception;
 
 public class MediaTypeParseErrorException extends RuntimeException {
 
-    public MediaTypeParseErrorException(String message) {
-        super(message);
+    public static final String MSG = "mediaType parse error";
+
+    public MediaTypeParseErrorException() {
+        super(MSG);
     }
 }

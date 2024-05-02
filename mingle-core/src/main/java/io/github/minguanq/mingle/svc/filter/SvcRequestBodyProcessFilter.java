@@ -2,6 +2,7 @@ package io.github.minguanq.mingle.svc.filter;
 
 import io.github.minguanq.mingle.svc.exception.ReqBodyNotJsonFormatException;
 import io.github.minguanq.mingle.svc.handler.SvcRequestBodyProcessHandler;
+import io.github.minguanq.mingle.svc.handler.model.SvcFeature;
 import io.github.minguanq.mingle.svc.utils.JacksonUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -39,7 +40,7 @@ public class SvcRequestBodyProcessFilter extends AbstractSvcFilter {
 
     private void processRequestBody() throws IOException {
         String body = getBody((ContentCachingRequestWrapper) svcInfo.getHttpServletRequest());
-        String payLoadBody = svcInfo.getSvcDefinition().getFeature().isBodyProcess() ? svcRequestBodyProcessHandler.processBody(body) : body;
+        String payLoadBody = svcInfo.getSvcDefinition().getFeature(SvcFeature.class).get().body_process() ? svcRequestBodyProcessHandler.processBody(body) : body;
         boolean isJson = jacksonUtils.isJson(payLoadBody);
         if (!isJson) {
             throw new ReqBodyNotJsonFormatException();

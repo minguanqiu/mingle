@@ -1,9 +1,12 @@
 package io.github.minguanq.mingle.svc.action.rest.configuration.properties;
 
-import io.github.minguanq.mingle.svc.action.configuration.properties.ActionProperties;
+import io.github.minguanq.mingle.svc.action.configuration.properties.SvcActionProperties;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * {@link ConfigurationProperties} mapping action properties
@@ -12,15 +15,58 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @Getter
 @Setter
-@ConfigurationProperties("mingle.svc.action.rest")
-public class RestActionProperties {
+public class RestActionProperties extends SvcActionProperties {
 
-    private final ActionProperties actionProperties;
+    private RestProperties rest = new RestProperties();
 
-    private String mockPath = "";
+    @Getter
+    @Setter
+    public static class RestProperties {
 
-    public RestActionProperties(ActionProperties actionProperties) {
-        this.actionProperties = actionProperties;
+        private Map<String, ServerProperties> server = new HashMap<>();
+
+        private Map<String, MockProperties> mock = new HashMap<>();
+
+        @Getter
+        @Setter
+        public static class ServerProperties {
+
+            private String scheme = "http";
+
+            private String host;
+
+            private int port;
+
+            private String[] pathSegments;
+
+        }
+
+        @Getter
+        @Setter
+        public static class MockProperties {
+
+            private int code = 200;
+
+            private Map<String, String> header = new HashMap<>();
+
+            private ResponseBody responseBody = new ResponseBody();
+
+            private String message = "200 OK";
+
+            private long delay;
+
+            @Getter
+            @Setter
+            public static class ResponseBody {
+
+                private String mediaType = "application/json";
+
+                private String content;
+
+            }
+
+        }
+
     }
 
 }

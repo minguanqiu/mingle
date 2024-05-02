@@ -2,8 +2,8 @@ package io.github.minguanq.mingle.svc.configuration;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
-import io.github.minguanq.mingle.svc.component.SvcRegisterComponent;
 import io.github.minguanq.mingle.svc.handler.SvcResponseHandler;
+import io.github.minguanq.mingle.svc.register.SvcRegister;
 import io.swagger.v3.core.converter.ModelConverters;
 import io.swagger.v3.core.converter.ResolvedSchema;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -34,13 +34,13 @@ import java.util.Map;
 @Configuration
 public class SvcDocConfiguration {
 
-    private final SvcRegisterComponent svcRegisterComponent;
+    private final SvcRegister svcRegister;
     private final SvcResponseHandler svcResponseHandler;
     private String responseBodyFiledName;
     private final ModelConverters instance = ModelConverters.getInstance();
 
-    public SvcDocConfiguration(SvcRegisterComponent svcRegisterComponent, SvcResponseHandler svcResponseHandler) {
-        this.svcRegisterComponent = svcRegisterComponent;
+    public SvcDocConfiguration(SvcRegister svcRegister, SvcResponseHandler svcResponseHandler) {
+        this.svcRegister = svcRegister;
         this.svcResponseHandler = svcResponseHandler;
         init();
     }
@@ -56,7 +56,7 @@ public class SvcDocConfiguration {
     @Bean
     public OpenApiCustomizer svcOpenApiCustomizer() {
         return openApi -> {
-            svcRegisterComponent.getSvcDefinitionMap().forEach((k, v) -> {
+            svcRegister.getSvcDefinitionMap().forEach((k, v) -> {
                 PathItem pathItem = openApi.getPaths().get(v.getSvcPath());
                 if (pathItem != null) {
                     Operation operation = null;
@@ -85,7 +85,7 @@ public class SvcDocConfiguration {
         };
     }
 
-    private void buildPathItem(ModelConverters instance, OpenAPI openApi, Operation operation, SvcRegisterComponent.SvcDefinition v) {
+    private void buildPathItem(ModelConverters instance, OpenAPI openApi, Operation operation, SvcRegister.SvcDefinition v) {
         operation.operationId(v.getSvcPath());
         operation.setTags(Arrays.asList(v.getSvc().tags()));
         operation.setSummary(v.getSvc().summary());
@@ -133,7 +133,7 @@ public class SvcDocConfiguration {
 
     private void init() {
         ArrayList<Class<?>> classes = new ArrayList<>();
-        svcRegisterComponent.getSvcDefinitionMap().forEach((k, v) -> {
+        svcRegister.getSvcDefinitionMap().forEach((k, v) -> {
             classes.add(v.getSvcClass());
         });
         AbstractOpenApiResource.addRestControllers(classes.toArray(new Class[0]));

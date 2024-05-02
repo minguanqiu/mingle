@@ -13,7 +13,7 @@ import io.github.minguanq.mingle.svc.session.annotation.SvcSession;
  * @author Ming
  */
 
-@SvcSession(type = "refresh")
+@SvcSession(types = "refresh")
 @Svc(description = "RefreshSession")
 public class RefreshSession extends AbstractService<SvcRequest, SvcResponseBody> {
 

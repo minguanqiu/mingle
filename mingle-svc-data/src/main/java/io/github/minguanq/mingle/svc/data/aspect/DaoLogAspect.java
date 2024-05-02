@@ -2,8 +2,8 @@ package io.github.minguanq.mingle.svc.data.aspect;
 
 import io.github.minguanq.mingle.svc.concurrent.SvcAttribute;
 import io.github.minguanq.mingle.svc.concurrent.SvcThreadLocal;
-import io.github.minguanq.mingle.svc.data.AbstractDao;
-import io.github.minguanq.mingle.svc.data.handler.DaoLogHandler;
+import io.github.minguanq.mingle.svc.data.JPARepositoryDao;
+import io.github.minguanq.mingle.svc.data.handler.DaoLoggingHandler;
 import io.github.minguanq.mingle.svc.handler.SerialNumberGeneratorHandler;
 import io.github.minguanq.mingle.svc.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
- * {@link Aspect} for dao logging for {@link AbstractDao} all method
+ * {@link Aspect} for dao logging for {@link JPARepositoryDao} all method
  *
  * @author Ming
  */
@@ -26,15 +26,15 @@ import java.util.Optional;
 public class DaoLogAspect {
 
 
-    private final DaoLogHandler daoLogHandler;
+    private final DaoLoggingHandler daoLoggingHandler;
     private final SerialNumberGeneratorHandler serialNumberGeneratorHandler;
 
-    public DaoLogAspect(DaoLogHandler daoLogHandler, SerialNumberGeneratorHandler serialNumberGeneratorHandler) {
-        this.daoLogHandler = daoLogHandler;
+    public DaoLogAspect(DaoLoggingHandler daoLoggingHandler, SerialNumberGeneratorHandler serialNumberGeneratorHandler) {
+        this.daoLoggingHandler = daoLoggingHandler;
         this.serialNumberGeneratorHandler = serialNumberGeneratorHandler;
     }
 
-    @Pointcut("within(io.github.minguanq.mingle.svc.data.AbstractDao+)")
+    @Pointcut("within(io.github.minguanq.mingle.svc.data.JPARepositoryDao+)")
     public void doPoint() {
     }
 
@@ -54,19 +54,19 @@ public class DaoLogAspect {
         LocalDateTime startTime = DateUtils.getNowLocalDateTime();
         try {
             try {
-                daoLogHandler.writeBeginLog(svcSerialNum, actSerialNum, DateUtils.getNowLocalDateTime(), joinPoint);
+                daoLoggingHandler.writeBeginLog(svcSerialNum, actSerialNum, DateUtils.getNowLocalDateTime(), joinPoint);
             } catch (Exception e) {
                 log.error("", e);
             }
             Object proceedObject = joinPoint.proceed();
             try {
-                daoLogHandler.writeEndLog(svcSerialNum, actSerialNum, startTime, joinPoint, proceedObject);
+                daoLoggingHandler.writeEndLog(svcSerialNum, actSerialNum, startTime, joinPoint, proceedObject);
             } catch (Exception e) {
                 log.error("", e);
             }
             return proceedObject;
         } catch (Throwable t) {
-            daoLogHandler.afterThrowing(t, svcSerialNum, actSerialNum, startTime, joinPoint);
+            daoLoggingHandler.afterThrowing(t, svcSerialNum, actSerialNum, startTime, joinPoint);
             throw t;
         }
     }

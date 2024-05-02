@@ -38,7 +38,7 @@ public class SvcInterruptTests {
 
     @Test
     void testReqBodyNotJsonFormatException() throws Exception {
-        ResultActions perform = mockMvc.perform(TestUtils.buildSvcRequest(svcPathHandler, SimpleSvc.class).content("{\"111\"}"));
+        ResultActions perform = mockMvc.perform(SvcTestUtils.buildSvcRequest(svcPathHandler, SimpleSvc.class).content("{\"111\"}"));
         MockHttpServletResponse response = perform.andReturn().getResponse();
         Optional<? extends SvcResponseHandler> optionalSvcResponseHandler = jacksonUtils.readValue(response.getContentAsString(), svcResponseHandler.getClass());
         assertThat(optionalSvcResponseHandler.isPresent()).isTrue();
@@ -49,7 +49,7 @@ public class SvcInterruptTests {
 
     @Test
     void testSvcReqBodyValidFailException() throws Exception {
-        ResultActions perform = mockMvc.perform(TestUtils.buildSvcRequest(svcPathHandler, SimpleSvc.class).content(TestUtils.getTestContent("", "", "")));
+        ResultActions perform = mockMvc.perform(SvcTestUtils.buildSvcRequest(svcPathHandler, SimpleSvc.class).content(SvcTestUtils.getTestContent("", "", "")));
         MockHttpServletResponse response = perform.andReturn().getResponse();
         Optional<? extends SvcResponseHandler> optionalSvcResponseHandler = jacksonUtils.readValue(response.getContentAsString(), svcResponseHandler.getClass());
         assertThat(optionalSvcResponseHandler.isPresent()).isTrue();
@@ -60,50 +60,26 @@ public class SvcInterruptTests {
 
     @Test
     void testTrow() throws Exception {
-        ResultActions perform = mockMvc.perform(TestUtils.buildSvcRequest(svcPathHandler, SimpleSvc.class).content(TestUtils.getTestContent("throw", "123", "123")));
+        ResultActions perform = mockMvc.perform(SvcTestUtils.buildSvcRequest(svcPathHandler, SimpleSvc.class).content(SvcTestUtils.getTestContent("throw", "123", "123")));
         MockHttpServletResponse response = perform.andReturn().getResponse();
         Optional<? extends SvcResponseHandler> optionalSvcResponseHandler = jacksonUtils.readValue(response.getContentAsString(), svcResponseHandler.getClass());
         assertThat(optionalSvcResponseHandler.isPresent()).isTrue();
         SvcResponseHandler handler = optionalSvcResponseHandler.get();
-        assertThat(handler.getCode()).isEqualTo(TestUtils.X001);
+        assertThat(handler.getCode()).isEqualTo(SvcTestUtils.X001);
         assertThat(handler.getMsg()).isEqualTo("x001-fail test var");
         assertThat(handler.getResponseBody().get("text2").asText()).isEqualTo("null");
     }
 
     @Test
-    void testThrowWithoutMsg() throws Exception {
-        ResultActions perform = mockMvc.perform(TestUtils.buildSvcRequest(svcPathHandler, SimpleSvc.class).content(TestUtils.getTestContent("throwWithoutMsg", "123", "123")));
-        MockHttpServletResponse response = perform.andReturn().getResponse();
-        Optional<? extends SvcResponseHandler> optionalSvcResponseHandler = jacksonUtils.readValue(response.getContentAsString(), svcResponseHandler.getClass());
-        assertThat(optionalSvcResponseHandler.isPresent()).isTrue();
-        SvcResponseHandler handler = optionalSvcResponseHandler.get();
-        assertThat(handler.getCode()).isEqualTo(TestUtils.X001);
-        assertThat(handler.getMsg()).isEqualTo("convertX001 test var");
-        assertThat(handler.getResponseBody().get("text2").asText()).isEqualTo("null");
-    }
-
-    @Test
     void testReturn() throws Exception {
-        ResultActions perform = mockMvc.perform(TestUtils.buildSvcRequest(svcPathHandler, SimpleSvc.class).content(TestUtils.getTestContent("return", "123", "123")));
+        ResultActions perform = mockMvc.perform(SvcTestUtils.buildSvcRequest(svcPathHandler, SimpleSvc.class).content(SvcTestUtils.getTestContent("return", "123", "123")));
         MockHttpServletResponse response = perform.andReturn().getResponse();
         Optional<? extends SvcResponseHandler> optionalSvcResponseHandler = jacksonUtils.readValue(response.getContentAsString(), svcResponseHandler.getClass());
         assertThat(optionalSvcResponseHandler.isPresent()).isTrue();
         SvcResponseHandler handler = optionalSvcResponseHandler.get();
-        assertThat(handler.getCode()).isEqualTo(TestUtils.X002);
+        assertThat(handler.getCode()).isEqualTo(SvcTestUtils.X002);
         assertThat(handler.getMsg()).isEqualTo("x002-fail test var");
         assertThat(handler.getResponseBody().get("text2").asText()).isEqualTo("null");
-    }
-
-    @Test
-    void testReturnWithoutMsg() throws Exception {
-        ResultActions perform = mockMvc.perform(TestUtils.buildSvcRequest(svcPathHandler, SimpleSvc.class).content(TestUtils.getTestContent("returnWithoutMsg", "123", "123")));
-        MockHttpServletResponse response = perform.andReturn().getResponse();
-        Optional<? extends SvcResponseHandler> optionalSvcResponseHandler = jacksonUtils.readValue(response.getContentAsString(), svcResponseHandler.getClass());
-        assertThat(optionalSvcResponseHandler.isPresent()).isTrue();
-        SvcResponseHandler handler = optionalSvcResponseHandler.get();
-        assertThat(handler.getCode()).isEqualTo(TestUtils.X002);
-        assertThat(handler.getMsg()).isEqualTo("convertX002 test var");
-        assertThat(handler.getResponseBody().isNull()).isTrue();
     }
 
 }

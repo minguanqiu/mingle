@@ -2,7 +2,7 @@ package io.github.minguanq.mingle.svc.action;
 
 import io.github.minguanq.mingle.svc.action.concurrent.ActionAttribute;
 import io.github.minguanq.mingle.svc.action.concurrent.ActionThreadLocal;
-import io.github.minguanq.mingle.svc.action.configuration.properties.ActionProperties;
+import io.github.minguanq.mingle.svc.action.configuration.properties.SvcActionProperties;
 import io.github.minguanq.mingle.svc.action.enums.AutoBreak;
 import io.github.minguanq.mingle.svc.action.exception.ActionAutoBreakException;
 import io.github.minguanq.mingle.svc.action.exception.resolver.ActionExceptionHandlerResolver;
@@ -26,11 +26,11 @@ import java.util.List;
  */
 public abstract non-sealed class AbstractAction<Req extends ActionRequest, ResB extends ActionResponseBody> implements Action<Req, ResB> {
 
-    protected final ActionProperties actionProperties;
+    protected final SvcActionProperties svcActionProperties;
     private List<ActionInterceptor> actionInterceptors;
 
-    public AbstractAction(ActionProperties actionProperties, ActionExceptionHandlerResolver actionExceptionHandlerResolver, List<ActionInterceptor> actionInterceptors) {
-        this.actionProperties = actionProperties;
+    public AbstractAction(SvcActionProperties svcActionProperties, ActionExceptionHandlerResolver actionExceptionHandlerResolver, List<ActionInterceptor> actionInterceptors) {
+        this.svcActionProperties = svcActionProperties;
         this.actionInterceptors = actionInterceptors;
         buildInterceptor(actionInterceptors, actionExceptionHandlerResolver);
     }
@@ -38,17 +38,18 @@ public abstract non-sealed class AbstractAction<Req extends ActionRequest, ResB 
     /**
      * Execute Action logic
      *
-     * @param reqModel Action request model
+     * @param request Action request model
      * @return ResData
      */
     @SuppressWarnings("unchecked")
-    public final ActionResponse<ResB> doAction(Req reqModel) {
+    public final ActionResponse<ResB> doAction(Req request) {
         ActionResponse<ActionResponseBody> response = new ActionResponse<>();
-        response.setCode(actionProperties.getSuccessCode());
-        response.setMsg(actionProperties.getSuccessMsg());
+        response.setMsgType(svcActionProperties.getMsg_type());
+        response.setCode(svcActionProperties.getCode());
+        response.setMsg(svcActionProperties.getMsg());
         initActionAttributes();
         try {
-            ActionChain actionChain = new ActionChain(actionInterceptors, this, reqModel, response, 0);
+            ActionChain actionChain = new ActionChain(actionInterceptors, this, request, response, 0);
             actionChain.proceed();
             return (ActionResponse<ResB>) actionChain.response();
         } finally {
@@ -61,16 +62,7 @@ public abstract non-sealed class AbstractAction<Req extends ActionRequest, ResB 
     }
 
 
-    protected abstract ActionInfo<ResB> processLogic(Req request, ActionInfo<ResB> actionInfo);
-
-    /**
-     * Defined action msg type
-     *
-     * @return String
-     */
-    public String getMsgType() {
-        return actionProperties.getMsgType();
-    }
+    protected abstract ResB processLogic(Req request, ActionInfo actionInfo);
 
     /**
      * Check action is success and set status
@@ -79,10 +71,10 @@ public abstract non-sealed class AbstractAction<Req extends ActionRequest, ResB 
      * @param actionResponse action response data
      */
     protected final void checkSuccess(AutoBreak autoBreak, ActionResponse<ResB> actionResponse) {
-        if (!actionProperties.getSuccessCode().equals(actionResponse.getCode())) {
+        if (!svcActionProperties.getCode().equals(actionResponse.getCode())) {
             switch (autoBreak) {
                 case GLOBAL:
-                    if (actionProperties.isAutoBreak()) {
+                    if (svcActionProperties.isAuto_break()) {
                         throw new ActionAutoBreakException(actionResponse);
                     }
                     break;

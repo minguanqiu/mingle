@@ -1,7 +1,8 @@
 package io.github.minguanq.mingle.svc.exception.handler;
 
 import io.github.minguanq.mingle.svc.SimpleSvc;
-import io.github.minguanq.mingle.svc.TestUtils;
+import io.github.minguanq.mingle.svc.SvcTestUtils;
+import io.github.minguanq.mingle.svc.exception.handler.model.TestExceptionModel;
 import io.github.minguanq.mingle.svc.handler.SvcPathHandler;
 import io.github.minguanq.mingle.svc.handler.SvcResponseHandler;
 import io.github.minguanq.mingle.svc.utils.JacksonUtils;
@@ -37,14 +38,15 @@ public class SvcAddExceptionHandlerTests {
 
     @Test
     void testOverrideAllExceptionHandler() throws Exception {
-        ResultActions perform = mockMvc.perform(TestUtils.buildSvcRequest(svcPathHandler, SimpleSvc.class).content(TestUtils.getTestContent("throwNullException","123", "123")));
+        ResultActions perform = mockMvc.perform(SvcTestUtils.buildSvcRequest(svcPathHandler, SimpleSvc.class).content(SvcTestUtils.getTestContent("throwNullException","123", "123")));
         MockHttpServletResponse response = perform.andReturn().getResponse();
         Optional<? extends SvcResponseHandler> optionalSvcResponseHandler = jacksonUtils.readValue(response.getContentAsString(), svcResponseHandler.getClass());
         assertThat(optionalSvcResponseHandler.isPresent()).isTrue();
         SvcResponseHandler handler = optionalSvcResponseHandler.get();
-        assertThat(handler.getCode()).isEqualTo(TestUtils.X004);
+        assertThat(handler.getCode()).isEqualTo(SvcTestUtils.X004);
         assertThat(handler.getMsg()).isEqualTo("X004-fail");
-        assertThat(handler.getResponseBody().get("exceptionMsg").asText()).isEqualTo("X004-fail");
+        TestExceptionModel testExceptionModel = jacksonUtils.readValue(handler.getResponseBody().toString(), TestExceptionModel.class).get();
+        assertThat(testExceptionModel.getExceptionMsg()).isEqualTo("X004-fail");
     }
 
 
