@@ -5,9 +5,12 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 /**
  * {@link AutoConfiguration} for session module
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 
 @AutoConfiguration
 public class SessionAutoConfiguration {
+
+
 }
+

@@ -1,14 +1,16 @@
 package io.github.minguanqiu.mingle.svc.action;
 
-import io.github.minguanqiu.mingle.svc.action.concurrent.ActionAttribute;
-import io.github.minguanqiu.mingle.svc.action.concurrent.ActionThreadLocal;
-import io.github.minguanqiu.mingle.svc.action.configuration.properties.SvcActionProperties;
+import io.github.minguanqiu.mingle.svc.action.configuration.properties.ActionProperties;
 import io.github.minguanqiu.mingle.svc.action.enums.AutoBreak;
 import io.github.minguanqiu.mingle.svc.action.exception.ActionAutoBreakException;
 import io.github.minguanqiu.mingle.svc.action.exception.resolver.ActionExceptionHandlerResolver;
-
+import io.github.minguanqiu.mingle.svc.action.handler.ActionLoggingHandler;
+import io.github.minguanqiu.mingle.svc.concurrent.SvcAttributeName;
+import io.github.minguanqiu.mingle.svc.concurrent.SvcThreadLocal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
 
 
 /**
@@ -22,75 +24,129 @@ import java.util.List;
  * Res - action response body
  * </pre>
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
-public abstract non-sealed class AbstractAction<Req extends ActionRequest, ResB extends ActionResponseBody> implements Action<Req, ResB> {
+public abstract non-sealed class AbstractAction<Req extends ActionRequest,
+    ResB extends ActionResponseBody> implements Action<Req, ResB> {
 
-    protected final SvcActionProperties svcActionProperties;
-    private List<ActionInterceptor> actionInterceptors;
+  protected final ActionProperties actionProperties;
+  private final List<ActionInterceptor> actionInterceptors = new ArrayList<>();
+  private static final ActionResponseInterceptor actionResponseInterceptor =
+      new ActionResponseInterceptor();
+  private boolean setActionInterceptors;
+  private boolean setActionExceptionHandlerResolver;
+  private boolean setActionLoggingHandler;
 
-    public AbstractAction(SvcActionProperties svcActionProperties, ActionExceptionHandlerResolver actionExceptionHandlerResolver, List<ActionInterceptor> actionInterceptors) {
-        this.svcActionProperties = svcActionProperties;
-        this.actionInterceptors = actionInterceptors;
-        buildInterceptor(actionInterceptors, actionExceptionHandlerResolver);
+  public AbstractAction(ActionProperties actionProperties) {
+    this.actionProperties = actionProperties;
+    buildInterceptor();
+  }
+
+  /**
+   * Execute Action logic
+   *
+   * @param request Action request model
+   * @return ResData
+   */
+  @SuppressWarnings("unchecked")
+  public final ActionResponse<ResB> doAction(Req request) {
+    ActionInfo actionInfo = buildActionInfo();
+    ActionResponse<ResB> actionResponse = buildActionResponse(actionInfo);
+    ActionChain actionChain = new ActionChain(actionInterceptors, this, request, actionInfo, 0);
+    actionChain.proceed();
+    actionResponse.setCode(actionInfo.getCode());
+    actionResponse.setMsg(actionInfo.getMsg());
+    actionResponse.setResponseBody((ResB) actionInfo.getActionResponseBody());
+    checkSuccess(request.getAutoBreak(), actionResponse);
+    return actionResponse;
+  }
+
+  private ActionInfo buildActionInfo() {
+    ActionInfo actionInfo = new ActionInfo();
+    actionInfo.setActionClass(this.getClass());
+    SvcThreadLocal.get()
+        .flatMap(attribute -> attribute.getAttributes(SvcAttributeName.SVC_SERIAL_NUMBER))
+        .ifPresent(serialNumber -> actionInfo.setSvcSerialNum((String) serialNumber));
+    actionInfo.setActSerialNum(UUID.randomUUID().toString());
+    actionInfo.setCode(actionProperties.getCode());
+    actionInfo.setMsg(actionProperties.getMsg());
+    return actionInfo;
+  }
+
+  private ActionResponse<ResB> buildActionResponse(ActionInfo actionInfo) {
+    ActionResponse<ResB> actionResponse = new ActionResponse<>();
+    actionResponse.setMsgType(actionProperties.getMsgType());
+    actionResponse.setValues(actionInfo.getValues());
+    return actionResponse;
+  }
+
+  protected abstract ResB processLogic(Req request, ActionInfo actionInfo);
+
+  /**
+   * Check action is success and set status
+   *
+   * @param autoBreak      autoBreak
+   * @param actionResponse action response data
+   */
+  protected final void checkSuccess(AutoBreak autoBreak,
+      ActionResponse<ResB> actionResponse) {
+    if (!actionProperties.getCode().equals(actionResponse.getCode())) {
+      switch (autoBreak) {
+        case GLOBAL:
+          if (actionProperties.isAutoBreak()) {
+            throw new ActionAutoBreakException(actionResponse);
+          }
+          break;
+        case TRUE:
+          throw new ActionAutoBreakException(actionResponse);
+      }
+    } else {
+      actionResponse.setSuccess(true);
     }
+  }
 
-    /**
-     * Execute Action logic
-     *
-     * @param request Action request model
-     * @return ResData
-     */
-    @SuppressWarnings("unchecked")
-    public final ActionResponse<ResB> doAction(Req request) {
-        ActionResponse<ActionResponseBody> response = new ActionResponse<>();
-        response.setMsgType(svcActionProperties.getMsg_type());
-        response.setCode(svcActionProperties.getCode());
-        response.setMsg(svcActionProperties.getMsg());
-        initActionAttributes();
-        try {
-            ActionChain actionChain = new ActionChain(actionInterceptors, this, request, response, 0);
-            actionChain.proceed();
-            return (ActionResponse<ResB>) actionChain.response();
-        } finally {
-            ActionThreadLocal.remove();
-        }
+  @Autowired(required = false)
+  public void setActionInterceptors(List<ActionInterceptor> actionInterceptors) {
+    if (setActionInterceptors) {
+      return;
     }
-
-    private void initActionAttributes() {
-        ActionThreadLocal.set(new ActionAttribute());
+    setActionInterceptors = true;
+    int count = 0;
+    if (setActionLoggingHandler) {
+      count++;
     }
-
-
-    protected abstract ResB processLogic(Req request, ActionInfo actionInfo);
-
-    /**
-     * Check action is success and set status
-     *
-     * @param autoBreak      autoBreak
-     * @param actionResponse action response data
-     */
-    protected final void checkSuccess(AutoBreak autoBreak, ActionResponse<ResB> actionResponse) {
-        if (!svcActionProperties.getCode().equals(actionResponse.getCode())) {
-            switch (autoBreak) {
-                case GLOBAL:
-                    if (svcActionProperties.isAuto_break()) {
-                        throw new ActionAutoBreakException(actionResponse);
-                    }
-                    break;
-                case TRUE:
-                    throw new ActionAutoBreakException(actionResponse);
-            }
-        } else {
-            actionResponse.setSuccess(true);
-        }
+    if (setActionExceptionHandlerResolver) {
+      count++;
     }
-
-    private void buildInterceptor(List<ActionInterceptor> actionInterceptors, ActionExceptionHandlerResolver actionExceptionHandlerResolver) {
-        this.actionInterceptors = new ArrayList<>(actionInterceptors);
-//        this.actionInterceptors.add(0, new ActionProcessInterceptor());
-        this.actionInterceptors.add(new ActionResponseInterceptor(actionExceptionHandlerResolver));
+    for (ActionInterceptor actionInterceptor : actionInterceptors) {
+      this.actionInterceptors.add(count, actionInterceptor);
+      count++;
     }
+  }
+
+  @Autowired(required = false)
+  public void setActionLoggingHandler(
+      ActionLoggingHandler actionLoggingHandler) {
+    if (setActionLoggingHandler) {
+      return;
+    }
+    setActionLoggingHandler = true;
+    actionInterceptors.add(0, new ActionLoggingInterceptor(actionLoggingHandler));
+  }
+
+  @Autowired(required = false)
+  public void setActionExceptionHandlerResolver(
+      ActionExceptionHandlerResolver actionExceptionHandlerResolver) {
+    if (setActionExceptionHandlerResolver) {
+      return;
+    }
+    setActionExceptionHandlerResolver = true;
+    actionInterceptors.add(1, new ActionExceptionInterceptor(actionExceptionHandlerResolver));
+  }
+
+  private void buildInterceptor() {
+    this.actionInterceptors.add(actionResponseInterceptor);
+  }
 
 
 }

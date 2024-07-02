@@ -10,18 +10,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 /**
- * @author Ming
+ * @author Qiu Guan Ming
  */
 @Component
 @Profile("add-exception-handler")
-public class NullPointerExceptionHandlerImpl extends AbstractExceptionHandler<NullPointerException> {
-    public NullPointerExceptionHandlerImpl(SvcInfo svcInfo) {
-        super(svcInfo);
-    }
+public class NullPointerExceptionHandlerImpl extends
+    AbstractExceptionHandler<NullPointerException> {
 
-    @Override
-    public ResponseEntity<SvcResponseBody> handle(NullPointerException ex) {
-        return build(SvcResponseHeader.builder(SvcTestUtils.X004).msg("X004-fail").build(), new TestExceptionModel("X004-fail"));
-    }
+  public NullPointerExceptionHandlerImpl(SvcInfo svcInfo) {
+    super(svcInfo);
+  }
+
+  @Override
+  public ResponseEntity<SvcResponseBody> handle(NullPointerException ex) {
+    return build(SvcResponseHeader.builder(SvcTestUtils.X004).msg("X004-fail").build(),
+        new TestExceptionModel("X004-fail"));
+  }
 
 }

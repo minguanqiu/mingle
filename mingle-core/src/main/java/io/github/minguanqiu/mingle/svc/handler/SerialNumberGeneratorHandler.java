@@ -3,10 +3,10 @@ package io.github.minguanqiu.mingle.svc.handler;
 /**
  * Handler for logging serial number
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 public interface SerialNumberGeneratorHandler {
 
-    String generate(String type);
+  String generate(String type);
 
 }

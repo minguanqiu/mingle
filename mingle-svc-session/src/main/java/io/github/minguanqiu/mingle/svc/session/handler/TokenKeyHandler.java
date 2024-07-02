@@ -5,10 +5,10 @@ import javax.crypto.SecretKey;
 /**
  * Handler for token key
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 public interface TokenKeyHandler {
 
-    SecretKey getAesSecretKey();
+  SecretKey getAesSecretKey();
 
 }

@@ -1,10 +1,9 @@
 package io.github.minguanqiu.mingle.svc.redis;
 
 /**
- * @author Ming
+ * @author Qiu Guan Ming
  */
 public class RedisDao {
-
 
 
 }

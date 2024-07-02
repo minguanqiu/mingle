@@ -1,6 +1,0 @@
-mingle:
-  svc:
-    properties:
-      logging: false
-      body-process: false
-      ip-secure: []

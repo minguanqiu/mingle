@@ -5,11 +5,11 @@ import java.util.Optional;
 /**
  * Handler for service message
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 
 public interface CodeMessageHandler {
 
-    Optional<String> getMsg(String type, String code);
+  Optional<String> getMsg(String type, String code);
 
 }

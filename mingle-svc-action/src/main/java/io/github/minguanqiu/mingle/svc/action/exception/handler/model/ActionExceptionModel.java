@@ -5,14 +5,14 @@ import lombok.Data;
 /**
  * Model for exception
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 
 @Data
 public class ActionExceptionModel {
 
-    private String code;
+  private String code;
 
-    private String msg;
+  private String msg;
 
 }

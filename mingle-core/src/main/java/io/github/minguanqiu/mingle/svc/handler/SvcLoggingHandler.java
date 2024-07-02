@@ -5,13 +5,13 @@ import io.github.minguanqiu.mingle.svc.filter.SvcInfo;
 /**
  * Handler for service logging logic
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 
 public interface SvcLoggingHandler {
 
-    void writeBeginLog(SvcInfo svcInfo);
+  void writeBeginLog(SvcInfo svcInfo);
 
-    void writeEndLog(SvcInfo svcInfo);
+  void writeEndLog(SvcInfo svcInfo);
 
 }

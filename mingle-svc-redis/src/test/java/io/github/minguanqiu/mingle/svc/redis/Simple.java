@@ -5,25 +5,25 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * @author Ming
+ * @author Qiu Guan Ming
  */
 @Getter
 @Setter
 public class Simple {
 
-    private String text1;
+  private String text1;
 
-    private String text2;
+  private String text2;
 
-    private Sub sub = new Sub();
+  private Sub sub = new Sub();
 
-    @Data
-    public static class Sub {
+  @Data
+  public static class Sub {
 
-        private String text1 = "Text1";
+    private String text1 = "Text1";
 
-        private String text2 = "Text2";
+    private String text2 = "Text2";
 
-    }
+  }
 
 }

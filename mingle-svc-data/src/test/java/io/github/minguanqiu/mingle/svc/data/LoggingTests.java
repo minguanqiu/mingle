@@ -1,7 +1,8 @@
 package io.github.minguanqiu.mingle.svc.data;
 
 /**
- * @author Ming
+ * @author Qiu Guan Ming
  */
 public class LoggingTests {
+
 }

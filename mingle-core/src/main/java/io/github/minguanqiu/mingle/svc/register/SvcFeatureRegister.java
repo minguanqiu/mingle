@@ -1,12 +1,12 @@
 package io.github.minguanqiu.mingle.svc.register;
 
 /**
- * @author Ming
+ * @author Qiu Guan Ming
  */
 public interface SvcFeatureRegister<T> {
 
-    boolean support(SvcRegister.SvcDefinition svcDefinition);
+  boolean support(SvcRegister.SvcDefinition svcDefinition);
 
-    T registerFeature(SvcRegister.SvcDefinition svcDefinition);
+  T registerFeature(SvcRegister.SvcDefinition svcDefinition);
 
 }

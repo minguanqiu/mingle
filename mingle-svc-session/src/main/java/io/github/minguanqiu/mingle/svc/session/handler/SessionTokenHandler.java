@@ -3,12 +3,12 @@ package io.github.minguanqiu.mingle.svc.session.handler;
 /**
  * Handler for session token encryption and decryption
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 public interface SessionTokenHandler {
 
-    String encryption(String plainText) throws Exception;
+  String encryption(String plainText) throws Exception;
 
-    String decryption(String cipherText) throws Exception;
+  String decryption(String cipherText) throws Exception;
 
 }

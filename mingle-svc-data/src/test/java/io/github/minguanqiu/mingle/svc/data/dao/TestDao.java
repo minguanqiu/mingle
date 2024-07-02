@@ -6,13 +6,13 @@ import io.github.minguanqiu.mingle.svc.data.dao.repository.TestRepository;
 import org.springframework.stereotype.Service;
 
 /**
- * @author Ming
+ * @author Qiu Guan Ming
  */
 @Service
 public class TestDao extends JPACrudRepositoryDao<TestRepository, TestEntity, String> {
 
-    public TestDao(TestRepository repository) {
-        super(repository);
-    }
+  public TestDao(TestRepository repository) {
+    super(repository);
+  }
 
 }

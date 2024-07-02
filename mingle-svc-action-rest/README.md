@@ -4,7 +4,7 @@
 
 ## Getting Started
 
-add pom.xml : 
+add pom.xml :
 
 ```xml
 <dependency>
@@ -98,8 +98,8 @@ mingle:
 
 **URI 規則**
 
-- `mingle.svc.action.rest.{action type}.uri` context path
-- `mingle.svc.action.rest.{action type}.impl.uri.{action class name}` api path
+- `mingle.svc.action.rest.{action type}.uri`context path
+- `mingle.svc.action.rest.{action type}.impl.uri.{action class name}`api path
 
 這就是為甚麼`getType()`不能為null的原因
 
@@ -259,7 +259,7 @@ http://localhost:8081/restdemo/getName1/Mingle
 Mingle
 ```
 
-如果沒加入 `@ExcludeRequestBody` `URI` 將會帶入`query parameter`
+如果沒加入`@ExcludeRequestBody``URI` 將會帶入`query parameter`
 
 ```
 http://localhost:8081/restdemo/getName?name=Mingle
@@ -382,7 +382,7 @@ public class JsonTestReq extends ActionReqModel {
 
 * `sleep` - 等待時間(毫秒)
 
-* `data` -  response body
+* `data` - response body
 
 **範例 :**
 
@@ -422,7 +422,7 @@ Action scope，請參考[mingle-core](#mingle-core) 實作Exception Handler
 ## Properties
 
 | Name                                           | Required | Default Value | Description             |
-| ---------------------------------------------- | -------- | ------------- | ----------------------- |
+|------------------------------------------------|----------|---------------|-------------------------|
 | `mingle.svc.action.rest.mock.path`             |          |               | action mock path        |
 | `mingle.svc.action.rest.client.connectTimeOut` |          | `3000 ms`     | client connect time out |
 | `mingle.svc.action.rest.client.readTimeOut`    |          | `70000 ms`    | client read time out    |

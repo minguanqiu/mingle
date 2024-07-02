@@ -4,14 +4,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * @author Ming
+ * @author Qiu Guan Ming
  */
 @Getter
 @Setter
 public class SimpleActionRes extends ActionResponseBody {
 
-    private String text1;
+  private String text1;
 
-    private String text2;
+  private String text2;
 
 }

@@ -8,21 +8,21 @@ import java.lang.annotation.Target;
 /**
  * Enable service security feature for authentication and authority
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SvcSession {
 
-    /**
-     * Type of session,make sure session independence
-     **/
-    String[] types();
+  /**
+   * Type of session,make sure session independence
+   **/
+  String[] types();
 
-    /**
-     * Enable authority for service
-     **/
-    boolean authority() default false;
+  /**
+   * Enable authority for service
+   **/
+  boolean authority() default false;
 
 }

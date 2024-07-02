@@ -12,22 +12,28 @@ import org.springframework.http.ResponseEntity;
 /**
  * Default handler will catch {@link ActionAutoBreakException}
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 
-public class ActionAutoBreakExceptionHandler extends AbstractExceptionHandler<ActionAutoBreakException> {
+public class ActionAutoBreakExceptionHandler extends
+    AbstractExceptionHandler<ActionAutoBreakException> {
 
-    private final CodeMessageHandler codeMessageHandler;
+  private final CodeMessageHandler codeMessageHandler;
 
-    public ActionAutoBreakExceptionHandler(SvcInfo svcInfo, CodeMessageHandler codeMessageHandler) {
-        super(svcInfo);
-        this.codeMessageHandler = codeMessageHandler;
+  public ActionAutoBreakExceptionHandler(SvcInfo svcInfo, CodeMessageHandler codeMessageHandler) {
+    super(svcInfo);
+    this.codeMessageHandler = codeMessageHandler;
+  }
+
+  @Override
+  public ResponseEntity<SvcResponseBody> handle(ActionAutoBreakException e) {
+    ActionResponse<?> actionResponse = e.getActionResponse();
+    String msg = e.getActionResponse().getMsg();
+    if(msg == null) {
+      msg = codeMessageHandler.getMsg(actionResponse.getMsgType(), actionResponse.getCode())
+          .orElse(null);
     }
-
-    @Override
-    public ResponseEntity<SvcResponseBody> handle(ActionAutoBreakException e) {
-        ActionResponse<?> actionResponse = e.getActionResponse();
-        return build(SvcResponseHeader.builder(actionResponse.getCode()).msg(codeMessageHandler.getMsg(actionResponse.getMsgType(), actionResponse.getCode()).orElse(null)).build());
-    }
+    return build(SvcResponseHeader.builder(actionResponse.getCode()).msg(msg).build());
+  }
 
 }

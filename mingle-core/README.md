@@ -109,7 +109,7 @@ MingleRuntimeException: you must create at least one Service
 
 ##### 規則
 
-* 預設路徑為/svc  例: http://localhost/{contextPath}/svc/{SvcName}
+* 預設路徑為/svc 例: http://localhost/{contextPath}/svc/{SvcName}
 
 * 預設Http Method為POST
 
@@ -174,7 +174,7 @@ public class Simple extends AbstractSvcLogic<SimpleReq, SimpleRes> {
 
 **Request Model**
 
-建議定義以下註釋 : 
+建議定義以下註釋 :
 
 * `@JsonProperty`定義欄位反序列化鍵名
 
@@ -262,7 +262,8 @@ mingle.svc.security.ip.TestSimple=127.0.0.1,127.0.0.2
 
 ##### Custom Svc
 
-如果預設`Svc`無法滿足你的需求，透過`@RequestMapping`相關註釋等，你可以自訂`Svc`的`request`、`response` body的格式
+如果預設`Svc`無法滿足你的需求，透過`@RequestMapping`相關註釋等，你可以自訂`Svc`的`request`、`response`
+body的格式
 
 ###### 規則
 
@@ -298,7 +299,8 @@ public class Simple extends AbstractSvcLogic<SimpleReq, SimpleRes> {
 
 * 自動註冊Restful API入口 - 會被自訂方法取代
 
-* 日誌紀錄 - 不會自動寫入日誌，但是可以透過`svcInfo` 的`setBackReqModel`或 `setSvcResModelHandler4Log` 分別紀錄`request`、`response`
+* 日誌紀錄 - 不會自動寫入日誌，但是可以透過`svcInfo` 的`setBackReqModel`
+  或 `setSvcResModelHandler4Log` 分別紀錄`request`、`response`
 
 ### Spring Open API
 
@@ -349,7 +351,8 @@ public class Simple extends AbstractSvcLogic<SimpleReq, SimpleRes> {
 
 #### 如何建立Action
 
-必須繼承`AbstractAction`，並且定義`Action`類型及實作範圍，所以不推薦單獨`class`直接繼承，而是透過`parent class`去處理統一邏輯
+必須繼承`AbstractAction`，並且定義`Action`類型及實作範圍，所以不推薦單獨`class`
+直接繼承，而是透過`parent class`去處理統一邏輯
 
 `proccessAction`是個callback方法，透過`doAction`
 
@@ -515,7 +518,7 @@ public class Demo extends AbstractSvcLogic<DemoReq, DemoRes> {
 
 ```json
 {  
- "firstName": "ming",  
+ "firstName": "Qiu Guan Ming",  
  "lastName": "le"
 }
 ```
@@ -546,7 +549,8 @@ Fail :
 
 ##### AutoBreak
 
-如果此功能開啟，將會自動拋出`ActionAutoBreakException`中斷`Svc`邏輯，並且把`Action`return `code`、`desc`帶入到`Svc`response裡
+如果此功能開啟，將會自動拋出`ActionAutoBreakException`中斷`Svc`邏輯，並且把`Action`
+return `code`、`desc`帶入到`Svc`response裡
 
 如果不需要處理失敗的`Action`，你可以考慮開啟此功能，可以透過`ActionReqData`或全域的Properties設置
 
@@ -580,7 +584,8 @@ public class Demo extends AbstractSvcLogic<DemoReq, DemoRes> {
 }
 ```
 
-會讓代碼寫得更少，因為`Action`啟用`AutoBreak`將會中斷`Svc`邏輯，所以不用判斷是否成功，甚至可以直接取得`ResModel`
+會讓代碼寫得更少，因為`Action`啟用`AutoBreak`將會中斷`Svc`
+邏輯，所以不用判斷是否成功，甚至可以直接取得`ResModel`
 
 **Request Body :**
 
@@ -601,27 +606,30 @@ public class Demo extends AbstractSvcLogic<DemoReq, DemoRes> {
 }
 ```
 
->  **Note** : 
-> 
-> 如果`Action code`不適合直接顯示在`Svc response body`，你應該關閉此功能，並且自訂`Svc code`去包裝`Action code`顯示
+> **Note** :
+>
+> 如果`Action code`不適合直接顯示在`Svc response body`，你應該關閉此功能，並且自訂`Svc code`
+> 去包裝`Action code`顯示
 
 ### 日誌紀錄
 
-對於`Svc`、`Action`是重要的功能之一，能夠紀錄`name`、`request`、`response`、`code`、`desc`、`runTime`等，透過`Svc`的`uuid`把`Action`關聯建立起來，可以知道`Svc`執行了哪些`Action`，甚至成功或失敗都會有相關的資訊
+對於`Svc`、`Action`是重要的功能之一，能夠紀錄`name`、`request`、`response`、`code`、`desc`、`runTime`
+等，透過`Svc`的`uuid`把`Action`關聯建立起來，可以知道`Svc`執行了哪些`Action`，甚至成功或失敗都會有相關的資訊
 
->  **Note** : 
-> 日誌自動紀錄只在`Requet Scope`裡，如果不是`Request Scope`或非同步處理，就必須透過`ActionUtils`或`SvcLogThreadLocal`自行處理`uuid`，配置完成後才會正常紀錄
+> **Note** :
+> 日誌自動紀錄只在`Requet Scope`裡，如果不是`Request Scope`或非同步處理，就必須透過`ActionUtils`
+> 或`SvcLogThreadLocal`自行處理`uuid`，配置完成後才會正常紀錄
 
 ### Handler
 
 以下`Handler`的預設邏輯都可以被覆蓋，只要你`implements`對應`Handler`，並且成為`spring bean`
 
-- `SvcLogHandler` -  `Svc` logging
-- `ActionLogHandler` - `Action` logging
-- `PayLoadDecryptionHandler` - `request body`解密
-- `IPHandler` - 取得IP
-- `SvcMsgListHandler` -  `Svc` `response` `code`、`desc`定義
-- `SvcResModelHandler` - `response body` template
+- `SvcLogHandler`-  `Svc` logging
+- `ActionLogHandler`- `Action` logging
+- `PayLoadDecryptionHandler`- `request body`解密
+- `IPHandler`- 取得IP
+- `SvcMsgListHandler`-`Svc``response` `code`、`desc`定義
+- `SvcResModelHandler`- `response body` template
 
 #### SvcMsgListHandler
 
@@ -646,7 +654,7 @@ create table MSGMAPPING
 **資料表內容 :**
 
 | MSGTYPE | CODE | DESC        | MEMO       |
-| ------- | ---- | ----------- | ---------- |
+|---------|------|-------------|------------|
 | svc     | X001 | test error1 | test error |
 | svc     | X002 | test error2 | test error |
 
@@ -713,8 +721,8 @@ public class MsgModel {
 }
 ```
 
->  **Note** : 
-> 
+> **Note** :
+>
 > `Svc msgType`必須設置為svc，`Action msgType`預設為action
 
 #### SvcResModelHandler
@@ -793,24 +801,27 @@ public class SvcResponseModelHandlerImpl extends SvcResModelHandler {
 ```
 
 > **Note :**
-> 
-> `resBody` 是固定的位置，只允許修改名稱，但是`code`、`desc`可以變更位置及名稱，但是必須使用`@JsonIgnore`在覆寫方法上，避免重複產生
+>
+> `resBody` 是固定的位置，只允許修改名稱，但是`code`、`desc`
+> 可以變更位置及名稱，但是必須使用`@JsonIgnore`在覆寫方法上，避免重複產生
 
 ## Exception Handler
 
-當`Svc`、`Action`拋出的`Exception`，可以透過`handler`自訂`return code`，如果沒有自訂則會使用預設`handler`
+當`Svc`、`Action`拋出的`Exception`，可以透過`handler`自訂`return code`
+，如果沒有自訂則會使用預設`handler`
 
 * `AbstractExceptionHandler` - for `Svc` scope handler，預設`return code`為`MG01`
 
 * `AbstractActionExceptionHandler` - for `Action` scope handler，預設`return code`為`MGA01`
 
-如果不想使用`MG01`、`MGA01`邏輯，請實作`AbstractExceptionHandler<Exception>`、`AbstractActionExceptionHandler<Exception>`
+如果不想使用`MG01`、`MGA01`
+邏輯，請實作`AbstractExceptionHandler<Exception>`、`AbstractActionExceptionHandler<Exception>`
 
 ### Svc Exception
 
 Svc scope
 
-* `ReqBodyNotJsonFormatException` 
+* `ReqBodyNotJsonFormatException`
 
 * `ReqModelDeserializeFailException`
 
@@ -830,7 +841,7 @@ Svc scope
 }
 ```
 
- 實作`AbstractExceptionHandler`
+實作`AbstractExceptionHandler`
 
 ```java
 @Component
@@ -843,7 +854,7 @@ public class ReqBodyNotJsonFormatExceptionHandler extends AbstractExceptionHandl
 }
 ```
 
-再次拋出將會得到 : 
+再次拋出將會得到 :
 
 ```json
 {
@@ -856,7 +867,7 @@ public class ReqBodyNotJsonFormatExceptionHandler extends AbstractExceptionHandl
 ## Properties
 
 | Name                             | Required | Default Value | Description                           |
-| -------------------------------- | -------- | ------------- | ------------------------------------- |
+|----------------------------------|----------|---------------|---------------------------------------|
 | `mingle.svc.path`                |          | `/svc`        | `Svc`路徑                               |
 | `mingle.svc.security.ip.openapi` |          |               | `spring open api`IP白名單設置              |
 | `mingle.svc.action.logging`      |          | `disable`     | 設置為enable，啟用日誌紀錄                      |

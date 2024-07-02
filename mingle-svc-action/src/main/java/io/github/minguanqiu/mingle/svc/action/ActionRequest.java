@@ -6,12 +6,12 @@ import lombok.Data;
 /**
  * Base class for all action request
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 
 @Data
 public class ActionRequest {
 
-    private AutoBreak autoBreak = AutoBreak.GLOBAL;
+  private AutoBreak autoBreak = AutoBreak.GLOBAL;
 
 }

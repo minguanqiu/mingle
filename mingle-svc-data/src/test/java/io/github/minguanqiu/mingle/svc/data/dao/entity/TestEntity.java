@@ -6,18 +6,18 @@ import jakarta.persistence.Table;
 import lombok.Data;
 
 /**
- * @author Ming
+ * @author Qiu Guan Ming
  */
 @Data
 @Entity
-@Table(schema = "public",name = "test")
+@Table(schema = "public", name = "test")
 public class TestEntity {
 
-    @Id
-    private String serial;
+  @Id
+  private String serial;
 
-    private String text1;
+  private String text1;
 
-    private String text2;
+  private String text2;
 
 }

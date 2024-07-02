@@ -6,15 +6,15 @@ import io.github.minguanqiu.mingle.svc.action.exception.handler.model.ActionExce
 /**
  * Default handler will catch {@link Exception} or unknown exception
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 
 public class AllActionExceptionHandler extends AbstractActionExceptionHandler<Exception> {
 
-    @Override
-    public ActionExceptionModel handle(Exception ex, ActionExceptionModel actionExceptionModel) {
-        actionExceptionModel.setCode("error");
-        actionExceptionModel.setMsg(ex.getMessage());
-        return actionExceptionModel;
-    }
+  @Override
+  public ActionExceptionModel handle(Exception ex, ActionExceptionModel actionExceptionModel) {
+    actionExceptionModel.setCode("error");
+    actionExceptionModel.setMsg(ex.getMessage());
+    return actionExceptionModel;
+  }
 }

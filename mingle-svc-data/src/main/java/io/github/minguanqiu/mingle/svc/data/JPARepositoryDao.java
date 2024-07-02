@@ -5,14 +5,14 @@ import org.springframework.data.repository.Repository;
 /**
  * Base class for all dao logic
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 public abstract class JPARepositoryDao<R extends Repository<?, ?>> {
 
-    protected R repository;
+  protected R repository;
 
-    public JPARepositoryDao(R repository) {
-        this.repository = repository;
-    }
+  public JPARepositoryDao(R repository) {
+    this.repository = repository;
+  }
 
 }

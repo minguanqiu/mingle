@@ -7,11 +7,12 @@ import io.github.minguanqiu.mingle.svc.redis.serializer.RedisKeyJsonDeserializer
 import io.github.minguanqiu.mingle.svc.redis.serializer.RedisKeyJsonSerializer;
 
 /**
- * @author Ming
+ * @author Qiu Guan Ming
  */
 
 public record SessionHeader(
-        @JsonSerialize(using = RedisKeyJsonSerializer.class)
-        @JsonDeserialize(using = RedisKeyJsonDeserializer.class) RedisKey redisKey,
-        String refreshTime) {
+    @JsonSerialize(using = RedisKeyJsonSerializer.class)
+    @JsonDeserialize(using = RedisKeyJsonDeserializer.class) RedisKey redisKey,
+    String timeToLive) {
+
 }

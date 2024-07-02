@@ -34,6 +34,7 @@ example for postgresql:
 ```
 
 yaml
+
 ```yaml
 spring:
   datasource:
@@ -50,7 +51,9 @@ spring:
       max-lifetime: 1800000
       connection-timeout: 60000
 ```
+
 properties
+
 ```properties
 spring.datasource.type=com.zaxxer.hikari.HikariDataSource
 spring.datasource.url=jdbc:postgresql://localhost:5432/postgres
@@ -110,7 +113,8 @@ public interface UsersRepository extends CrudRepository<UsersEntity, String>{
 ##### Dao
 
 - configuration `@Service`
-- must extend `AbstractDataDao<T extends Repository>` and through implicit variable `repository` or `entityManager` to do logic 
+- must extend `AbstractDataDao<T extends Repository>` and through implicit variable `repository`
+  or `entityManager` to do logic
 
 ```java
 @Service
@@ -150,7 +154,8 @@ public class UserLogin extends AbstractSvcLogic<UserLoginReq, LoginRes> {
 ```
 
 > **Note** <br>
-> Above practice AbstractDataDao is only by one database use,if you need use multiple database,must implements spring data jpa configuration by yourself and dao or new parent extends AbstractDao
+> Above practice AbstractDataDao is only by one database use,if you need use multiple database,must
+> implements spring data jpa configuration by yourself and dao or new parent extends AbstractDao
 
 ## Properties
 

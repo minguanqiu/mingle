@@ -6,17 +6,17 @@ import lombok.Setter;
 /**
  * Response body common header model determine this action success or fail for rest action
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 
 @Getter
 @Setter
 public class RestActionResponseBodyHeader {
 
-    private String successCode;
+  private String successCode;
 
-    private String code;
+  private String code;
 
-    private String msg;
+  private String msg;
 
 }

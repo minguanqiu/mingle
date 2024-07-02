@@ -5,18 +5,17 @@ import io.github.minguanqiu.mingle.svc.SvcResponseHeader;
 import io.github.minguanqiu.mingle.svc.register.SvcRegister;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
-import java.time.LocalDateTime;
-
 /**
- * This class is a spring request scope bean,will keep service need information
+ * A spring request scope bean,will keep service information
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 
 @Getter
@@ -25,27 +24,27 @@ import java.time.LocalDateTime;
 @RequestScope
 public class SvcInfo {
 
-    private String svcSerialNum;
+  private String svcSerialNum;
 
-    private LocalDateTime startDateTime;
+  private LocalDateTime startDateTime;
 
-    private LocalDateTime endDateTime;
+  private LocalDateTime endDateTime;
 
-    private HttpServletRequest httpServletRequest;
+  private HttpServletRequest httpServletRequest;
 
-    private HttpServletResponse httpServletResponse;
+  private HttpServletResponse httpServletResponse;
 
-    private SvcRegister.SvcDefinition svcDefinition;
+  private SvcRegister.SvcDefinition svcDefinition;
 
-    @Setter(AccessLevel.PUBLIC)
-    private SvcResponseHeader svcResponseHeader;
+  @Setter(AccessLevel.PUBLIC)
+  private SvcResponseHeader svcResponseHeader;
 
-    private String requestBody;
+  private String requestBody;
 
-    private Object svcRequest;
+  private Object svcRequest;
 
-    private JsonNode responseBody;
+  private JsonNode responseBody;
 
-    private Object svcResponseBody;
+  private Object svcResponseBody;
 
 }

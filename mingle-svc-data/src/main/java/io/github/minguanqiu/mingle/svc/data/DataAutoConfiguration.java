@@ -5,9 +5,10 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 /**
  * {@link AutoConfiguration} for data module
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 
 @AutoConfiguration
 public class DataAutoConfiguration {
+
 }

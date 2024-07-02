@@ -7,22 +7,22 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * @author Ming
+ * @author Qiu Guan Ming
  */
 @Setter
 @Getter
 public class SimpleSvcReq extends SvcRequest {
 
-    @NotEmpty
-    private String action;
+  @NotEmpty
+  private String action;
 
-    @NotEmpty
-    private String text1;
+  @NotEmpty
+  private String text1;
 
-    @NotEmpty
-    private String text2;
+  @NotEmpty
+  private String text2;
 
-    @ExcludeLog
-    private String text3;
+  @ExcludeLog
+  private String text3;
 
 }

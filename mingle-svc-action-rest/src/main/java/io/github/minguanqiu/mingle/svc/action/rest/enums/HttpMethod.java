@@ -1,12 +1,11 @@
 package io.github.minguanqiu.mingle.svc.action.rest.enums;
 
 /**
- * @author Ming
- * 
+ * @author Qiu Guan Ming
  */
 
 public enum HttpMethod {
 
-    GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, TRACE;
+  GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, TRACE;
 
 }

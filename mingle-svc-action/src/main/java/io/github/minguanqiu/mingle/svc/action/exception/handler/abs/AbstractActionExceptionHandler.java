@@ -7,24 +7,24 @@ import lombok.Getter;
 /**
  * Base class for action exception handler
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 @Getter
 public abstract class AbstractActionExceptionHandler<E extends Exception> {
 
-    private final Class<E> exceptionClass;
+  private final Class<E> exceptionClass;
 
-    @SuppressWarnings("unchecked")
-    public AbstractActionExceptionHandler() {
-        exceptionClass = (Class<E>) new TypeToken<E>(getClass()) {
-        }.getRawType();
-    }
+  @SuppressWarnings("unchecked")
+  public AbstractActionExceptionHandler() {
+    exceptionClass = (Class<E>) new TypeToken<E>(getClass()) {
+    }.getRawType();
+  }
 
-    /**
-     * Handle exception logic
-     *
-     * @param ex Exception
-     */
-    public abstract ActionExceptionModel handle(E ex, ActionExceptionModel actionExceptionModel);
+  /**
+   * Handle exception logic
+   *
+   * @param ex Exception
+   */
+  public abstract ActionExceptionModel handle(E ex, ActionExceptionModel actionExceptionModel);
 
 }

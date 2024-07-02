@@ -9,12 +9,13 @@ package io.github.minguanqiu.mingle.svc.action;
  * Res - action response body
  * </pre>
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
-public sealed interface Action<Req extends ActionRequest, ResB extends ActionResponseBody> permits AbstractAction {
+public sealed interface Action<Req extends ActionRequest, ResB extends ActionResponseBody> permits
+    AbstractAction {
 
-    ActionResponse<ResB> doAction(Req reqModel);
+  ActionResponse<ResB> doAction(Req reqModel);
 
-    String getType();
+  String getType();
 
 }

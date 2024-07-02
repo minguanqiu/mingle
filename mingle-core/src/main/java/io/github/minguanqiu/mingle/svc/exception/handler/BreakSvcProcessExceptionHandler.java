@@ -9,18 +9,19 @@ import org.springframework.http.ResponseEntity;
 /**
  * Default handler will catch {@link BreakSvcProcessException}
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 @Order(Integer.MIN_VALUE)
-public class BreakSvcProcessExceptionHandler extends AbstractExceptionHandler<BreakSvcProcessException> {
+public class BreakSvcProcessExceptionHandler extends
+    AbstractExceptionHandler<BreakSvcProcessException> {
 
-    public BreakSvcProcessExceptionHandler(SvcInfo svcInfo) {
-        super(svcInfo);
-    }
+  public BreakSvcProcessExceptionHandler(SvcInfo svcInfo) {
+    super(svcInfo);
+  }
 
-    @Override
-    public ResponseEntity<SvcResponseBody> handle(BreakSvcProcessException e) {
-        return build(e.getSvcResponseHeader(), e.getSvcResponseBody());
-    }
+  @Override
+  public ResponseEntity<SvcResponseBody> handle(BreakSvcProcessException e) {
+    return build(e.getSvcResponseHeader(), e.getSvcResponseBody());
+  }
 
 }

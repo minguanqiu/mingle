@@ -9,23 +9,23 @@ import org.springframework.data.redis.core.TimeToLive;
 /**
  * Base class for all redis entity
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 @Getter
 @RedisHash("undefined")
 public class RedisEntity {
 
-    @Id
-    private final RedisKey redisKey;
+  @Id
+  private RedisKey redisKey;
 
-    @Setter
-    @TimeToLive
-    private long timeToLive;
+  @Setter
+  @TimeToLive
+  private long timeToLive;
 
 
-    public RedisEntity(RedisKey redisKey, long timeToLive) {
-        this.redisKey = redisKey;
-        this.timeToLive = timeToLive;
-    }
+  public RedisEntity(RedisKey redisKey, long timeToLive) {
+    this.redisKey = redisKey;
+    this.timeToLive = timeToLive;
+  }
 
 }

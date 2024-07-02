@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 /**
  * Base class for all service response
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 
 @JsonSerialize

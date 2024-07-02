@@ -7,23 +7,24 @@ import lombok.Getter;
 /**
  * Exception for break service process logic
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 
 @Getter
 public class BreakSvcProcessException extends RuntimeException {
 
-    private final SvcResponseHeader svcResponseHeader;
+  private final SvcResponseHeader svcResponseHeader;
 
-    private final SvcResponseBody svcResponseBody;
+  private final SvcResponseBody svcResponseBody;
 
-    /**
-     * @param svcResponseHeader service response header
-     * @param svcResponseBody       service response body
-     */
-    public BreakSvcProcessException(SvcResponseHeader svcResponseHeader, SvcResponseBody svcResponseBody) {
-        this.svcResponseHeader = svcResponseHeader;
-        this.svcResponseBody = svcResponseBody;
-    }
+  /**
+   * @param svcResponseHeader service response header
+   * @param svcResponseBody   service response body
+   */
+  public BreakSvcProcessException(SvcResponseHeader svcResponseHeader,
+      SvcResponseBody svcResponseBody) {
+    this.svcResponseHeader = svcResponseHeader;
+    this.svcResponseBody = svcResponseBody;
+  }
 
 }

@@ -2,38 +2,37 @@ package io.github.minguanqiu.mingle.svc.exception.handler.resolver;
 
 import io.github.minguanqiu.mingle.svc.SvcResponseBody;
 import io.github.minguanqiu.mingle.svc.exception.handler.AbstractExceptionHandler;
-import jakarta.annotation.PostConstruct;
-import org.springframework.http.ResponseEntity;
-
 import java.util.HashMap;
 import java.util.List;
+import org.springframework.http.ResponseEntity;
 
 /**
- * This class collect all register {@link AbstractExceptionHandler} and resolver exception
+ * This class collect and register all {@link AbstractExceptionHandler} and resolve exception.
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 
 public class ExceptionHandlerResolver {
 
-    private final HashMap<Class<?>, AbstractExceptionHandler<Exception>> exceptionHandlerMap = new HashMap<>();
-    private final List<AbstractExceptionHandler<? extends Exception>> abstractExceptionHandlers;
+  private final HashMap<Class<?>, AbstractExceptionHandler<Exception>> exceptionHandlerMap = new HashMap<>();
+  private final List<AbstractExceptionHandler<? extends Exception>> abstractExceptionHandlers;
 
-    public ExceptionHandlerResolver(List<AbstractExceptionHandler<?>> abstractExceptionHandlers) {
-        this.abstractExceptionHandlers = abstractExceptionHandlers;
-    }
+  public ExceptionHandlerResolver(List<AbstractExceptionHandler<?>> abstractExceptionHandlers) {
+    this.abstractExceptionHandlers = abstractExceptionHandlers;
+    init();
+  }
 
-    public ResponseEntity<SvcResponseBody> resolver(Exception e) {
-        return exceptionHandlerMap.getOrDefault(e.getClass(), exceptionHandlerMap.get(Exception.class)).handle(e);
-    }
+  public ResponseEntity<SvcResponseBody> resolver(Exception e) {
+    return exceptionHandlerMap.getOrDefault(e.getClass(), exceptionHandlerMap.get(Exception.class))
+        .handle(e);
+  }
 
-    @SuppressWarnings("unchecked")
-    @PostConstruct
-    private void init() {
-        abstractExceptionHandlers.forEach(e -> {
-            exceptionHandlerMap.put(e.getEClass(), (AbstractExceptionHandler<Exception>) e);
-        });
-    }
+  @SuppressWarnings("unchecked")
+  private void init() {
+    abstractExceptionHandlers.forEach(e -> {
+      exceptionHandlerMap.put(e.getEClass(), (AbstractExceptionHandler<Exception>) e);
+    });
+  }
 
 
 }

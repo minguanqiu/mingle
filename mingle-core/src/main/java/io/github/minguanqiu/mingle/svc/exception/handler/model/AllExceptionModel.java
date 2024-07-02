@@ -5,16 +5,16 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Exception message response model
+ * Exception message response model.
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 @Getter
 @Setter
 public class AllExceptionModel extends SvcResponseBody {
 
-    private String exception;
-    private String causeException;
-    private String msg;
+  private String exception;
+  private String causeException;
+  private String msg;
 
 }

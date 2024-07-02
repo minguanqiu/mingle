@@ -1,31 +1,30 @@
 package io.github.minguanqiu.mingle.svc.exception;
 
-import lombok.Getter;
-
 import java.io.Serial;
+import lombok.Getter;
 
 /**
  * Exception for break filter process logic
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 @Getter
 public class BreakFilterProcessException extends RuntimeException {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+  @Serial
+  private static final long serialVersionUID = 1L;
 
-    private final String code;
+  private final String code;
 
-    private final String msg;
+  private final String msg;
 
-    /**
-     * @param code response code
-     * @param msg response desc
-     */
-    public BreakFilterProcessException(String code, String msg) {
-        this.code = code;
-        this.msg = msg;
-    }
+  /**
+   * @param code response code
+   * @param msg  response msg
+   */
+  public BreakFilterProcessException(String code, String msg) {
+    this.code = code;
+    this.msg = msg;
+  }
 
 }

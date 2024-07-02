@@ -18,38 +18,39 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Configuration for data bean
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 
 @Configuration
 public class SvcDataConfiguration {
 
-    @Bean
-    @ConfigurationProperties("mingle.svc.dao")
-    public SvcDataProperties dataProperties() {
-        return new SvcDataProperties();
-    }
+  @Bean
+  @ConfigurationProperties("mingle.svc.dao")
+  public SvcDataProperties dataProperties() {
+    return new SvcDataProperties();
+  }
 
-    @Bean
-    @ConditionalOnProperty(prefix = "mingle.svc.dao", name = "logging", havingValue = "true")
-    public DaoLogAspect daoLogAspect(DaoLoggingHandler daoLoggingHandler, SerialNumberGeneratorHandler serialNumberGeneratorHandler) {
-        return new DaoLogAspect(daoLoggingHandler, serialNumberGeneratorHandler);
-    }
+  @Bean
+  @ConditionalOnProperty(prefix = "mingle.svc.dao", name = "logging", havingValue = "true")
+  public DaoLogAspect daoLogAspect(DaoLoggingHandler daoLoggingHandler,
+      SerialNumberGeneratorHandler serialNumberGeneratorHandler) {
+    return new DaoLogAspect(daoLoggingHandler, serialNumberGeneratorHandler);
+  }
 
-    @Bean
-    @ConditionalOnMissingBean
-    public DaoLoggingHandler daoLoggingHandler() {
-        return new DaoLoggingHandlerDefaultImpl(dataLogJacksonUtils());
-    }
+  @Bean
+  @ConditionalOnMissingBean
+  public DaoLoggingHandler daoLoggingHandler() {
+    return new DaoLoggingHandlerDefaultImpl(dataLogJacksonUtils());
+  }
 
-    @Bean("dataLogJacksonUtils")
-    @ConditionalOnMissingBean(name = "dataLogJacksonUtils")
-    public JacksonUtils dataLogJacksonUtils() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        objectMapper.findAndRegisterModules();
-        return new JacksonUtils(objectMapper);
-    }
+  @Bean("dataLogJacksonUtils")
+  @ConditionalOnMissingBean(name = "dataLogJacksonUtils")
+  public JacksonUtils dataLogJacksonUtils() {
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+    objectMapper.findAndRegisterModules();
+    return new JacksonUtils(objectMapper);
+  }
 
 }

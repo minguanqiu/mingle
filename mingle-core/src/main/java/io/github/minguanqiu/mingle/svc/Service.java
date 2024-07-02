@@ -2,11 +2,13 @@ package io.github.minguanqiu.mingle.svc;
 
 /**
  * Base class for all service
- *
- * @author Ming
+ * @param <R1> service request
+ * @param <R2> service response body
+ * @author Qiu Guan Ming
  */
-public sealed interface Service<Req extends SvcRequest, Res extends SvcResponseBody> permits AbstractService {
+public sealed interface Service<R1 extends SvcRequest, R2 extends SvcResponseBody> permits
+    AbstractService {
 
-    Res doService(Req request);
+  R2 doService(R1 request);
 
 }

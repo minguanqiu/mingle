@@ -3,11 +3,11 @@ package io.github.minguanqiu.mingle.svc.handler;
 /**
  * Handler for request payload decryption
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 
 public interface SvcRequestBodyProcessHandler {
 
-    String processBody(String body);
+  String processBody(String body);
 
 }

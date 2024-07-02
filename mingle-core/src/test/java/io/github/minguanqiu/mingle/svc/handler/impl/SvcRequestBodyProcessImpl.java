@@ -6,18 +6,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * @author Ming
+ * @author Qiu Guan Ming
  */
 @Component
 public class SvcRequestBodyProcessImpl implements SvcRequestBodyProcessHandler {
 
-    @Autowired
-    HttpServletRequest httpServletRequest;
+  @Autowired
+  HttpServletRequest httpServletRequest;
 
-    @Override
-    public String processBody(String body) {
-        httpServletRequest.setAttribute(SvcRequestBodyProcessHandler.class.getSimpleName(),"true");
-        return body;
-    }
+  @Override
+  public String processBody(String body) {
+    httpServletRequest.setAttribute(SvcRequestBodyProcessHandler.class.getSimpleName(), "true");
+    return body;
+  }
 
 }

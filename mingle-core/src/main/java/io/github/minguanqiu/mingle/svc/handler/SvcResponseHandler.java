@@ -5,21 +5,21 @@ import com.fasterxml.jackson.databind.JsonNode;
 /**
  * Handler for service response body format
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 
 public interface SvcResponseHandler {
 
-    void setResponseBody(JsonNode jsonNode);
+  void setResponseBody(JsonNode jsonNode);
 
-    JsonNode getResponseBody();
+  JsonNode getResponseBody();
 
-    void setCode(String code);
+  void setCode(String code);
 
-    String getCode();
+  String getCode();
 
-    void setMsg(String msg);
+  void setMsg(String msg);
 
-    String getMsg();
+  String getMsg();
 
 }

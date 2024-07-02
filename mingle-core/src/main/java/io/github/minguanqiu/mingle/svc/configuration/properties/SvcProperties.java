@@ -5,31 +5,104 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * {@link ConfigurationProperties} mapping service properties
+ * {@link ConfigurationProperties} mapping service properties.
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 @Getter
 @Setter
 public class SvcProperties {
 
-    private String msg_type = "svc";
+  /**
+   * Service message type.
+   */
+  private String msgType = "svc";
 
-    private String code = "0";
+  /**
+   * Service successful code in response body.
+   */
+  private String code = "0000";
 
-    private String msg = "successful";
+  /**
+   * Service successful message in response body.
+   */
+  private String msg = "successful";
 
-    private Feature feature = new Feature();
+  private SvcFeature feature = new SvcFeature();
 
-    @Getter
-    @Setter
-    public static class Feature {
+  /**
+   * Service feature defined.
+   */
+  public static class SvcFeature {
 
-        boolean logging;
+    /**
+     * Whether logging is enabled.
+     */
+    private boolean logging;
 
-        boolean bodyProcess;
+    /**
+     * Whether body processing is enabled.
+     */
+    private boolean bodyProcess;
 
-        String[] ipSecure = new String[]{};
+    /**
+     * Secure IP addresses.
+     */
+    private String[] ipSecure = new String[]{};
+
+    /**
+     * Gets whether logging is enabled.
+     *
+     * @return true if logging is enabled, false otherwise.
+     */
+    public boolean isLogging() {
+      return logging;
     }
+
+    /**
+     * Sets whether logging is enabled.
+     *
+     * @param logging true to enable logging, false to disable.
+     */
+    public void setLogging(boolean logging) {
+      this.logging = logging;
+    }
+
+    /**
+     * Gets whether body processing is enabled.
+     *
+     * @return true if body processing is enabled, false otherwise.
+     */
+    public boolean isBodyProcess() {
+      return bodyProcess;
+    }
+
+    /**
+     * Sets whether body processing is enabled.
+     *
+     * @param bodyProcess true to enable body processing, false to disable.
+     */
+    public void setBodyProcess(boolean bodyProcess) {
+      this.bodyProcess = bodyProcess;
+    }
+
+    /**
+     * Gets the secure IP addresses.
+     *
+     * @return the secure IP addresses.
+     */
+    public String[] getIpSecure() {
+      return ipSecure;
+    }
+
+    /**
+     * Sets the secure IP addresses.
+     *
+     * @param ipSecure the secure IP addresses.
+     */
+    public void setIpSecure(String[] ipSecure) {
+      this.ipSecure = ipSecure;
+    }
+  }
 
 }

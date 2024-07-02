@@ -1,1 +1,1 @@
-io.github.minguanqiu.mingle.svc.redis.RedisAutoConfiguration
+io.github.minguanqiu.mingle.svc.redis.SvcRedisAutoConfiguration

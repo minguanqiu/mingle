@@ -6,22 +6,22 @@ import io.github.minguanqiu.mingle.svc.filter.SvcInfo;
 import io.github.minguanqiu.mingle.svc.session.annotation.SvcSession;
 
 /**
- * @author Ming
+ * @author Qiu Guan Ming
  */
 @Svc
 @SvcSession(types = "Login")
-public class SimpleSvc extends AbstractService<SimpleSvcReq,SimpleSvcRes> {
+public class SimpleSvc extends AbstractService<SimpleSvcReq, SimpleSvcRes> {
 
-    public SimpleSvc(SvcInfo svcInfo) {
-        super(svcInfo);
-    }
+  public SimpleSvc(SvcInfo svcInfo) {
+    super(svcInfo);
+  }
 
-    @Override
-    public SimpleSvcRes doService(SimpleSvcReq request) {
-        SimpleSvcRes simpleSvcRes = new SimpleSvcRes();
-        simpleSvcRes.setText1(request.getText1());
-        simpleSvcRes.setText2(request.getText2());
-        return simpleSvcRes;
-    }
+  @Override
+  public SimpleSvcRes doService(SimpleSvcReq request) {
+    SimpleSvcRes simpleSvcRes = new SimpleSvcRes();
+    simpleSvcRes.setText1(request.getText1());
+    simpleSvcRes.setText2(request.getText2());
+    return simpleSvcRes;
+  }
 
 }

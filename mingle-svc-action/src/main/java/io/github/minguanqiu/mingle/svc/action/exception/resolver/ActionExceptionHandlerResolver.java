@@ -2,37 +2,38 @@ package io.github.minguanqiu.mingle.svc.action.exception.resolver;
 
 import io.github.minguanqiu.mingle.svc.action.exception.handler.abs.AbstractActionExceptionHandler;
 import io.github.minguanqiu.mingle.svc.action.exception.handler.model.ActionExceptionModel;
-
 import java.util.HashMap;
 import java.util.List;
 
 /**
  * This class collect all register {@link AbstractActionExceptionHandler} and resolver exception
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 
 public class ActionExceptionHandlerResolver {
 
-    private final HashMap<Class<?>, AbstractActionExceptionHandler<Exception>> exceptionHandlerMap = new HashMap<>();
-    private final List<AbstractActionExceptionHandler<?>> abstractExceptionHandlers;
+  private final HashMap<Class<?>, AbstractActionExceptionHandler<Exception>> exceptionHandlerMap = new HashMap<>();
+  private final List<AbstractActionExceptionHandler<?>> abstractExceptionHandlers;
 
-    public ActionExceptionHandlerResolver(List<AbstractActionExceptionHandler<?>> abstractExceptionHandlers) {
-        this.abstractExceptionHandlers = abstractExceptionHandlers;
-        init();
-    }
+  public ActionExceptionHandlerResolver(
+      List<AbstractActionExceptionHandler<?>> abstractExceptionHandlers) {
+    this.abstractExceptionHandlers = abstractExceptionHandlers;
+    init();
+  }
 
-    public ActionExceptionModel resolver(Exception e) {
-        if (exceptionHandlerMap.containsKey(e.getClass())) {
-            return exceptionHandlerMap.get(e.getClass()).handle(e, new ActionExceptionModel());
-        }
-        return exceptionHandlerMap.get(Exception.class).handle(e, new ActionExceptionModel());
+  public ActionExceptionModel resolver(Exception e) {
+    if (exceptionHandlerMap.containsKey(e.getClass())) {
+      return exceptionHandlerMap.get(e.getClass()).handle(e, new ActionExceptionModel());
     }
+    return exceptionHandlerMap.get(Exception.class).handle(e, new ActionExceptionModel());
+  }
 
-    @SuppressWarnings("unchecked")
-    private void init() {
-        abstractExceptionHandlers.forEach(e -> exceptionHandlerMap.put(e.getExceptionClass(), (AbstractActionExceptionHandler<Exception>) e));
-    }
+  @SuppressWarnings("unchecked")
+  private void init() {
+    abstractExceptionHandlers.forEach(e -> exceptionHandlerMap.put(e.getExceptionClass(),
+        (AbstractActionExceptionHandler<Exception>) e));
+  }
 
 
 }

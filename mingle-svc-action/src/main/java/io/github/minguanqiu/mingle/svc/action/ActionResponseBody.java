@@ -4,7 +4,7 @@ package io.github.minguanqiu.mingle.svc.action;
 /**
  * Base class for all action response body
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 
 public class ActionResponseBody {

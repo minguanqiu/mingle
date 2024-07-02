@@ -4,21 +4,22 @@ import io.github.minguanqiu.mingle.svc.session.exception.SessionAccessDeniedExce
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
-
-import java.io.IOException;
 
 /**
  * Custom spring security {@link AccessDeniedHandler}
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 public class SessionAccessDeniedHandler implements AccessDeniedHandler {
 
-    @Override
-    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        throw new SessionAccessDeniedException(accessDeniedException.getMessage(), accessDeniedException);
-    }
+  @Override
+  public void handle(HttpServletRequest request, HttpServletResponse response,
+      AccessDeniedException accessDeniedException) throws IOException, ServletException {
+    throw new SessionAccessDeniedException(accessDeniedException.getMessage(),
+        accessDeniedException);
+  }
 
 }

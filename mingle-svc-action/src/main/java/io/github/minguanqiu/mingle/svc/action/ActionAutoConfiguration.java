@@ -8,7 +8,7 @@ import org.springframework.context.annotation.ComponentScan;
 /**
  * {@link AutoConfiguration} for action
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 
 @AutoConfiguration

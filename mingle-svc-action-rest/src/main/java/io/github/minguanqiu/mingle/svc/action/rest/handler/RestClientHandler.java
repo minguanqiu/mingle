@@ -5,11 +5,11 @@ import okhttp3.OkHttpClient;
 /**
  * Handler for okhttp client
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 
 public interface RestClientHandler {
 
-    OkHttpClient getClient();
+  OkHttpClient getClient();
 
 }

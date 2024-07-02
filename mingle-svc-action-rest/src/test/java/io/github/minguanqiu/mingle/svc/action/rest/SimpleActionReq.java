@@ -4,14 +4,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * @author Ming
+ * @author Qiu Guan Ming
  */
 @Setter
 @Getter
 public class SimpleActionReq extends RestActionRequest {
 
-    private String text1;
+  private String text1;
 
-    private String text2;
+  private String text2;
 
 }

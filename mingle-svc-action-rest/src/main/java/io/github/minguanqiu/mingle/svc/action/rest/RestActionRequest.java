@@ -6,16 +6,15 @@ import lombok.Setter;
 import okhttp3.OkHttpClient;
 
 /**
- * {@inheritDoc}
- * Action request for rest type
+ * {@inheritDoc} Action request for rest type
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 
 @Getter
 @Setter
 public class RestActionRequest extends ActionRequest {
 
-    private OkHttpClient.Builder okHttpClientBuilder;
+  private OkHttpClient.Builder okHttpClientBuilder;
 
 }

@@ -7,12 +7,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * {@link ConfigurationProperties} mapping session properties
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 @Getter
 @Setter
 public class SvcSessionProperties {
 
-    private String header = "token";
+  private String header = "token";
 
 }

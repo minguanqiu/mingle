@@ -6,10 +6,11 @@ import org.springframework.context.annotation.ComponentScan;
 /**
  * {@link AutoConfiguration} for mingle service
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 
 @AutoConfiguration
 @ComponentScan(basePackageClasses = SvcAutoConfiguration.class)
 public class SvcAutoConfiguration {
+
 }

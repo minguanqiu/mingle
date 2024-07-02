@@ -2,7 +2,7 @@ package io.github.minguanqiu.mingle.svc.session.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.minguanqiu.mingle.svc.session.configuration.properties.SvcSessionProperties;
-import io.github.minguanqiu.mingle.svc.session.dao.SessionDao;
+import io.github.minguanqiu.mingle.svc.session.dao.SvcSessionDao;
 import io.github.minguanqiu.mingle.svc.session.handler.SessionTokenHandler;
 import io.github.minguanqiu.mingle.svc.session.handler.SvcSessionFeatureHandler;
 import io.github.minguanqiu.mingle.svc.session.handler.TokenKeyHandler;
@@ -20,47 +20,47 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Configuration for session bean
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 @Configuration
 public class SvcSessionConfiguration {
 
-    @Bean
-    @ConfigurationProperties("mingle.svc.session")
-    public SvcSessionProperties sessionProperties() {
-        return new SvcSessionProperties();
-    }
+  @Bean
+  @ConfigurationProperties("mingle.svc.session")
+  public SvcSessionProperties sessionProperties() {
+    return new SvcSessionProperties();
+  }
 
-    @Bean
-    public SvcSessionRegisterImpl svcSessionRegister(SvcSessionFeatureHandler sessionFeatureHandler) {
-        return new SvcSessionRegisterImpl(sessionFeatureHandler);
-    }
+  @Bean
+  public SvcSessionRegisterImpl svcSessionRegister(SvcSessionFeatureHandler sessionFeatureHandler) {
+    return new SvcSessionRegisterImpl(sessionFeatureHandler);
+  }
 
-    @Bean
-    public SessionTokenHandler sessionTokenHandler() {
-        return new SessionTokenHandlerDefaultImpl(tokenKeyHandler());
-    }
+  @Bean
+  public SessionTokenHandler sessionTokenHandler() {
+    return new SessionTokenHandlerDefaultImpl(tokenKeyHandler());
+  }
 
-    @Bean
-    @ConditionalOnMissingBean
-    public SvcSessionFeatureHandler sessionFeatureHandler() {
-        return new SvcSessionFeatureDefaultImpl();
-    }
+  @Bean
+  @ConditionalOnMissingBean
+  public SvcSessionFeatureHandler sessionFeatureHandler() {
+    return new SvcSessionFeatureDefaultImpl();
+  }
 
-    @Bean
-    @ConditionalOnMissingBean
-    public TokenKeyHandler tokenKeyHandler() {
-        return new TokenKeyHandlerImpl();
-    }
+  @Bean
+  @ConditionalOnMissingBean
+  public TokenKeyHandler tokenKeyHandler() {
+    return new TokenKeyHandlerImpl();
+  }
 
-    @Bean
-    public SessionUtils sessionUtils(SessionDao sessionDao) {
-        return new SessionUtils(sessionDao, sessionTokenHandler(), sessionJacksonUtils());
-    }
+  @Bean
+  public SessionUtils sessionUtils(SvcSessionDao svcSessionDao) {
+    return new SessionUtils(svcSessionDao, sessionTokenHandler(), sessionJacksonUtils());
+  }
 
-    @Bean
-    public JacksonUtils sessionJacksonUtils() {
-        return new JacksonUtils(new ObjectMapper());
-    }
+  @Bean
+  public JacksonUtils sessionJacksonUtils() {
+    return new JacksonUtils(new ObjectMapper());
+  }
 
 }

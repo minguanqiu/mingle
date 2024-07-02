@@ -11,26 +11,26 @@ import org.springframework.http.ResponseEntity;
 /**
  * Default handler will catch {@link Exception} or unknown exception
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 @Slf4j
 @Order(Integer.MIN_VALUE)
 public class AllExceptionHandler extends AbstractExceptionHandler<Exception> {
 
-    public AllExceptionHandler(SvcInfo svcInfo) {
-        super(svcInfo);
-    }
+  public AllExceptionHandler(SvcInfo svcInfo) {
+    super(svcInfo);
+  }
 
-    @Override
-    public ResponseEntity<SvcResponseBody> handle(Exception e) {
-        AllExceptionModel model = new AllExceptionModel();
-        model.setException(e.getClass().getName());
-        if (e.getCause() != null) {
-            model.setCauseException(e.getCause().getClass().getName());
-        }
-        model.setMsg(e.getMessage());
-        log.error("Exception by " + e);
-        return build(SvcResponseHeader.builder("error").msg(e.getMessage()).build(), model);
+  @Override
+  public ResponseEntity<SvcResponseBody> handle(Exception e) {
+    AllExceptionModel model = new AllExceptionModel();
+    model.setException(e.getClass().getName());
+    if (e.getCause() != null) {
+      model.setCauseException(e.getCause().getClass().getName());
     }
+    model.setMsg(e.getMessage());
+    log.error("Exception by " + e);
+    return build(SvcResponseHeader.builder("error").msg(e.getMessage()).build(), model);
+  }
 
 }

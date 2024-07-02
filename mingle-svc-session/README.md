@@ -6,9 +6,9 @@
 
 ### Install Redis
 
-https://redis.io/  
+https://redis.io/
 
-add pom.xml  
+add pom.xml
 
 ```xml
 <dependency>
@@ -19,7 +19,7 @@ add pom.xml
 
 ### Create Session
 
-使用 `SessionUtils` 產生`jwt token` 
+使用 `SessionUtils` 產生`jwt token`
 
 ```java
 @Svc(desc = "test create session")
@@ -142,6 +142,6 @@ Svc scope，請參考[mingle-core](#mingle-core) 實作Exception Handler
 
 ## Properties
 
-please watch .A.5. Data Properties `spring.redis` properties  
+please watch .A.5. Data Properties `spring.redis` properties
 
 https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#appendix.application-properties.data  

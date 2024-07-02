@@ -6,16 +6,16 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * @author Ming
+ * @author Qiu Guan Ming
  */
 @Setter
 @Getter
 public class SimpleSvcReq extends SvcRequest {
 
-    @NotEmpty
-    private String text1;
+  @NotEmpty
+  private String text1;
 
-    @NotEmpty
-    private String text2;
+  @NotEmpty
+  private String text2;
 
 }

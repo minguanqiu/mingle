@@ -3,27 +3,27 @@ package io.github.minguanqiu.mingle.svc.action;
 /**
  * Interface for action interceptor
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 public interface ActionInterceptor {
 
-    void intercept(Chain chain);
+  void intercept(Chain chain);
 
-    /**
-     * Interface for action chain
-     *
-     * @author Ming
-     */
-    interface Chain {
+  /**
+   * Interface for action chain
+   *
+   * @author Qiu Guan Ming
+   */
+  interface Chain {
 
-        void proceed();
+    void proceed();
 
-        AbstractAction<? extends ActionRequest, ? extends ActionResponseBody> actionTarget();
+    AbstractAction<? extends ActionRequest, ? extends ActionResponseBody> actionTarget();
 
-        ActionRequest request();
+    ActionRequest request();
 
-        ActionResponse<ActionResponseBody> response();
+    ActionInfo actionInfo();
 
-    }
+  }
 
 }

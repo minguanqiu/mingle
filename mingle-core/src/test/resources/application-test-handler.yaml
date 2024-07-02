@@ -1,5 +1,6 @@
 mingle:
   svc:
     properties:
-      logging: false
-      body-process: false
+      feature:
+        logging: false
+        body-process: false

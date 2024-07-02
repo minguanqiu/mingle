@@ -5,14 +5,14 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
 
 /**
- * @author Ming
+ * @author Qiu Guan Ming
  */
 @WritingConverter
 public class RedisKeyToStringConverter implements Converter<RedisKey, String> {
 
-    @Override
-    public String convert(RedisKey source) {
-        return source.toString();
-    }
+  @Override
+  public String convert(RedisKey source) {
+    return source.toString();
+  }
 
 }

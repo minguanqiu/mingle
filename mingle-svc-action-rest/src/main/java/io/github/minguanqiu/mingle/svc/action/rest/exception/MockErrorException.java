@@ -3,15 +3,15 @@ package io.github.minguanqiu.mingle.svc.action.rest.exception;
 /**
  * Exception for mock data parse error
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 
 public class MockErrorException extends RuntimeException {
 
-    public static final String MSG = "mock error";
+  public static final String MSG = "mock error";
 
-    public MockErrorException(Exception e) {
-        super(MSG, e);
-    }
+  public MockErrorException(Exception e) {
+    super(MSG, e);
+  }
 
 }

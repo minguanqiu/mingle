@@ -10,18 +10,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 /**
- * @author Ming
+ * @author Qiu Guan Ming
  */
 @Component
 @Profile("test-exception-handler")
 public class AllExceptionHandlerImpl extends AbstractExceptionHandler<Exception> {
-    public AllExceptionHandlerImpl(SvcInfo svcInfo) {
-        super(svcInfo);
-    }
 
-    @Override
-    public ResponseEntity<SvcResponseBody> handle(Exception ex) {
-        return build(SvcResponseHeader.builder(SvcTestUtils.X003).msg("X003-fail").build(), new TestExceptionModel("X003-fail"));
-    }
+  public AllExceptionHandlerImpl(SvcInfo svcInfo) {
+    super(svcInfo);
+  }
+
+  @Override
+  public ResponseEntity<SvcResponseBody> handle(Exception ex) {
+    return build(SvcResponseHeader.builder(SvcTestUtils.X003).msg("X003-fail").build(),
+        new TestExceptionModel("X003-fail"));
+  }
 
 }

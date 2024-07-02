@@ -10,18 +10,19 @@ import org.springframework.http.ResponseEntity;
 /**
  * Default handler will catch {@link BreakFilterProcessException}
  *
- * @author Ming
+ * @author Qiu Guan Ming
  */
 @Order(Integer.MIN_VALUE)
-public class BreakFilterProcessExceptionHandler extends AbstractExceptionHandler<BreakFilterProcessException> {
+public class BreakFilterProcessExceptionHandler extends
+    AbstractExceptionHandler<BreakFilterProcessException> {
 
-    public BreakFilterProcessExceptionHandler(SvcInfo svcInfo) {
-        super(svcInfo);
-    }
+  public BreakFilterProcessExceptionHandler(SvcInfo svcInfo) {
+    super(svcInfo);
+  }
 
-    @Override
-    public ResponseEntity<SvcResponseBody> handle(BreakFilterProcessException e) {
-        return build(SvcResponseHeader.builder(e.getCode()).msg(e.getMsg()).build());
-    }
+  @Override
+  public ResponseEntity<SvcResponseBody> handle(BreakFilterProcessException e) {
+    return build(SvcResponseHeader.builder(e.getCode()).msg(e.getMsg()).build());
+  }
 
 }

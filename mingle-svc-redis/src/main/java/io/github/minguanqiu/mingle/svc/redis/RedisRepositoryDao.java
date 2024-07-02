@@ -3,14 +3,15 @@ package io.github.minguanqiu.mingle.svc.redis;
 import org.springframework.data.repository.Repository;
 
 /**
- * @author Ming
+ * @author Qiu Guan Ming
  */
-public class RedisRepositoryDao<R extends Repository<? extends RedisEntity, RedisKey>> extends RedisDao {
+public class RedisRepositoryDao<R extends Repository<? extends RedisEntity, RedisKey>> extends
+    RedisDao {
 
-    protected final R repository;
+  protected final R repository;
 
-    public RedisRepositoryDao(R repository) {
-        this.repository = repository;
-    }
+  public RedisRepositoryDao(R repository) {
+    this.repository = repository;
+  }
 
 }
