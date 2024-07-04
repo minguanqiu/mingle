@@ -10,6 +10,6 @@ dependencies {
 
 mavenPublishing {
     pom {
-        description.set("Architecture for java web application")
+        description.set("Provides the functions of logic-related modules that make up service")
     }
 }

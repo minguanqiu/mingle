@@ -14,7 +14,7 @@ dependencies {
 
 mavenPublishing {
     pom {
-        description.set("Architecture for java web application")
+        description.set("The core module based on the spring web functionality, responsible for receiving and responding to client messages.")
     }
 }
 
