@@ -1,429 +1,268 @@
 # mingle-svc-action-rest
 
-此模組透過`Action`實現，提供`Restful`client功能
+[action](../mingle-svc-action/README.md) 的實現，提供`HTTP`的`client`功能模組，進行`API`呼叫處理。
+
+## 特點
+- [action](../mingle-svc-action/README.md) 模組化設計
+- 開箱即用的`client`功能
 
 ## Getting Started
 
-add pom.xml :
+**Maven設定**
 
 ```xml
-<dependency>
-    <groupId>io.github.amings</groupId>
-    <artifactId>mingle-svc-action-rest</artifactId>
-</dependency>
+<dependencies>
+    <dependency>
+      <groupId>io.github.minguanqiu</groupId>
+      <artifactId>mingle-svc-action-rest</artifactId>
+    </dependency>
+</dependencies>
+
+<dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>io.github.minguanqiu</groupId>
+      <artifactId>mingle-bom</artifactId>
+      <version>2.0.0-SNAPSHOT</version>
+      <type>pom</type>
+      <scope>import</scope>
+    </dependency>
+  </dependencies>
+</dependencyManagement>
 ```
 
-#### Build Rest Action
+有一個名稱為`Simple`的系統，以下是相關`API`規格。
 
-首先建立`parent class`，目標`Server`為依據命名
+```text
+URL : http://localhost:8080/svc/SimpleDemoSvc
+Method : POST
+```
 
-```java
-public abstract class AbstractRestDemoAction<Req extends ActionReqModel, Res extends ActionResModel> extends AbstractRestAction<Req, Res> {
+**request body :**
 
-    @Override
-    protected Map<String, String> buildRequestCacheHeaderValue() {
-        return null;
-    }
-
-    @Override
-    protected Set<Integer> buildCacheSuccessHttpCode() {
-        HashSet<Integer> hashSet = new HashSet<>();
-        hashSet.add(200);
-        return hashSet;
-    }
-
-    @Override
-    protected void before(Req reqModel) {
-
-    }
-
-    @Override
-    protected void after(Res resModel) {
-
-    }
-
-
-    @Override
-    public String getType() {
-        return "RestDemo";
-    }
-
+```json
+{
+    "text1": "Hello",
+    "text2": "World"
 }
 ```
 
-`buildCacheSuccessHttpCode()`
+**response body :**
 
-如果只新增`http code`200，其餘`http code`則會讓`Action`不成功
-
-`buildRequestCacheHeaderValue()`
-
-每次皆會把`cache`的值帶入`request header`中
-
-`getType()`
-
-定義目標`serverProperties`名稱
-
-`再建立`sub class`繼承`parent class
-
-```java
-@RestAction(desc = "Get Name", method = HttpMethod.GET)
-public class GetName extends AbstractRestDemoAction<GetNameReq, GetNameRes> {
-
-
+```json
+{
+    "code": "0000",
+    "msg": "successful",
+    "body": {
+        "text": "Hello World"
+    }
 }
 ```
 
-#### Configruation URI
+要透過程式的方式呼叫`API`，就必須要撰寫`client`相關程式，但是透過此模組就可以很輕鬆的完成。
 
-**properties :**
+首先，繼承`AbstractRestAction`為`Simple`系統建立抽象類，並建立通用類型方法。
 
-```properties
-mingle.svc.action.rest.RestDemo.uri=http://localhost:8081/restdemo
-mingle.svc.action.rest.RestDemo.impl.uri.GetName=/getName
+```java
+public abstract class AbstractSimpleAction<Req extends RestActionRequest, ResB extends ActionResponseBody> extends
+    AbstractRestAction<Req, ResB> {
+
+  public AbstractSimpleAction(RestActionProperties actionProperties) {
+    super(actionProperties);
+  }
+
+  @Override
+  public HttpMethod getHttpMethod() {
+    return HttpMethod.POST;
+  }
+
+  @Override
+  public String getServerName() {
+    return "Simple";
+  }
+
+  @Override
+  public String getType() {
+    return "Simple";
+  }
+
+  @Override
+  protected RestActionResponseBodyHeader buildResponseBodyHeader(JsonNode resultNode) {
+    RestActionResponseBodyHeader restActionResponseBodyHeader = new RestActionResponseBodyHeader();
+    restActionResponseBodyHeader.setSuccessCode("0");
+    restActionResponseBodyHeader.setCode(resultNode.get("code").asText());
+    restActionResponseBodyHeader.setMsg(resultNode.get("msg").asText());
+    return restActionResponseBodyHeader;
+  }
+
+  @Override
+  protected ResB deserializeResponseBody(JsonNode resultNode) {
+    return restActionJacksonUtils.readValue(resultNode.get("body").toString(), resClass)
+        .orElseThrow(ActionResponseBodyDeserializeErrorException::new);
+  }
+
+}
 ```
-
-**yaml :**
-
-```yml
+配置屬性：
+```yaml
 mingle:
   svc:
     action:
       rest:
-        RestDemo:
-          uri: http://localhost:8081/restdemo
-          impl:
-            uri:
-              GetName: /getName
+        server:
+          Simple: #依據getServerName()
+            scheme: http
+            host: 127.0.0.1
+            port: 8080
+            path-segments:
+              - svc #maybe context path
 ```
 
-**URI 規則**
-
-- `mingle.svc.action.rest.{action type}.uri`context path
-- `mingle.svc.action.rest.{action type}.impl.uri.{action class name}`api path
-
-這就是為甚麼`getType()`不能為null的原因
-
-#### Request Model Convert Body
-
-##### Get Method
-
-透過`request model`的變數`name`、`value`自動建立`query parameter`
-
-**Target API :**
-
-```java
-@RestController
-public class GetNameController {
-
-    ObjectMapper objectMapper = new ObjectMapper();
-
-    @GetMapping("/getName")
-    public String getName(@PathParam("name") String name) {
-        ObjectNode objectNode = objectMapper.createObjectNode();
-        objectNode.put("name", name);
-        return objectNode.toString();
-    }
-
-}
-```
-
-**Logic :**
-
-```java
-@RestAction(desc = "Get Name", method = HttpMethod.GET)
-public class GetName extends AbstractRestDemoAction<GetNameReq, GetNameRes> {
 
 
-}
-```
+以上方法簡單介紹：
+- getHttpMethod - 設定`API`的`HTTP`方法
+- getServerName - 設定目標系統名稱，並搭配配置屬性取得路徑
+- getType - `action`的類型
+- buildResponseBodyHeader - 如果此系統有狀態碼，可以透過此方法設定，預設為`null`。(可選)
+- deserializeResponseBody - 截取部分`response body`，執行`JSON`反序列化成為`ActionResponseBody`物件，預設為整個`response body`。(可選)
 
-**Request Model :**
+接下來，我們就可以針對目標的API，建立相對應的`action`。
+
+**RestActionRequest：**
 
 ```java
 @Setter
-public class GetNameReq extends ActionReqModel {
+@Getter
+public class SimpleDemoSvcReq extends RestActionRequest {
 
-    private String name;
+  private String text1;
+
+  private String text2;
 
 }
 ```
 
-**Response Model :**
-
+**ActionResponseBody：**
 ```java
 @Getter
-public class GetNameRes extends ActionResModel {
-
-    private String name;
-
-}
-```
-
-**Svc Logic :**
-
-```java
-@Svc(desc = "Rest action demo")
-public class GetNameDemo extends AbstractSvcLogic<SvcReqModel, SvcResModel> {
-
-    @Autowired
-    GetName getName;
-
-    @Override
-    public SvcResModel doService(SvcReqModel reqModel, SvcResModel resModel) {
-        RestActionResData<GetNameRes> getNameResRestActionResData = getName.doAction(getNameReq());
-        System.out.println(getNameResRestActionResData.getUri());
-        System.out.println(getNameResRestActionResData.getResModel().getName());
-        return resModel;
-    }
-
-    private GetNameReq getNameReq() {
-        GetNameReq model = new GetNameReq();
-        model.setName("Mingle");
-        return model;
-    }
-
-}
-```
-
-執行`doAction`將會打印出以下訊息
-
-```tex
-http://localhost:8081/restdemo/getName?name=Mingle
-Mingle
-```
-
-###### PathVariable
-
-* `PathVariable` - 定義`path`變數欄位
-
-* `ExcludeRequestBody` - 排除`body`欄位
-
-**Target API :**
-
-```java
-@RestController
-public class GetName1Controller {
-
-    ObjectMapper objectMapper = new ObjectMapper();
-
-    @GetMapping("/getName1/{name}")
-    public String getName(@PathVariable("name") String name) {
-        ObjectNode objectNode = objectMapper.createObjectNode();
-        objectNode.put("name", name);
-        return objectNode.toString();
-    }
-
-}
-```
-
-**Logic :**
-
-```java
-@RestAction(desc = "Get Name", method = HttpMethod.GET)
-public class GetName1 extends AbstractRestDemoAction<GetName1Req, GetName1Res> {
-
-
-}
-```
-
-**Request Model :**
-
-因為是`Get Method`所以必須透過`@ExcludeRequest`排除`query paramter`
-
-```java
 @Setter
-public class GetName1Req extends ActionReqModel {
+public class SimpleDemoSvcRes extends ActionResponseBody {
 
-    @PathVariable
-    @ExcludeRequestBody
-    private String name;
+  private String text;
 
 }
 ```
 
-**Response Model :**
-
+**AbstractRestAction：**
 ```java
-@Getter
-public class GetName1Res extends ActionResModel {
+@Service
+public class SimpleDemoSvc extends AbstractSimpleAction<SimpleDemoSvcReq, SimpleDemoSvcRes> {
 
-    private String name;
+  public SimpleDemoSvc(RestActionProperties actionProperties) {
+    super(actionProperties);
+  }
+
+  @Override
+  protected List<String> buildRestPath(SimpleActionReq request) {
+    return List.of("SimpleSvc");
+  }
+}
+
+```
+- buildRestPath - 只設定API路徑。
+
+建立`service`裡面包含rest action。
+```java
+@Svc(tags = "svc", summary = "RestTestSvc", description = "Test rest service")
+public class RestTestSvc extends AbstractService<RestTestSvcReq, RestTestSvcRes> {
+
+  @Autowired
+  private SimpleDemoSvc simpleDemoSvc;
+
+  public RestTestSvc(SvcInfo svcInfo) {
+    super(svcInfo);
+  }
+
+  @Override
+  public RestTestSvcRes doService(RestTestSvcReq request) {
+    ActionResponse<SimpleDemoSvcRes> simpleDemoSvcResActionResponse = simpleDemoSvc.doAction(simpleDemoSvcReq(request));
+    RestTestSvcRes restTestSvcRes = new RestTestSvcRes();
+    restTestSvcRes.setText(simpleDemoSvcResActionResponse.getResponseBody().get().getText());
+    return restTestSvcRes;
+  }
+
+  private SimpleDemoSvcReq simpleDemoSvcReq(RestTestSvcReq request) {
+    SimpleDemoSvcReq simpleDemoSvcReq = new SimpleDemoSvcReq();
+    simpleDemoSvcReq.setText1(request.getText1());
+    simpleDemoSvcReq.setText2(request.getText2());
+    return simpleDemoSvcReq;
+  }
 
 }
 ```
+完成後，發送請求至`service`
 
-執行`doAction`將會打印出以下訊息
-
-```
-http://localhost:8081/restdemo/getName1/Mingle
-Mingle
-```
-
-如果沒加入`@ExcludeRequestBody``URI` 將會帶入`query parameter`
-
-```
-http://localhost:8081/restdemo/getName?name=Mingle
+```text
+URL : http://localhost:8080/svc/RestTestSvc
+Method : POST
 ```
 
-##### Post Method
-
-`request model`自動轉換以下`media type`的`request body`
-
-###### multipart/form-data
-
-**Target API :**
-
-```java
-@PostMapping(path = "setFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String setFile(@RequestParam("fileName") String fileName, @RequestParam("file") MultipartFile file) throws IOException {
-        ObjectNode objectNode = objectMapper.createObjectNode();
-        objectNode.put("FileName", fileName);
-        objectNode.put("FileBase64", Base64.encodeBase64String(file.getBytes()));
-        return objectNode.toString();
-    }
-```
-
-**Request Model :**
-
-```java
-@Setter
-public class SetFileReq extends ActionReqModel {
-
-    private String fileName;
-
-    private byte[] file;
-
-}
-```
-
-###### application/x-www-form-urlencoded
-
-**Target API :**
-
-```java
-@PostMapping(path = "getName2", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getName2(@RequestParam MultiValueMap<String, String> paramMap) {
-        ObjectNode objectNode = objectMapper.createObjectNode();
-        objectNode.put("Name", paramMap.getFirst("name"));
-        objectNode.put("Age", paramMap.getFirst("age"));
-        return objectNode.toString();
-    }
-```
-
-**Request Model :**
-
-```java
-@Setter
-public class GetName2Req extends ActionReqModel {
-
-    private String name;
-
-    private String age;
-
-}
-```
-
-###### application/json
-
-**Target API :**
-
-```java
-@PostMapping(path = "jsonTest", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String jsonTest(@RequestBody String user) throws IOException {
-        System.out.println(user);
-        return user;
-    }
-```
-
-**Request Model :**
-
-```java
-@Setter
-public class JsonTestReq extends ActionReqModel {
-
-    @JsonProperty("name")
-    private String name;
-    @JsonProperty("age")
-    private String age;
-    @JsonProperty("data")
-    private Data data;
-    @JsonProperty("authorities")
-    private List<Authority> authorities;
-    @JsonProperty("datas")
-    private List<String> datas;
-    @ExcludeRequestBody
-    private String ttttt = "tttt";
-
-    @Setter
-    public static class Data {
-
-        @JsonProperty("email")
-        private String email;
-        @JsonProperty("mobile")
-        private String mobile;
-    }
-
-    @Setter
-    public static class Authority {
-
-        @JsonProperty("name")
-        private String name;
-
-    }
-
-}
-```
-
-一樣可以使用`@ExcludeRequestBody`忽略
-
-#### Response Mock
-
-定義`mingle.svc.action.rest.mock.path`及新增`${action class name}.json`檔案
-
-* `sleep` - 等待時間(毫秒)
-
-* `data` - response body
-
-**範例 :**
+**request body：**
 
 ```json
 {
-  "sleep": "2000",
-  "data": {
-    "code": "0",
-    "desc": "successful",
-    "resBody": {
-      "Message": "Hello : mingle"
-    }
-  }
+    "text1": "Hello",
+    "text2": "World"
 }
 ```
 
-設置成功後，執行`Action`就不會發送`request`到目標`API`，而是使用`mock data`回應
+**response body：**
 
-## Exception
+```json
+{
+    "code": "0000",
+    "msg": "successful",
+    "body": {
+        "text": "Hello World"
+    }
+}
+```
 
-Action scope，請參考[mingle-core](#mingle-core) 實作Exception Handler
+你會發現其實跟一般`action`使用方式一致，只是用途不同。
 
-- `ActionReqModelSerializeFailException`
+## 主要組件
 
-- `ActionResModelFormatErrorException`
+### RestActionRequest
+自動將物件序列化成`JSON`字串變成`request body`。
+- `OkHttpClient.Builder` - 彈性調整相關`client`設定
+- `@QueryParameter` - 欄位加入URL
+- `@ExcludeLog` - 日誌記錄時，忽略相對欄位
 
-- `ActionRestResModelFormatFailException`
+### ActionResponseBody
+自動將`response body`反序列化成物件
+- `@ExcludeLog` - 日誌記錄時，忽略相對欄位
 
-- `ClientErrorException`
+### AbstractRestAction
+`action`的抽象實作，`RESTful`模組，透過自動的序列化、反序列化，來達到快速、方便的應用。
+> [!NOTE]
+> 通常由父類繼承，而不是子類直接繼承。
 
-- `HttpCodeErrorException`
+## 配置屬性
 
-- `MediaTypeParseFailException`
+下面列出了主要配置屬性及其描述。
 
-- `MockDataParseFailException`
 
-## Properties
+| 屬性                                                    | 預設值                  | 描述                                |
+|---------------------------------------------------------|-------------------------|-------------------------------------|
+| `mingle.action.rest.server.{server name}.scheme`               | `http`                  | 服務器的協議（如 `http` 或 `https`）|
+| `mingle.action.rest.server.{server name}.host`                 | 無                      | 服務器的主機名                      |
+| `mingle.action.rest.server.{server name}.port`                 | 無                      | 服務器的端口號                      |
+| `mingle.action.rest.server.{server name}.pathSegments`         | 無                      | URL 路徑段，為數組格式              |
+| `mingle.action.rest.mock.{action name}.code`                   | `200`                   | 模擬響應的狀態碼                    |
+| `mingle.action.rest.mock.{action name}.header`                 | 空 Map                  | 模擬響應的頭信息                    |
+| `mingle.action.rest.mock.{action name}.responseBody.mediaType` | `application/json`      | 模擬響應的媒體類型                  |
+| `mingle.action.rest.mock.{action name}.responseBody.content`   | 無                      | 模擬響應的內容                      |
+| `mingle.action.rest.mock.{action name}.message`                | `200 OK`                | 模擬響應的狀態訊息                  |
+| `mingle.action.rest.mock.{action name}.delay`                  | `0`                     | 模擬響應的延遲時間，以毫秒為單位    |
 
-| Name                                           | Required | Default Value | Description             |
-|------------------------------------------------|----------|---------------|-------------------------|
-| `mingle.svc.action.rest.mock.path`             |          |               | action mock path        |
-| `mingle.svc.action.rest.client.connectTimeOut` |          | `3000 ms`     | client connect time out |
-| `mingle.svc.action.rest.client.readTimeOut`    |          | `70000 ms`    | client read time out    |
-| `mingle.svc.action.rest.client.ignoreSSL`      |          | `false`       | client ignore SSL       |

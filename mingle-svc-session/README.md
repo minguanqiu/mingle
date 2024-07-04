@@ -1,147 +1,185 @@
 # mingle-svc-session
+搭配[spring security](https://spring.io/projects/spring-security)及[mingle-svc-redis](../mingle-svc-redis/README.md)，提供`service`安全性。
 
-透過`redis`提供`session`持久管理，並使用`jwt token`實現`stateless`，達到`authentication`、`authority`功能
+## 特點
+- 簡單設定驗證、授權功能，保護`service`安全。
+- 統一的開發流程
 
-## Building
+## Getting Started
 
-### Install Redis
-
-https://redis.io/
-
-add pom.xml
+### Maven設定
 
 ```xml
-<dependency>
-    <groupId>io.github.amings</groupId>
-    <artifactId>mingle-svc-session</artifactId>
-</dependency>
+<dependencies>
+    <dependency>
+      <groupId>io.github.minguanqiu</groupId>
+      <artifactId>mingle-svc-session</artifactId>
+    </dependency>
+</dependencies>
+
+<dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>io.github.minguanqiu</groupId>
+      <artifactId>mingle-bom</artifactId>
+      <version>2.0.0-SNAPSHOT</version>
+      <type>pom</type>
+      <scope>import</scope>
+    </dependency>
+  </dependencies>
+</dependencyManagement>
 ```
 
-### Create Session
+### 建立Service
 
-使用 `SessionUtils` 產生`jwt token`
+**建立登入Service**
 
 ```java
-@Svc(desc = "test create session")
-public class Test extends AbstractSvcLogic<TestReq, SvcNoRes> {
+@Svc(tags = "svc", summary = "LoginTestSvc", description = "Test login service")
+public class LoginTestSvc extends AbstractService<LoginTestSvcReq, LoginTestSvcRes> {
 
-    @Autowired
-    SessionUtils sessionUtils;
+  @Autowired
+  SessionUtils sessionUtils;
 
-    @Override
-    public SvcNoRes doService(TestReq reqModel, SvcNoRes resModel) {
-        ArrayList<String> keyPrefix = new ArrayList<>();
-        keyPrefix.add("user123456");
-        String jwt = sessionUtils.createSession(keyPrefix, "Login", Duration.ofMinutes(10));
-        svcInfo.getHttpServletResponse().setHeader("session-header", jwt);
-        return resModel;
-    }
+  public LoginTestSvc(SvcInfo svcInfo) {
+    super(svcInfo);
+  }
+
+  @Override
+  public LoginTestSvcRes doService(LoginTestSvcReq request) {
+    String sessionId = UUID.randomUUID().toString();
+    RedisKey redisKey = RedisKey.builder().addParam(sessionId).build();
+    String sessionToken = sessionUtils.createSessionToken(redisKey,
+        svcSessionEntity(request, redisKey));
+    LoginTestSvcRes loginTestSvcRes = new LoginTestSvcRes();
+    loginTestSvcRes.setAccount(request.getAccount());
+    loginTestSvcRes.setToken(sessionToken);
+    return loginTestSvcRes;
+  }
+
+  private SvcSessionEntity svcSessionEntity(LoginTestSvcReq request, RedisKey redisKey) {
+    SvcSessionEntity svcSessionEntity = new SvcSessionEntity(redisKey, 600, "login",
+        request.getAccount());
+    HashMap<String, Object> sessionValue = new HashMap<>();
+    sessionValue.put("account", request.getAccount());
+    sessionValue.put("text", request.getText());
+    svcSessionEntity.setSessionValue(sessionValue);
+    svcSessionEntity.setAuthorities(List.of("CheckLoginSvc"));
+    return svcSessionEntity;
+  }
 
 }
 ```
 
-### Authentication Session
+完成後發送請求。
 
-`@Session` 會去驗證`jwt token`是否正確及有效時間
+```text
+URL : http://localhost:8080/svc/LoginTestSvc
+Method : POST
+```
+request body :
+
+```json
+{
+    "account": "mingle",
+    "text": "Hello"
+}
+```
+
+response body :
+
+```json
+{
+    "code": "0000",
+    "msg": "successful",
+    "body": {
+        "token": "IoeigcojRGo9ug6pr/vrWyBK0uWr5N9MV8McCLdzR9iQc0rnkKwsgKfJkSlaBQTL0KXJLy/xfFtCLPWd49XMhGckKZs3jdSp+iKrpztm7Qu7SKcM31KhxOhcaJCfwkHMVtw=",
+        "account": "mingle"
+    }
+}
+```
+
+**建立驗證登入Service**
+
+加入`@SvcSession`讓`service`啟用驗證授權功能。
 
 ```java
-@Session("Login")
-@Svc(desc = "test valid session")
-public class Test1 extends AbstractSvcLogic<SvcNoReq, SvcNoRes> {
+@SvcSession(types = "login", authority = true)
+@Svc(tags = "svc", summary = "CheckLoginSvc", description = "Test check login service")
+public class CheckLoginSvc extends AbstractService<SvcRequest, CheckLoginSvcRes> {
 
-    @Autowired
-    SessionUtils sessionUtils;
+  @Autowired
+  SessionUtils sessionUtils;
 
-    @Override
-    public SvcNoRes doService(SvcNoReq reqModel, SvcNoRes resModel) {
-        sessionUtils.setSessionValue("test1", "1"); // add new data
-        return resModel;
-    }
+  public CheckLoginSvc(SvcInfo svcInfo) {
+    super(svcInfo);
+  }
+
+  @Override
+  public CheckLoginSvcRes doService(SvcRequest request) {
+    Map<String, Object> sessionValue = sessionUtils.getCurrentSession().getSessionValue();
+    CheckLoginSvcRes checkLoginSvcRes = new CheckLoginSvcRes();
+    checkLoginSvcRes.setAccount((String) sessionValue.get("account"));
+    checkLoginSvcRes.setText((String) sessionValue.get("text"));
+    return checkLoginSvcRes;
+  }
 
 }
 ```
 
-透過 `SessionUtils` 取得及儲存`session value`
+完成後登入回覆的`token`帶入`header`並發送請求，。
 
-### Authority Session
+```text
+URL : http://localhost:8080/svc/CheckLoginSvc
+Method : POST
+Header :
+    token : IoeigcojRGo9ug6pr/vrWyBK0uWr5N9MV8McCLdzR9iQc0rnkKwsgKfJkSlaBQTL0KXJLy/xfFtCLPWd49XMhGckKZs3jdSp+iKrpztm7Qu7SKcM31KhxOhcaJCfwkHMVtw=
+```
+request body :
 
-設置`authority` 為`ture`後，代表`session`必須要有`Test1`的`authority`，則可以呼叫此`Svc`
-
-```java
-@Session(value = "Login", authority = ture)
-@Svc(desc = "test valid session")
-public class Test1 extends AbstractSvcLogic<SvcNoReq, SvcNoRes> {
-
-    @Autowired
-    SessionUtils sessionUtils;
-
-    @Override
-    public SvcNoRes doService(SvcNoReq reqModel, SvcNoRes resModel) {
-        Optional<String> userNameOptional = sessionUtils.getSessionValue("userName"); // get session value
-        sessionUtils.setSessionValue("UserName1","Mingle1"); // add session value
-        return resModel;
-    }
-
+```json
+{
+    "account": "mingle",
+    "text": "Hello"
 }
 ```
 
-建立`authority`並且加入`Test1`
+response body :
 
-```java
-@Svc(desc = "test create session with authority")
-public class Test extends AbstractSvcLogic<TestReq, SvcNoRes> {
-
-    @Autowired
-    SessionUtils sessionUtils;
-
-    @Override
-    public SvcNoRes doService(TestReq reqModel, SvcNoRes resModel) {
-        ArrayList<String> keyParams = new ArrayList<>();
-        keyParams.add("user account"); // user id
-        ArrayList<String> authorities = new ArrayList<>();
-        authorities.add("Test1"); // security authority
-        Map<String, Object> sessionValue = new HashMap<>();
-        sessionValue.put("UserName", "Mingle"); // set session value
-        String token = sessionUtils.createSession(keyParams, "Login", Duration.ofMinutes(10), sessionValue, authorities);
-        svcInfo.getHttpServletResponse().setHeader("session-header", token);
-        return resModel;
+```json
+{
+    "code": "0000",
+    "msg": "successful",
+    "body": {
+        "account": "mingle",
+        "text": "Hello"
     }
-
 }
 ```
 
-## Handler
+## 主要組件
 
-* JwtKeyHandler - 產生`jwt`加密方法
+### @SvcSession
+提供`service`驗證授權功能。
+- types - 驗證種類。
+- authority - 是否啟用授權。
 
-#### JwtKeyHandler
+### SessionUtils
+提供管理`session`的工具。
 
-當`serverProperties`啟動，預設將會產生一組新的`aes-256 key`，如要更改請覆蓋此`handler`
+### SvcSessionEntity
+`session`物件，儲存相關資料。
+- type - 驗證種類。
+- id - 帳號。
+- authorities - 授權列表，加入`serivce`名稱。
+- sessionValue - `session`暫存資料。
 
-## Provide Svc
+## 配置屬性
 
-- RefreshSession - 刷新`session`存活時間
+下面列出了主要配置屬性及其描述。
 
-## Exception
+| 屬性                                | 預設值         | 描述                                    |
+|-------------------------------------|----------------|-----------------------------------------|
+| `mingle.svc.session.header`          | `token`         |  session header key                  |
 
-Svc scope，請參考[mingle-core](#mingle-core) 實作Exception Handler
 
-- `JwtDecryptionFailException`
-
-- `JwtHeaderMissingException`
-
-- `SessionAccessDeniedException`
-
-- `SessionInfoDeserializeFailException`
-
-- `SessionKickException`
-
-- `SessionNotFoundException`
-
-- `SessionTypeIncorrectException`
-
-## Properties
-
-please watch .A.5. Data Properties `spring.redis` properties
-
-https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#appendix.application-properties.data  

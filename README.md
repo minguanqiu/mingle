@@ -1,65 +1,42 @@
-# Mingle
 
-In a project, architecture is very important, especially when multiple people develop.
+# mingle
+`mingle`是一個與`spring boot`框架搭配而成的應用架構，幫助您快速建置專案，專注在業務邏輯開發。
 
-**Mingle** is a java web architecture, based on spring boot framework, helps build a architecture on
-your project
+## 主要目標
+- 節省開發時間
+- 專注業務邏輯
+- 統一的開發、維護流程
 
-primary goals:
+## 為什麼需要
+雖然`spring boot`框架非常強大，但還是需要基礎架構才能完全發揮，`mingle`架構幫助您省去設計、開發時間成本，達到開箱即用。
 
-* Simple and easy to use and configuration
-* Unified development and maintenance process
-* Spring boot powerful feature to use
+## 必要條件
+- java 17 +
+- [spring boot 3](https://spring.io/projects/spring-boot#overview)
+- [jackson](https://github.com/FasterXML/jackson)
 
-#### Requirements
-
-mingle works on spring boot 3 and java 17+
-
-#### Concept
-
-In mingle, there are two very important roles, Service and Action, follow introduce below:
-
-##### Service
-
-Alias svc, is a API. Your business logic and process place, provide for receiving and responding to
-client messages
-
+## 概念
+`mingle`中重要的角色，以下介紹：
+### service
+別名svc，一個API接口，同時也負責處理商業邏輯，提供接收和回應客戶端訊息。
 ![service](docs/images/service.jpg)
+### action
+模組或組件。商業邏輯都可以實作成為`action`，提供`service`邏輯的一部份。
 
-##### Action
+可以將`action` 想成多塊獨立拼圖，`service` 則是拼圖組合出來的成品。
 
-Is a module or component. Everyone logic can be a Action, provide for Service logic and reuse
-
-![service](docs/images/action.jpg)
-
-## Modules
-
-There are several modules in Mingle. Here is a quick overview:
-
+![action](docs/images/action.jpg)
+## 模組
+可以針對需求選擇需要哪些模組，以下簡單介紹：
 ### mingle-core
-
-Core of mingle module. Is a Service role, based on spring boot web feature.
-
+基於`spring web`功能的核心模組，負責接收及回應客戶端訊息。
 ### mingle-svc-action
-
-Is a Action role, provide request and response design, unfied Action logic development and
-maintenance process
-
+提供組成`service`邏輯相關模組功能。
 ### mingle-svc-action-rest
-
-Action implements for restful client feature
-
+`action`的實現之一，提供`RESTful`客戶端的功能。
 ### mingle-svc-session
-
-Provide session authentication and authority feature on service, based on spring security
-
+基於`spring security`，提供`service`的驗證、授權功能。
 ### mingle-svc-data
-
-Provide dao layout, based on spring data jpa
-
+基於`spring data jpa`，提供`DAO`架構。
 ### mingle-svc-redis
-
-Provide redis layout, based on spring data redis
-
-
-
+基於`spring data redis`，提供`redis`架構。
