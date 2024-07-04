@@ -7,8 +7,14 @@ package io.github.minguanqiu.mingle.svc.exception;
  */
 public class SvcRequestDeserializeFailException extends RuntimeException {
 
+  /**
+   * Exception message constant.
+   */
   public static final String MSG = "Request deserialize fail";
 
+  /**
+   * Create a new SvcRequestDeserializeFailException instance.
+   */
   public SvcRequestDeserializeFailException() {
     super(MSG);
   }

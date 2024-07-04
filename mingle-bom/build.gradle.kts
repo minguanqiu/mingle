@@ -10,7 +10,7 @@ dependencies {
     api(platform(libs.springBootDependencies))
     constraints {
         project.rootProject.subprojects.forEach { subproject ->
-            if(subproject != project) {
+            if (subproject != project) {
                 api(subproject)
             }
         }

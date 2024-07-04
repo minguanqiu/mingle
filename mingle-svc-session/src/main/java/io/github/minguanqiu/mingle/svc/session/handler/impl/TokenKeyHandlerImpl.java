@@ -6,7 +6,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
 /**
- * {@inheritDoc} Default impl for {@link TokenKeyHandler}
+ * Default implementations for {@link TokenKeyHandler}.
  *
  * @author Qiu Guan Ming
  */
@@ -14,6 +14,9 @@ public class TokenKeyHandlerImpl implements TokenKeyHandler {
 
   private final SecretKey key;
 
+  /**
+   * Create a new TokenKeyHandlerImpl instance.
+   */
   public TokenKeyHandlerImpl() {
     KeyGenerator keyGenerator;
     try {

@@ -22,18 +22,33 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ActionRestConfiguration {
 
+  /**
+   * Create a new RestActionProperties instance.
+   *
+   * @return return rest action properties instance.
+   */
   @Bean
   @ConfigurationProperties("mingle.svc.action")
   public RestActionProperties restActionProperties() {
     return new RestActionProperties();
   }
 
+  /**
+   * Create a new RestClientHandler instance.
+   *
+   * @return return rest client handler instance.
+   */
   @Bean
   @ConditionalOnMissingBean
   public RestClientHandler restClientHandler() {
     return new RestClientDefaultHandler();
   }
 
+  /**
+   * Create a new JacksonUtils instance.
+   *
+   * @return return jackson utils instance.
+   */
   @Bean
   @ConditionalOnMissingBean(name = "restActionJacksonUtils")
   public JacksonUtils restActionJacksonUtils() {

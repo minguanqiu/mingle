@@ -6,6 +6,8 @@ import io.github.minguanqiu.mingle.svc.handler.model.SvcFeature;
 import java.util.Map;
 
 /**
+ * Default implement for {@link SvcFeatureHandler}.
+ *
  * @author Qiu Guan Ming
  */
 public class SvcFeatureHandlerDefaultImpl implements SvcFeatureHandler {

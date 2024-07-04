@@ -13,8 +13,26 @@ import lombok.Setter;
 @Setter
 public class AllExceptionModel extends SvcResponseBody {
 
+  /**
+   * Exception name.
+   *
+   * @param exception the exception name.
+   * @return return the exception name.
+   */
   private String exception;
+  /**
+   * Cause exception name.
+   *
+   * @param causeException the cause exception name.
+   * @return return the cause exception name.
+   */
   private String causeException;
+  /**
+   * Exception message.
+   *
+   * @param msg the exception message.
+   * @return return the exception message.
+   */
   private String msg;
 
 }

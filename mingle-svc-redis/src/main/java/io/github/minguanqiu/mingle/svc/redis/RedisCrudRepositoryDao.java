@@ -4,13 +4,20 @@ import java.util.Optional;
 import org.springframework.data.repository.CrudRepository;
 
 /**
- * A {@link CrudRepository} impl provide crud base method
+ * A {@link CrudRepository} implementations provide CRUD base method.
  *
+ * @param <R> the spring repository.
+ * @param <T> the redis entity.
  * @author Qiu Guan Ming
  */
 public class RedisCrudRepositoryDao<R extends CrudRepository<T, RedisKey>, T extends RedisEntity> extends
     RedisRepositoryDao<R> {
 
+  /**
+   * Create a new RedisCrudRepositoryDao instance.
+   *
+   * @param repository the spring repository.
+   */
   public RedisCrudRepositoryDao(R repository) {
     super(repository);
   }

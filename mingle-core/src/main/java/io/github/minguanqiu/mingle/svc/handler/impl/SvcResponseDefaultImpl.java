@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.github.minguanqiu.mingle.svc.handler.SvcResponseHandler;
 
 /**
- * {@inheritDoc} Default impl for {@link SvcResponseHandler}
+ * Default implement for {@link SvcResponseHandler}.
  *
  * @author Qiu Guan Ming
  */

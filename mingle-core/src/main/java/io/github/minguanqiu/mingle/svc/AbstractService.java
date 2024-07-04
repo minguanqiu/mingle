@@ -7,22 +7,40 @@ import io.github.minguanqiu.mingle.svc.filter.SvcInfo;
 import lombok.Getter;
 
 /**
- * This class provide service register must extend and add {@link Svc} on target class
+ * This class provide service register must extend and add {@link Svc} on target class.
  *
  * @author Qiu Guan Ming
  */
 public abstract non-sealed class AbstractService<R1 extends SvcRequest, R2 extends SvcResponseBody>
     implements Service<R1, R2> {
 
+  /**
+   * Service information.
+   */
   protected final SvcInfo svcInfo;
 
+  /**
+   * Service request class.
+   *
+   * @return return the service request class.
+   */
   @Getter
   protected final Class<R1> reqClass;
 
+  /**
+   * Service response class.
+   *
+   * @return return the service response class.
+   */
   @Getter
   protected final Class<R2> resClass;
 
 
+  /**
+   * Create a new service instance.
+   *
+   * @param svcInfo the service information.
+   */
   @SuppressWarnings("unchecked")
   public AbstractService(SvcInfo svcInfo) {
     this.svcInfo = svcInfo;
@@ -35,8 +53,8 @@ public abstract non-sealed class AbstractService<R1 extends SvcRequest, R2 exten
   /**
    * Interrupt service logic.
    *
-   * @param svcResponseHeader service response header.
-   * @throws BreakSvcProcessException will throw.
+   * @param svcResponseHeader the service response header.
+   * @throws BreakSvcProcessException when call this method.
    **/
   protected void throwLogic(SvcResponseHeader svcResponseHeader) throws BreakSvcProcessException {
     throwLogic(svcResponseHeader, null);
@@ -45,9 +63,9 @@ public abstract non-sealed class AbstractService<R1 extends SvcRequest, R2 exten
   /**
    * Interrupt service logic.
    *
-   * @param svcResponseHeader service response header
-   * @param svcResponse       service response
-   * @throws BreakSvcProcessException will throw
+   * @param svcResponseHeader the service response header.
+   * @param svcResponse       the service response.
+   * @throws BreakSvcProcessException when call this method.
    **/
   protected void throwLogic(SvcResponseHeader svcResponseHeader, R2 svcResponse)
       throws BreakSvcProcessException {
@@ -57,7 +75,8 @@ public abstract non-sealed class AbstractService<R1 extends SvcRequest, R2 exten
   /**
    * Return service logic.
    *
-   * @param svcResponseHeader service response header
+   * @param svcResponseHeader the service response header.
+   * @return return the service response body.
    **/
   protected R2 returnLogic(SvcResponseHeader svcResponseHeader) {
     return returnLogic(svcResponseHeader, null);
@@ -66,8 +85,9 @@ public abstract non-sealed class AbstractService<R1 extends SvcRequest, R2 exten
   /**
    * Return service logic.
    *
-   * @param svcResponseHeader service response header
-   * @param svcResponse       service response
+   * @param svcResponseHeader the service response header.
+   * @param svcResponse       the service response.
+   * @return return the service response body.
    **/
   protected R2 returnLogic(SvcResponseHeader svcResponseHeader, R2 svcResponse) {
     svcInfo.setSvcResponseHeader(svcResponseHeader);

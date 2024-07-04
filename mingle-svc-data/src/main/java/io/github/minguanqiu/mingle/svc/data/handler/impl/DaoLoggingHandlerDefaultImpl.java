@@ -14,7 +14,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 
 /**
- * {@link DaoLoggingHandler} impl
+ * Default implementations for {@link DaoLoggingHandler}.
  *
  * @author Qiu Guan Ming
  */
@@ -24,6 +24,11 @@ public class DaoLoggingHandlerDefaultImpl implements DaoLoggingHandler {
 
   private final JacksonUtils jacksonUtils;
 
+  /**
+   * Create a new DaoLoggingHandlerDefaultImpl instance.
+   *
+   * @param jacksonUtils the jackson utils.
+   */
   public DaoLoggingHandlerDefaultImpl(JacksonUtils jacksonUtils) {
     this.jacksonUtils = jacksonUtils;
   }
@@ -35,7 +40,8 @@ public class DaoLoggingHandlerDefaultImpl implements DaoLoggingHandler {
     objectNode.put("svcSerialNum", svcSerialNum);
     objectNode.put("actSerialNum", actSerialNum);
     objectNode.put("name",
-        joinPoint.getTarget().getClass().getSimpleName() + "." +joinPoint.getSignature().getName());
+        joinPoint.getTarget().getClass().getSimpleName() + "." + joinPoint.getSignature()
+            .getName());
     objectNode.put("startTime", DateUtils.dateTimeFormat(startTime, "yyyy/MM/dd HH:mm:ss").get());
     objectNode.set("reqBody", jacksonUtils.readTree(buildParameter(joinPoint)).orElse(null));
     objectNode.put("type", "dao");
@@ -62,7 +68,9 @@ public class DaoLoggingHandlerDefaultImpl implements DaoLoggingHandler {
     LocalDateTime endTime = LocalDateTime.now();
     objectNode.put("svcSerialNum", svcSerialNum);
     objectNode.put("actSerialNum", actSerialNum);
-    objectNode.put("name", joinPoint.getTarget().getClass().getSimpleName() + "." +joinPoint.getSignature().getName());
+    objectNode.put("name",
+        joinPoint.getTarget().getClass().getSimpleName() + "." + joinPoint.getSignature()
+            .getName());
     objectNode.put("startTime", DateUtils.dateTimeFormat(startTime, "yyyy/MM/dd HH:mm:ss").get());
     objectNode.put("endTime", DateUtils.dateTimeFormat(endTime, "yyyy/MM/dd HH:mm:ss").get());
     objectNode.put("exception", throwable.toString());

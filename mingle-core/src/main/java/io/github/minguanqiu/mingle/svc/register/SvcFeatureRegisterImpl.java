@@ -7,6 +7,8 @@ import io.github.minguanqiu.mingle.svc.handler.model.SvcFeature;
 import java.util.Map;
 
 /**
+ * Implement for {@link SvcFeatureRegister}.
+ *
  * @author Qiu Guan Ming
  */
 public class SvcFeatureRegisterImpl implements SvcFeatureRegister<SvcFeature> {
@@ -15,22 +17,34 @@ public class SvcFeatureRegisterImpl implements SvcFeatureRegister<SvcFeature> {
 
   private final SvcFeatureHandler svcFeatureHandler;
 
+  /**
+   * Create a new SvcFeatureRegisterImpl instance.
+   *
+   * @param svcProperties     the service properties.
+   * @param svcFeatureHandler the service feature handler.
+   */
   public SvcFeatureRegisterImpl(SvcProperties svcProperties, SvcFeatureHandler svcFeatureHandler) {
     this.svcProperties = svcProperties;
     this.svcFeatureHandler = svcFeatureHandler;
   }
 
   @Override
-  public boolean support(SvcRegister.SvcDefinition svcDefinition) {
+  public boolean support(SvcDefinition svcDefinition) {
     return true;
   }
 
   @Override
-  public SvcFeature registerFeature(SvcRegister.SvcDefinition svcDefinition) {
+  public SvcFeature registerFeature(SvcDefinition svcDefinition) {
     return buildFeature(svcDefinition);
   }
 
-  private SvcFeature buildFeature(SvcRegister.SvcDefinition svcDefinition) {
+  /**
+   * Build service feature. The priority is properties < annotation < handler.
+   *
+   * @param svcDefinition the service definition.
+   * @return return the service feature.
+   */
+  private SvcFeature buildFeature(SvcDefinition svcDefinition) {
     boolean logging = svcProperties.getFeature().isLogging();
     boolean bodyProcess = svcProperties.getFeature().isBodyProcess();
     String[] ipSecure = svcProperties.getFeature().getIpSecure();

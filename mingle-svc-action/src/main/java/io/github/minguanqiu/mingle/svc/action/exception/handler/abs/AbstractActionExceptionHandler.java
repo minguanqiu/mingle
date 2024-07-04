@@ -5,15 +5,23 @@ import io.github.minguanqiu.mingle.svc.action.exception.handler.model.ActionExce
 import lombok.Getter;
 
 /**
- * Base class for action exception handler
+ * Base class for action exception handler.
  *
  * @author Qiu Guan Ming
  */
 @Getter
 public abstract class AbstractActionExceptionHandler<E extends Exception> {
 
+  /**
+   * Exception class
+   *
+   * @return return the exception class.
+   */
   private final Class<E> exceptionClass;
 
+  /**
+   * Create a new AbstractActionExceptionHandler implement instance.
+   */
   @SuppressWarnings("unchecked")
   public AbstractActionExceptionHandler() {
     exceptionClass = (Class<E>) new TypeToken<E>(getClass()) {
@@ -21,9 +29,11 @@ public abstract class AbstractActionExceptionHandler<E extends Exception> {
   }
 
   /**
-   * Handle exception logic
+   * Handle exception logic.
    *
-   * @param ex Exception
+   * @param ex                   the exception.
+   * @param actionExceptionModel the action exception model.
+   * @return return the action exception model.
    */
   public abstract ActionExceptionModel handle(E ex, ActionExceptionModel actionExceptionModel);
 

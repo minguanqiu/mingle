@@ -9,7 +9,7 @@ import java.time.temporal.ChronoUnit;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@inheritDoc} Default impl for {@link SvcLoggingHandler}
+ * Default implement for {@link SvcLoggingHandler}.
  *
  * @author Qiu Guan Ming
  */
@@ -18,6 +18,11 @@ public class SvcLoggingHandlerDefaultImpl implements SvcLoggingHandler {
 
   private final JacksonUtils jacksonUtils;
 
+  /**
+   * Create a new SvcLoggingHandlerDefaultImpl instance.
+   *
+   * @param jacksonUtils the jackson utils.
+   */
   public SvcLoggingHandlerDefaultImpl(JacksonUtils jacksonUtils) {
     this.jacksonUtils = jacksonUtils;
   }

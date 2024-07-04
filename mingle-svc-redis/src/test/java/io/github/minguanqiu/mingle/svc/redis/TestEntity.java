@@ -9,7 +9,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class TestEntity implements Serializable{
+public class TestEntity implements Serializable {
 
 
   public String text = "Hello";

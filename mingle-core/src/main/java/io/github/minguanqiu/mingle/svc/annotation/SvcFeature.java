@@ -7,18 +7,18 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation provides the setting service function.
- * It allows enabling or disabling specific features of the service such as logging,
- * request body processing, and IP security.
+ * This annotation provides the setting service function. It allows enabling or disabling specific
+ * features of the service such as logging, request body processing, and IP security.
  * <pre>
  * {@code
  * @example
  * @SvcFeature(logging = true, body_process = true, ip_secure = {"192.168.1.1"})
  * public class MyService extends AbstractService {
- *     // Service implementation
+ *     // Service implementations
  * }
  * }
- *</pre>
+ * </pre>
+ *
  * @author Qiu Guan Ming
  * @see AbstractService
  */
@@ -41,8 +41,7 @@ public @interface SvcFeature {
   boolean body_process() default false;
 
   /**
-   * If set, will enable the IP secure feature.
-   * Specifies the IP addresses that are allowed access.
+   * If set, will enable the IP secure feature. Specifies the IP addresses that are allowed access.
    *
    * @return an array of IP addresses for the IP secure feature
    **/

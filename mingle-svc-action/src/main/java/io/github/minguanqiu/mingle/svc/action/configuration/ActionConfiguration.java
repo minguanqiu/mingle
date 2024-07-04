@@ -22,13 +22,18 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 /**
- * Configuration for action
+ * Configuration for all action bean.
  *
  * @author Qiu Guan Ming
  */
 @Configuration
 public class ActionConfiguration {
 
+  /**
+   * Create new a ActionProperties instance.
+   *
+   * @return return a ActionProperties instance.
+   */
   @Bean
   @Primary
   @ConfigurationProperties("mingle.svc.action")
@@ -36,6 +41,11 @@ public class ActionConfiguration {
     return new ActionProperties();
   }
 
+  /**
+   * Create new a JacksonUtils instance.
+   *
+   * @return return a JacksonUtils instance.
+   */
   @Bean("actionLogJacksonUtils")
   @ConditionalOnMissingBean(name = "actionLogJacksonUtils")
   public JacksonUtils actionLogJacksonUtils() {
@@ -47,24 +57,47 @@ public class ActionConfiguration {
     return new JacksonUtils(objectMapper);
   }
 
+  /**
+   * Create new a ActionLoggingHandler instance.
+   *
+   * @return return a ActionLoggingHandler instance.
+   */
   @Bean
   @ConditionalOnMissingBean
   public ActionLoggingHandler actionLoggingHandler() {
     return new ActionLoggingDefaultHandlerImpl(actionLogJacksonUtils());
   }
 
+  /**
+   * Create new a ActionExceptionHandlerResolver instance.
+   *
+   * @param abstractExceptionHandlers the list of action exception handlers.
+   * @return return a ActionExceptionHandlerResolver instance.
+   */
   @Bean
   public ActionExceptionHandlerResolver actionExceptionHandlerResolver(
       List<AbstractActionExceptionHandler<?>> abstractExceptionHandlers) {
     return new ActionExceptionHandlerResolver(abstractExceptionHandlers);
   }
 
+  /**
+   * Create new a ActionAutoBreakExceptionHandler instance.
+   *
+   * @param svcInfo            the service information.
+   * @param codeMessageHandler the code message handler.
+   * @return return a ActionAutoBreakExceptionHandler instance.
+   */
   @Bean
   public ActionAutoBreakExceptionHandler actionAutoBreakExceptionHandler(SvcInfo svcInfo,
       CodeMessageHandler codeMessageHandler) {
     return new ActionAutoBreakExceptionHandler(svcInfo, codeMessageHandler);
   }
 
+  /**
+   * Create new a AllActionExceptionHandler instance.
+   *
+   * @return return a AllActionExceptionHandler instance.
+   */
   @Bean
   public AllActionExceptionHandler allActionExceptionHandler() {
     return new AllActionExceptionHandler();

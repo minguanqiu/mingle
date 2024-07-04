@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * {@inheritDoc} Default impl for {@link CodeMessageHandler}
+ * Default implement for {@link CodeMessageHandler}.
  *
  * @author Qiu Guan Ming
  */
@@ -18,14 +18,16 @@ public class CodeMessageHandlerDefaultImpl implements CodeMessageHandler {
   private final List<CodeMessageListHandler> codeMessageListHandlers;
   private final Map<String, Map<String, String>> msgMap = new HashMap<>();
 
+  /**
+   * Create a new CodeMessageHandlerDefaultImpl instance.
+   *
+   * @param codeMessageListHandlers the code message list handlers.
+   */
   public CodeMessageHandlerDefaultImpl(List<CodeMessageListHandler> codeMessageListHandlers) {
     this.codeMessageListHandlers = codeMessageListHandlers;
     init();
   }
 
-  /**
-   * Get map mapping message
-   */
   @Override
   public Optional<String> getMsg(String type, String code) {
     if (msgMap.containsKey(type)) {
@@ -36,6 +38,11 @@ public class CodeMessageHandlerDefaultImpl implements CodeMessageHandler {
     return Optional.empty();
   }
 
+  /**
+   * Build message from message handlers.
+   *
+   * @param handlers the code message list handlers.
+   */
   private void buildMsg(List<CodeMessageListHandler> handlers) {
     handlers.forEach(handler -> handler.getMsgList()
         .forEach(node -> msgMap
@@ -43,6 +50,9 @@ public class CodeMessageHandlerDefaultImpl implements CodeMessageHandler {
             .put(node.code(), node.msg())));
   }
 
+  /**
+   * Initialized when the object is created
+   */
   public void init() {
     buildMsg(codeMessageListHandlers);
   }

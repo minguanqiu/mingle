@@ -5,6 +5,9 @@ package io.github.minguanqiu.mingle.svc.concurrent;
  */
 public class SvcAttributeName {
 
+  /**
+   * Service serial number constant.
+   */
   public static final String SVC_SERIAL_NUMBER = "SVC_SERIAL_NUMBER";
 
 }

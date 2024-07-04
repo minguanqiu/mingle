@@ -10,7 +10,7 @@ import io.github.minguanqiu.mingle.svc.handler.CodeMessageHandler;
 import org.springframework.http.ResponseEntity;
 
 /**
- * Default handler will catch {@link ActionAutoBreakException}
+ * Default handler will catch {@link ActionAutoBreakException}.
  *
  * @author Qiu Guan Ming
  */
@@ -20,6 +20,12 @@ public class ActionAutoBreakExceptionHandler extends
 
   private final CodeMessageHandler codeMessageHandler;
 
+  /**
+   * Create a new ActionAutoBreakExceptionHandler instance.
+   *
+   * @param svcInfo            the service information.
+   * @param codeMessageHandler the code message handler.
+   */
   public ActionAutoBreakExceptionHandler(SvcInfo svcInfo, CodeMessageHandler codeMessageHandler) {
     super(svcInfo);
     this.codeMessageHandler = codeMessageHandler;
@@ -29,7 +35,7 @@ public class ActionAutoBreakExceptionHandler extends
   public ResponseEntity<SvcResponseBody> handle(ActionAutoBreakException e) {
     ActionResponse<?> actionResponse = e.getActionResponse();
     String msg = e.getActionResponse().getMsg();
-    if(msg == null) {
+    if (msg == null) {
       msg = codeMessageHandler.getMsg(actionResponse.getMsgType(), actionResponse.getCode())
           .orElse(null);
     }

@@ -4,7 +4,7 @@ import java.util.Optional;
 import org.springframework.data.repository.CrudRepository;
 
 /**
- * A {@link CrudRepository} impl provide crud base method
+ * A {@link CrudRepository} impl provide crud base method.
  *
  * @author Qiu Guan Ming
  */

@@ -16,7 +16,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 
 /**
- * {@link Aspect} for dao logging for {@link JPARepositoryDao} all method
+ * {@link Aspect} for dao logging pointcut {@link JPARepositoryDao} all method.
  *
  * @author Qiu Guan Ming
  */
@@ -29,6 +29,12 @@ public class DaoLogAspect {
   private final DaoLoggingHandler daoLoggingHandler;
   private final SerialNumberGeneratorHandler serialNumberGeneratorHandler;
 
+  /**
+   * Create a new DaoLogAspect instance.
+   *
+   * @param daoLoggingHandler            the dao logging handler.
+   * @param serialNumberGeneratorHandler the serial number generator handler.
+   */
   public DaoLogAspect(DaoLoggingHandler daoLoggingHandler,
       SerialNumberGeneratorHandler serialNumberGeneratorHandler) {
     this.daoLoggingHandler = daoLoggingHandler;
@@ -50,7 +56,8 @@ public class DaoLogAspect {
       return joinPoint.proceed();
     }
     Attribute attribute = svcAttributeOptional.get();
-    String svcSerialNum = (String) attribute.getAttributes(SvcAttributeName.SVC_SERIAL_NUMBER).get();
+    String svcSerialNum = (String) attribute.getAttributes(SvcAttributeName.SVC_SERIAL_NUMBER)
+        .get();
     String actSerialNum = serialNumberGeneratorHandler.generate("dao");
     LocalDateTime startTime = DateUtils.getNowLocalDateTime();
     try {

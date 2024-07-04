@@ -18,9 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -32,22 +30,41 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 /**
- * Register service and check rules
+ * Register and check rules for service.
  *
  * @author Qiu Guan Ming
  */
 @Slf4j
 public class SvcRegister {
 
+  /**
+   * Service properties.
+   *
+   * @return return the service properties.
+   */
   @Getter
   private final SvcProperties svcProperties;
   private final List<Service<?, ?>> services;
   private final RequestMappingHandlerMapping requestMappingHandlerMapping;
   private final SvcPathHandler svcPathHandler;
   private final List<SvcFeatureRegister<?>> svcFeatureRegisters;
+  /**
+   * Service definition map.
+   *
+   * @return return the service definition map.
+   */
   @Getter
   private Map<String, SvcDefinition> svcDefinitionMap = new HashMap<>();
 
+  /**
+   * Create a new SvcRegister instance.
+   *
+   * @param svcProperties                the service properties.
+   * @param services                     the list of services.
+   * @param requestMappingHandlerMapping the request mapping handler.
+   * @param svcPathHandler               the path handler.
+   * @param svcFeatureRegisters          the service feature registers.
+   */
   public SvcRegister(SvcProperties svcProperties, List<Service<?, ?>> services,
       RequestMappingHandlerMapping requestMappingHandlerMapping, SvcPathHandler svcPathHandler,
       List<SvcFeatureRegister<?>> svcFeatureRegisters) {
@@ -59,14 +76,32 @@ public class SvcRegister {
     init();
   }
 
+  /**
+   * Get service definition from map.
+   *
+   * @param request the http servlet request.
+   * @return return the optional service definition.
+   */
   public Optional<SvcDefinition> getSvcDefinition(HttpServletRequest request) {
     return getSvcDefinition(request.getServletPath());
   }
 
+  /**
+   * Get service definition from map.
+   *
+   * @param path the request path.
+   * @return return the optional service definition.
+   */
   public Optional<SvcDefinition> getSvcDefinition(String path) {
     return Optional.ofNullable(svcDefinitionMap.get(path));
   }
 
+  /**
+   * Get service path and filter.
+   *
+   * @param predicate the predicate lambda func.
+   * @return return array of paths.
+   */
   public String[] getSvcPath(Predicate<SvcDefinition> predicate) {
     ArrayList<String> strings = new ArrayList<>();
     svcDefinitionMap.forEach((k, v) -> {
@@ -77,6 +112,12 @@ public class SvcRegister {
     return strings.toArray(new String[0]);
   }
 
+  /**
+   * Get service definition and filter.
+   *
+   * @param predicate the predicate lambda func.
+   * @return return list of service definitions.
+   */
   public ArrayList<SvcDefinition> getSvcDefinition(Predicate<SvcDefinition> predicate) {
     ArrayList<SvcDefinition> svcDefinitions = new ArrayList<>();
     svcDefinitionMap.forEach((k, v) -> {
@@ -87,6 +128,9 @@ public class SvcRegister {
     return svcDefinitions;
   }
 
+  /**
+   * Register service logic.
+   */
   private void register() {
     HashMap<String, ArrayList<String>> svcMissingMap = new HashMap<>();
     services.forEach(service -> {
@@ -126,6 +170,9 @@ public class SvcRegister {
     });
   }
 
+  /**
+   * Build service method and check rule.
+   */
   private void buildServiceMethod(SvcDefinition svcDefinition, ArrayList<String> svcErrorMsgList) {
     Class<?> serviceClass = svcDefinition.getSvcClass();
     List<Method> methods = Arrays.stream(serviceClass.getDeclaredMethods())
@@ -154,6 +201,11 @@ public class SvcRegister {
     svcDefinition.setSvcMethod(doService);
   }
 
+  /**
+   * Register service for controller mapping.
+   *
+   * @param v the service definition.
+   */
   private void registerServiceForMapping(SvcDefinition v) {
     requestMappingHandlerMapping
         .registerMapping(RequestMappingInfo.paths(v.getSvcPath())
@@ -164,6 +216,11 @@ public class SvcRegister {
             v.getService(), v.getSvcMethod());
   }
 
+  /**
+   * Register service feature.
+   *
+   * @param svcDefinition the service definition.
+   */
   private void registerFeature(SvcDefinition svcDefinition) {
     svcFeatureRegisters.forEach(svcFeatureRegister -> {
       if (svcFeatureRegister.support(svcDefinition)) {
@@ -173,44 +230,13 @@ public class SvcRegister {
     });
   }
 
+  /**
+   * Initialized when the object is created
+   */
   private void init() {
     register();
     log.info("Servlet Path : {}", Arrays.toString(getSvcPath((svcBinderModel -> true))));
     log.info("{} init", this.getClass().getSimpleName());
-  }
-
-  @Getter
-  @Setter(AccessLevel.PACKAGE)
-  public static class SvcDefinition {
-
-    private String svcName;
-
-    private String svcPath;
-
-    @Getter(AccessLevel.PACKAGE)
-    private Service<?, ?> service;
-
-    private Class<?> svcClass;
-
-    private Class<?> requestClass;
-
-    private Class<?> responseClass;
-
-    @Getter(AccessLevel.PACKAGE)
-    private Method svcMethod;
-
-    private Svc svc;
-
-    @Getter(AccessLevel.PRIVATE)
-    @Setter(AccessLevel.PRIVATE)
-    private Map<Class<?>, Object> features = new HashMap<>();
-
-    @SuppressWarnings("unchecked")
-    public <T> Optional<T> getFeature(Class<T> feature) {
-      return (Optional<T>) Optional.ofNullable(features.get(feature));
-    }
-
-
   }
 
 }

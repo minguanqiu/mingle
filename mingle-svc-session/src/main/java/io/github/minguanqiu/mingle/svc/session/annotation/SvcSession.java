@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Enable service security feature for authentication and authority
+ * Enable service security feature for authentication and authority.
  *
  * @author Qiu Guan Ming
  */
@@ -17,11 +17,15 @@ public @interface SvcSession {
 
   /**
    * Type of session,make sure session independence
+   *
+   * @return return the array of session types.
    **/
   String[] types();
 
   /**
    * Enable authority for service
+   *
+   * @return return the ture or false to determine service enable authority feature.
    **/
   boolean authority() default false;
 

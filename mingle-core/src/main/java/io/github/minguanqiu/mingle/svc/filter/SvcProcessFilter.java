@@ -12,6 +12,7 @@ import io.github.minguanqiu.mingle.svc.exception.handler.resolver.ExceptionHandl
 import io.github.minguanqiu.mingle.svc.handler.CodeMessageHandler;
 import io.github.minguanqiu.mingle.svc.handler.SvcLoggingHandler;
 import io.github.minguanqiu.mingle.svc.handler.SvcResponseHandler;
+import io.github.minguanqiu.mingle.svc.register.SvcDefinition;
 import io.github.minguanqiu.mingle.svc.register.SvcRegister;
 import io.github.minguanqiu.mingle.svc.utils.DateUtils;
 import io.github.minguanqiu.mingle.svc.utils.JacksonUtils;
@@ -44,6 +45,18 @@ public class SvcProcessFilter extends AbstractSvcFilter {
   private final JacksonUtils jacksonUtils;
   private final SvcResUtils svcResUtils;
 
+  /**
+   * Create a new SvcProcessFilter instance.
+   *
+   * @param svcInfo                  the service information.
+   * @param codeMessageHandler       the code message handler.
+   * @param svcProperties            the service properties.
+   * @param svcLoggingHandler        the service logging handler.
+   * @param exceptionHandlerResolver the exception handler resolver.
+   * @param svcRegister              the service register.
+   * @param jacksonUtils             the jackson utils.
+   * @param svcResUtils              the service response utils.
+   */
   public SvcProcessFilter(SvcInfo svcInfo, CodeMessageHandler codeMessageHandler,
       SvcProperties svcProperties, SvcLoggingHandler svcLoggingHandler,
       ExceptionHandlerResolver exceptionHandlerResolver, SvcRegister svcRegister,
@@ -80,19 +93,25 @@ public class SvcProcessFilter extends AbstractSvcFilter {
     }
   }
 
+  /**
+   * Pre-processing request for service.
+   */
   private void start() {
     svcInfo.setStartDateTime(DateUtils.getNowLocalDateTime());
     svcInfo.setSvcResponseHeader(
         SvcResponseHeader.builder(svcProperties.getCode()).msg(svcProperties.getMsg()).build());
-    Optional<SvcRegister.SvcDefinition> optionalSvcBinderModel = svcRegister.getSvcDefinition(
+    Optional<SvcDefinition> optionalSvcBinderModel = svcRegister.getSvcDefinition(
         svcInfo.getHttpServletRequest());
     if (optionalSvcBinderModel.isEmpty()) {
       throw new SvcNotFoundException();
     }
-    SvcRegister.SvcDefinition svcDefinition = optionalSvcBinderModel.get();
+    SvcDefinition svcDefinition = optionalSvcBinderModel.get();
     svcInfo.setSvcDefinition(svcDefinition);
   }
 
+  /**
+   * Post-processing response for service.
+   */
   private void end(ContentCachingResponseWrapper responseWrapper) throws IOException {
     svcInfo.setEndDateTime(DateUtils.getNowLocalDateTime());
     SvcResponseHandler svcResponseHandler = svcResUtils.build(
@@ -103,6 +122,12 @@ public class SvcProcessFilter extends AbstractSvcFilter {
     writeResponse(responseWrapper, jsonNode);
   }
 
+  /**
+   * Process response body.
+   *
+   * @param responseWrapper the response wrapper.
+   * @throws JsonProcessingException when jackson resolve error.
+   */
   private void processResponseBody(ContentCachingResponseWrapper responseWrapper)
       throws JsonProcessingException {
     ObjectMapper objectMapper = jacksonUtils.getObjectMapper();
@@ -113,13 +138,20 @@ public class SvcProcessFilter extends AbstractSvcFilter {
     }
   }
 
+  /**
+   * Process exception to resolver.
+   *
+   * @param e               the exception.
+   * @param responseWrapper the response wrapper.
+   * @throws IOException when jackson resolve error.
+   */
   private void processExceptionBody(Exception e, ContentCachingResponseWrapper responseWrapper)
-      throws IOException {
+      throws JsonProcessingException {
     Exception exception = e;
     if (e instanceof ServletException servletException) {
       exception = (Exception) servletException.getRootCause();
     }
-    ResponseEntity<SvcResponseBody> resolver = exceptionHandlerResolver.resolver(exception);
+    ResponseEntity<SvcResponseBody> resolver = exceptionHandlerResolver.resolve(exception);
     ObjectMapper objectMapper = jacksonUtils.getObjectMapper();
     responseWrapper.setStatus(resolver.getStatusCode().value());
     resolver.getHeaders()
@@ -130,6 +162,13 @@ public class SvcProcessFilter extends AbstractSvcFilter {
     }
   }
 
+  /**
+   * Write data to http servlet response.
+   *
+   * @param responseWrapper the response wrapper.
+   * @param jsonNode        the jackson node.
+   * @throws IOException when http servlet response error.
+   */
   private void writeResponse(ContentCachingResponseWrapper responseWrapper, JsonNode jsonNode)
       throws IOException {
     responseWrapper.resetBuffer();
@@ -139,6 +178,12 @@ public class SvcProcessFilter extends AbstractSvcFilter {
     responseWrapper.copyBodyToResponse();
   }
 
+  /**
+   * Get response message from CodeMessageHandler.
+   *
+   * @param svcResponseHeader the service response header.
+   * @return return the response message.
+   */
   private String getMsg(SvcResponseHeader svcResponseHeader) {
     if (svcResponseHeader.getMsg() == null) {
       return codeMessageHandler.getMsg(svcProperties.getMsgType(), svcResponseHeader.getCode())
@@ -147,6 +192,12 @@ public class SvcProcessFilter extends AbstractSvcFilter {
     return svcResponseHeader.getMsg();
   }
 
+  /**
+   * Check response message need convert.
+   *
+   * @param svcResponseHeader the service response header.
+   * @return return the response message.
+   */
   private String convertMsg(SvcResponseHeader svcResponseHeader) {
     String msg = getMsg(svcResponseHeader);
     if (msg != null && svcResponseHeader.getConvertMap() != null) {

@@ -6,6 +6,8 @@ import io.github.minguanqiu.mingle.svc.session.handler.model.SvcSessionFeature;
 import java.util.Map;
 
 /**
+ * Default implementations for {@link SvcSessionFeatureHandler}.
+ *
  * @author Qiu Guan Ming
  */
 public class SvcSessionFeatureDefaultImpl implements SvcSessionFeatureHandler {

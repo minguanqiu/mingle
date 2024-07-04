@@ -39,46 +39,62 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
- * {@inheritDoc}
- * <p>
- * Action of restful feature
+ * <p> Action for restful feature.
  * <pre>
  * Feature :
- * Request serialize and response deserialize using jackson
- * Target response body header common process to decide action success or fail
- *
+ * Request serialize and response deserialize using jackson.
+ * Target server response unite header process to decide action success or fail.
  * </pre>
  *
+ * @param <R1> action request.
+ * @param <R2> action response body.
  * @author Qiu Guan Ming
  */
 
-public abstract class AbstractRestAction<Req extends RestActionRequest, ResB extends ActionResponseBody>
-    extends AbstractAction<Req, ResB> {
+public abstract class AbstractRestAction<R1 extends RestActionRequest, R2 extends ActionResponseBody>
+    extends AbstractAction<R1, R2> {
 
+  /**
+   * Properties for rest action.
+   */
   protected final RestActionProperties restActionProperties;
+  /**
+   * Handler for okhttp client.
+   */
   public RestClientHandler restClientHandler = new RestClientDefaultHandler();
+  /**
+   * Utils for jackson process.
+   */
   public JacksonUtils jacksonUtils = new JacksonUtils(new ObjectMapper());
   private Map<String, String> commonHeaderValueMap;
   private Set<Integer> successHttpCodeSet;
-  protected final Class<ResB> resClass;
+  /**
+   * Response body class.
+   */
+  protected final Class<R2> resClass;
 
+  /**
+   * Create a new AbstractRestAction implementations instance.
+   *
+   * @param actionProperties the properties for rest action.
+   */
   @SuppressWarnings("unchecked")
   public AbstractRestAction(RestActionProperties actionProperties) {
     super(actionProperties);
     this.restActionProperties = actionProperties;
-    resClass = (Class<ResB>) new TypeToken<ResB>(getClass()) {
+    resClass = (Class<R2>) new TypeToken<R2>(getClass()) {
     }.getRawType();
     init();
   }
 
 
   @Override
-  protected final ResB processLogic(Req request, ActionInfo actionInfo) {
+  protected final R2 processLogic(R1 request, ActionInfo actionInfo) {
     before(request);
     ResponseData responseData =
         !restActionProperties.getRest().getMock().containsKey(getMockName()) ? processCall(
             request) : processMockCall();
-    ResB responseBody = buildResponseBody(actionInfo, responseData.responseBytes());
+    R2 responseBody = buildResponseBody(actionInfo, responseData.responseBytes());
     Map<String, Object> actionInfoValue = buildActionInfoValue(request, responseBody,
         responseData.response());
     if (actionInfoValue != null) {
@@ -93,7 +109,13 @@ public abstract class AbstractRestAction<Req extends RestActionRequest, ResB ext
     return responseBody;
   }
 
-  private ResponseData processCall(Req request) {
+  /**
+   * Process okhttp call.
+   *
+   * @param request the action request.
+   * @return return the response data.
+   */
+  private ResponseData processCall(R1 request) {
     try (Response response = getOkHttpClient(request).newCall(buildHttpRequest(request))
         .execute()) {
       if (response.cacheResponse() != null) {
@@ -105,6 +127,11 @@ public abstract class AbstractRestAction<Req extends RestActionRequest, ResB ext
     }
   }
 
+  /**
+   * Process mock call.
+   *
+   * @return return the response data.
+   */
   private ResponseData processMockCall() {
     RestActionProperties.RestProperties.MockProperties mockProperties = restActionProperties.getRest()
         .getMock().get(getMockName());
@@ -122,12 +149,26 @@ public abstract class AbstractRestAction<Req extends RestActionRequest, ResB ext
     }
   }
 
-  protected Map<String, Object> buildActionInfoValue(Req request, ResB resBModel,
+  /**
+   * Build action information tmp map.
+   *
+   * @param request      the action request.
+   * @param responseBody the action response body.
+   * @param response     the action response.
+   * @return return action information tmp map.
+   */
+  protected Map<String, Object> buildActionInfoValue(R1 request, R2 responseBody,
       Response response) {
     return null;
   }
 
-  protected Request buildHttpRequest(Req request) {
+  /**
+   * Build okhttp request info.
+   *
+   * @param request the action request.
+   * @return return okhttp request object.
+   */
+  protected Request buildHttpRequest(R1 request) {
     Request.Builder requestBuilder = new Request.Builder();
     if (commonHeaderValueMap != null) {
       commonHeaderValueMap.forEach(requestBuilder::addHeader);
@@ -141,20 +182,41 @@ public abstract class AbstractRestAction<Req extends RestActionRequest, ResB ext
     return requestBuilder.build();
   }
 
+  /**
+   * Setting action http method.
+   *
+   * @return the action http method.
+   */
   public abstract HttpMethod getHttpMethod();
 
-  protected abstract List<String> buildRestPath(Req request);
+  /**
+   * Setting action http suffix path.
+   *
+   * @param request the action request.
+   * @return the action http suffix path.
+   */
+  protected abstract List<String> buildRestPath(R1 request);
 
+  /**
+   * Get action defined server name to mapping properties.
+   *
+   * @return return the action defined server name.
+   */
   public abstract String getServerName();
 
+  /**
+   * Get mock name to mapping properties.
+   *
+   * @return return the mock name.
+   */
   public String getMockName() {
-    return null;
+    return this.getClass().getSimpleName();
   }
 
   /**
-   * Build action request header for cache
+   * Build action request header for cache.
    *
-   * @return Map
+   * @return return the header map.
    */
   protected Map<String, String> buildCommonHeaderValue() {
     return null;
@@ -162,19 +224,19 @@ public abstract class AbstractRestAction<Req extends RestActionRequest, ResB ext
 
   /**
    * Build action success http code for cache,if not contains code,this action will set error code
-   * and not success
+   * and not success.
    *
-   * @return Set
+   * @return return the set of http code.
    */
   protected Set<Integer> buildSuccessHttpCodeSet() {
     return Set.of(200);
   }
 
   /**
-   * API response body format specification to json string
+   * Http response body format specification to json object.
    *
-   * @param responseBody API response body
-   * @return JsonNode
+   * @param responseBody the http response body.
+   * @return return the json node.
    */
   protected JsonNode formatRawResponseBody(String responseBody) {
     return jacksonUtils.readTree(responseBody)
@@ -183,27 +245,37 @@ public abstract class AbstractRestAction<Req extends RestActionRequest, ResB ext
 
 
   /**
-   * Pre process action request
+   * Pre-processing action request.
    *
-   * @param request action request model
+   * @param request the action request.
    */
-  protected void before(Req request) {
+  protected void before(R1 request) {
   }
 
   /**
-   * Post process action response body
+   * Post-processing action response body
    *
-   * @param responseBody action response model
+   * @param responseBody the action response body.
    */
-  protected void after(ResB responseBody) {
+  protected void after(R2 responseBody) {
   }
 
-
+  /**
+   * Build response body header from API.
+   *
+   * @param resultNode the http response body json node.
+   * @return return the response body header from API.
+   */
   protected RestActionResponseBodyHeader buildResponseBodyHeader(JsonNode resultNode) {
     return null;
   }
 
-
+  /**
+   * Get okhttp client and check custom.
+   *
+   * @param request the rest action request.
+   * @return return the okhttp client object.
+   */
   private OkHttpClient getOkHttpClient(RestActionRequest request) {
     if (request.getOkHttpClientBuilder() != null) {
       return request.getOkHttpClientBuilder().build();
@@ -211,8 +283,13 @@ public abstract class AbstractRestAction<Req extends RestActionRequest, ResB ext
     return restClientHandler.getClient();
   }
 
-
-  protected HttpUrl buildUrl(Req request) {
+  /**
+   * Build okhttp request url.
+   *
+   * @param request the action request.
+   * @return return http url object.
+   */
+  protected HttpUrl buildUrl(R1 request) {
     if (!restActionProperties.getRest().getServer().containsKey(getServerName())) {
       throw new ServerNotExistException("Server not exist with name: " + getServerName());
     }
@@ -234,7 +311,13 @@ public abstract class AbstractRestAction<Req extends RestActionRequest, ResB ext
     return builder.build();
   }
 
-  protected HashMap<String, String> buildQueryParameter(Req request) {
+  /**
+   * Build request url query parameter.
+   *
+   * @param request the action request.
+   * @return return the query parameter map.
+   */
+  protected HashMap<String, String> buildQueryParameter(R1 request) {
     HashMap<String, String> stringHashMap = null;
     for (Field field : request.getClass().getDeclaredFields()) {
       field.setAccessible(true);
@@ -258,13 +341,13 @@ public abstract class AbstractRestAction<Req extends RestActionRequest, ResB ext
   }
 
   /**
-   * Build request body
+   * Build request body.
    *
-   * @param reqModel Action request model
-   * @return RequestBody
+   * @param request the action request.
+   * @return return okhttp request body.
    */
-  protected RequestBody buildRequestBody(Req reqModel) {
-    Optional<JsonNode> jsonNodeOptional = jacksonUtils.readTree(reqModel);
+  protected RequestBody buildRequestBody(R1 request) {
+    Optional<JsonNode> jsonNodeOptional = jacksonUtils.readTree(request);
     jsonNodeOptional.orElseThrow(ActionRequestSerializeErrorException::new);
     ObjectNode objectNode = (ObjectNode) jsonNodeOptional.get();
     objectNode.remove("autoBreak");
@@ -273,7 +356,12 @@ public abstract class AbstractRestAction<Req extends RestActionRequest, ResB ext
         MediaType.parse("application/json"));
   }
 
-
+  /**
+   * Check http response code whether contains http code set, if ture will throw
+   * {@link HttpCodeErrorException}.
+   *
+   * @param code the http response code.
+   */
   private void checkHttpCode(int code) {
     if (successHttpCodeSet != null) {
       if (!successHttpCodeSet.contains(code)) {
@@ -282,19 +370,33 @@ public abstract class AbstractRestAction<Req extends RestActionRequest, ResB ext
     }
   }
 
-  private ResB buildResponseBody(ActionInfo actionInfo, byte[] resBody) {
+  /**
+   * Deserialize response body from http response raw body and check response body header success or
+   * fail.
+   *
+   * @param actionInfo the action information.
+   * @param resBody    the response body of byte.
+   * @return return the response body object after deserialize.
+   */
+  private R2 buildResponseBody(ActionInfo actionInfo, byte[] resBody) {
     JsonNode responseBodyNode = formatRawResponseBody(new String(resBody, StandardCharsets.UTF_8));
-    RestActionResponseBodyHeader restActionResHeaderModel = buildResponseBodyHeader(
+    RestActionResponseBodyHeader restActionResponseBodyHeader = buildResponseBodyHeader(
         responseBodyNode);
-    if (restActionResHeaderModel != null && !restActionResHeaderModel.getSuccessCode()
-        .equals(restActionResHeaderModel.getCode())) {
-      actionInfo.setCode(restActionResHeaderModel.getCode());
-      actionInfo.setMsg(restActionResHeaderModel.getMsg());
+    if (restActionResponseBodyHeader != null && !restActionResponseBodyHeader.getSuccessCode()
+        .equals(restActionResponseBodyHeader.getCode())) {
+      actionInfo.setCode(restActionResponseBodyHeader.getCode());
+      actionInfo.setMsg(restActionResponseBodyHeader.getMsg());
     }
     return deserializeResponseBody(responseBodyNode);
   }
 
-  protected ResB deserializeResponseBody(JsonNode resultNode) {
+  /**
+   * Deserialize response body from http response raw body.
+   *
+   * @param resultNode the response body json node.
+   * @return return the response body object after deserialize.
+   */
+  protected R2 deserializeResponseBody(JsonNode resultNode) {
     return jacksonUtils.readValue(resultNode.toString(), resClass)
         .orElseThrow(ActionResponseBodyDeserializeErrorException::new);
   }
@@ -304,18 +406,34 @@ public abstract class AbstractRestAction<Req extends RestActionRequest, ResB ext
     commonHeaderValueMap = buildCommonHeaderValue();
   }
 
+  /**
+   * Setting custom rest client handler.
+   *
+   * @param restClientHandler the rest client handler.
+   */
   @Autowired(required = false)
   public void setRestClientHandler(
       RestClientHandler restClientHandler) {
     this.restClientHandler = restClientHandler;
   }
 
+  /**
+   * Setting custom jackson utils.
+   *
+   * @param jacksonUtils the jackson utils.
+   */
   @Autowired(required = false)
   public void setJacksonUtils(
       @Qualifier("restActionJacksonUtils") JacksonUtils jacksonUtils) {
     this.jacksonUtils = jacksonUtils;
   }
 
+  /**
+   * Http response data.
+   *
+   * @param response      the okhttp response object.
+   * @param responseBytes the okhttp response body.
+   */
   private record ResponseData(Response response, byte[] responseBytes) {
 
   }

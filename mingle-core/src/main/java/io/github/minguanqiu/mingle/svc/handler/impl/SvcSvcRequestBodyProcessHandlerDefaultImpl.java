@@ -3,7 +3,7 @@ package io.github.minguanqiu.mingle.svc.handler.impl;
 import io.github.minguanqiu.mingle.svc.handler.SvcRequestBodyProcessHandler;
 
 /**
- * {@inheritDoc} Default impl for {@link SvcRequestBodyProcessHandler}
+ * Default implement for {@link SvcRequestBodyProcessHandler}.
  *
  * @author Qiu Guan Ming
  */

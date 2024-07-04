@@ -24,12 +24,13 @@ public class SimpleSvcSessionFeature1 extends AbstractService<SimpleSvcReq, Simp
 
   @Override
   public SimpleSvcRes doService(SimpleSvcReq request) {
-    String value = (String) sessionUtils.getSessionValue("Hello").orElseThrow(IllegalArgumentException::new);
-    if(!value.equals("World1")) {
+    String value = (String) sessionUtils.getSessionValue("Hello")
+        .orElseThrow(IllegalArgumentException::new);
+    if (!value.equals("World1")) {
       throw new IllegalArgumentException();
     }
     Optional<String> value2 = sessionUtils.getSessionValue("Hello2");
-    if(value2.isPresent()) {
+    if (value2.isPresent()) {
       throw new IllegalArgumentException();
     }
     sessionUtils.cleanSession();

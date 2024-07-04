@@ -10,13 +10,9 @@ import org.springframework.core.annotation.AliasFor;
 import org.springframework.stereotype.Controller;
 
 /**
- * Annotation for service register.
- * This annotation is used to mark a class as a service controller and provides additional.
- * <p>
- * It is a Spring MVC controller.
- * <p>
- * It is a OpenAPI doc.
- * <p>
+ * Annotation for service register. This annotation is used to mark a class as a service controller
+ * and provides additional.
+ *
  * <pre>
  * {@code
  * @example
@@ -26,11 +22,11 @@ import org.springframework.stereotype.Controller;
  * }
  * }
  * </pre>
+ *
+ * @author Qiu Guan Ming
  * @see Controller
  * @see io.swagger.v3.oas.annotations.Operation
  * @see AbstractService
- *
- * @author Qiu Guan Ming
  */
 @Documented
 @Controller
@@ -39,10 +35,10 @@ import org.springframework.stereotype.Controller;
 public @interface Svc {
 
   /**
-   * Alias for {@link Controller} value.
-   * This value is used as the name of the controller in Spring.
+   * Alias for {@link Controller} value. This value is used as the name of the controller in
+   * Spring.
    *
-   * @return the name of the service controller
+   * @return return the name of the service controller
    */
   @AliasFor(annotation = Controller.class)
   String value() default "";
@@ -50,21 +46,21 @@ public @interface Svc {
   /**
    * Mapping Spring doc tags.
    *
-   * @return an array of tags
+   * @return return array of tags
    */
   String[] tags() default {};
 
   /**
    * Mapping Spring doc summary.
    *
-   * @return the summary of the service
+   * @return return the summary of the service
    */
   String summary() default "";
 
   /**
    * Mapping Spring doc description.
    *
-   * @return the description of the service
+   * @return return the description of the service
    */
   String description() default "";
 

@@ -8,7 +8,7 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * {@link ConfigurationProperties} mapping action properties
+ * {@link ConfigurationProperties} mapping action properties.
  *
  * @author Qiu Guan Ming
  */
@@ -16,6 +16,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 public class RestActionProperties extends ActionProperties {
 
+  /**
+   * Restful properties.
+   *
+   * @param rest the restful properties.
+   * @return return the restful properties.
+   */
   private RestProperties rest = new RestProperties();
 
   @Getter

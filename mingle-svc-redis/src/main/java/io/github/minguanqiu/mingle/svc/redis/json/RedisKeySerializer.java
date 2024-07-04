@@ -1,4 +1,4 @@
-package io.github.minguanqiu.mingle.svc.redis.serializer;
+package io.github.minguanqiu.mingle.svc.redis.json;
 
 import io.github.minguanqiu.mingle.svc.redis.RedisKey;
 import java.nio.charset.StandardCharsets;
@@ -7,7 +7,7 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.SerializationException;
 
 /**
- * Customize spring redis key serializer for {@link RedisKey}
+ * Customize spring redis key serializer for {@link RedisKey}.
  *
  * @author Qiu Guan Ming
  */

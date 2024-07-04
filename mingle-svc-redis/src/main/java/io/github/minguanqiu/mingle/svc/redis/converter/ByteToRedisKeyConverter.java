@@ -6,6 +6,8 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 
 /**
+ * This class for spring redis repository key byte to redisKey object converter.
+ *
  * @author Qiu Guan Ming
  */
 @ReadingConverter

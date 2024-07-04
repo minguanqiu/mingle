@@ -4,11 +4,10 @@ import io.github.minguanqiu.mingle.svc.action.exception.handler.abs.AbstractActi
 import io.github.minguanqiu.mingle.svc.action.exception.handler.model.ActionExceptionModel;
 
 /**
- * Default handler will catch {@link Exception} or unknown exception
+ * Default handler will catch {@link Exception} or unknown exception.
  *
  * @author Qiu Guan Ming
  */
-
 public class AllActionExceptionHandler extends AbstractActionExceptionHandler<Exception> {
 
   @Override

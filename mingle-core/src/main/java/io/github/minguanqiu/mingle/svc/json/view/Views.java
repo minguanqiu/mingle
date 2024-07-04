@@ -7,6 +7,9 @@ package io.github.minguanqiu.mingle.svc.json.view;
  */
 public class Views {
 
+  /**
+   * ExcludeLog.
+   */
   public interface ExcludeLog {
 
   }

@@ -7,8 +7,14 @@ package io.github.minguanqiu.mingle.svc.exception;
  */
 public class SvcNotFoundException extends RuntimeException {
 
+  /**
+   * Exception message constant.
+   */
   public static final String MSG = "Service not found";
 
+  /**
+   * Create a new SvcNotFoundException instance.
+   */
   public SvcNotFoundException() {
     super(MSG);
   }

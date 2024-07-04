@@ -1,7 +1,7 @@
 package io.github.minguanqiu.mingle.svc.action;
 
 /**
- * Interceptor for execute action logic and process response
+ * Interceptor for execute action logic and process response.
  *
  * @author Qiu Guan Ming
  */

@@ -5,7 +5,7 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * {@link ConfigurationProperties} mapping session properties
+ * {@link ConfigurationProperties} mapping session properties.
  *
  * @author Qiu Guan Ming
  */
@@ -13,6 +13,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 public class SvcSessionProperties {
 
+  /**
+   * The session token header name.
+   *
+   * @param header the session token header name.
+   * @return return token header name.
+   */
   private String header = "token";
 
 }

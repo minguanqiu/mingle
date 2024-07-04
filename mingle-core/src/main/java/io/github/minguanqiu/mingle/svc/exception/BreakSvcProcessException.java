@@ -13,13 +13,25 @@ import lombok.Getter;
 @Getter
 public class BreakSvcProcessException extends RuntimeException {
 
+  /**
+   * Service response header.
+   *
+   * @return return the service response header.
+   */
   private final SvcResponseHeader svcResponseHeader;
 
+  /**
+   * Service response body.
+   *
+   * @return return the service response body.
+   */
   private final SvcResponseBody svcResponseBody;
 
   /**
-   * @param svcResponseHeader service response header
-   * @param svcResponseBody   service response body
+   * Create a new BreakSvcProcessException instance.
+   *
+   * @param svcResponseHeader the service response header.
+   * @param svcResponseBody   the service response body.
    */
   public BreakSvcProcessException(SvcResponseHeader svcResponseHeader,
       SvcResponseBody svcResponseBody) {

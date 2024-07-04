@@ -16,7 +16,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 
 /**
- * {@link Aspect} for redis logging for {@link RedisTemplateDao} all method
+ * {@link Aspect} for redis logging for {@link RedisTemplateDao} all method.
  *
  * @author Qiu Guan Ming
  */
@@ -29,6 +29,12 @@ public class RedisLogAspect {
 
   private final SerialNumberGeneratorHandler serialNumberGeneratorHandler;
 
+  /**
+   * Create a new RedisLogAspect instance.
+   *
+   * @param redisLogHandler              the redis logging handler.
+   * @param serialNumberGeneratorHandler the serial number generator handler.
+   */
   public RedisLogAspect(RedisLogHandler redisLogHandler,
       SerialNumberGeneratorHandler serialNumberGeneratorHandler) {
     this.redisLogHandler = redisLogHandler;
@@ -50,7 +56,8 @@ public class RedisLogAspect {
       return joinPoint.proceed();
     }
     Attribute attribute = svcAttributeOptional.get();
-    String svcSerialNum = (String) attribute.getAttributes(SvcAttributeName.SVC_SERIAL_NUMBER).get();
+    String svcSerialNum = (String) attribute.getAttributes(SvcAttributeName.SVC_SERIAL_NUMBER)
+        .get();
     String actSerialNum = serialNumberGeneratorHandler.generate("redis");
     LocalDateTime startTime = DateUtils.getNowLocalDateTime();
     try {

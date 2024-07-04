@@ -5,7 +5,7 @@ import io.github.minguanqiu.mingle.svc.action.ActionResponseBody;
 import lombok.Getter;
 
 /**
- * Exception for when action error will auto break logic
+ * Exception for action error will auto break logic.
  *
  * @author Qiu Guan Ming
  */
@@ -13,8 +13,18 @@ import lombok.Getter;
 @Getter
 public class ActionAutoBreakException extends RuntimeException {
 
+  /**
+   * Action response
+   *
+   * @return return an action response.
+   */
   private final ActionResponse<? extends ActionResponseBody> actionResponse;
 
+  /**
+   * Create a new ActionAutoBreakException instance.
+   *
+   * @param actionResponse the action response.
+   */
   public ActionAutoBreakException(ActionResponse<? extends ActionResponseBody> actionResponse) {
     this.actionResponse = actionResponse;
   }

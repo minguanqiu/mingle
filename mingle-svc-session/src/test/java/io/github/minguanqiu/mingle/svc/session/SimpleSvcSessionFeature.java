@@ -23,8 +23,9 @@ public class SimpleSvcSessionFeature extends AbstractService<SimpleSvcReq, Simpl
 
   @Override
   public SimpleSvcRes doService(SimpleSvcReq request) {
-    String value = (String) sessionUtils.getSessionValue("Hello").orElseThrow(IllegalArgumentException::new);
-    if(!value.equals("World")) {
+    String value = (String) sessionUtils.getSessionValue("Hello")
+        .orElseThrow(IllegalArgumentException::new);
+    if (!value.equals("World")) {
       throw new IllegalArgumentException();
     }
     sessionUtils.setSessionValue("Hello", "World1");

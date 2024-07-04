@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation Help build uri path variable for restful action
+ * Annotation for build path query parameter.
  *
  * @author Qiu Guan Ming
  */
@@ -15,6 +15,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface QueryParameter {
 
+  /**
+   * Parameter key name.
+   *
+   * @return return the parameter key name.
+   */
   String value() default "";
 
 }

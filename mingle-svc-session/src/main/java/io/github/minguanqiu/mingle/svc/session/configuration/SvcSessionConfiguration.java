@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Configuration for session bean
+ * Configuration for session bean.
  *
  * @author Qiu Guan Ming
  */

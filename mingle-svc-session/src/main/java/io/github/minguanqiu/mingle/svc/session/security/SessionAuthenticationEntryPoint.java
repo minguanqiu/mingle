@@ -8,7 +8,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
 /**
- * Custom spring security {@link AuthenticationEntryPoint}
+ * Custom spring security {@link AuthenticationEntryPoint}.
  *
  * @author Qiu Guan Ming
  */

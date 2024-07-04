@@ -22,6 +22,13 @@ public class SvcLogFilter extends AbstractSvcFilter {
   private final SvcLoggingHandler svcLoggingHandler;
   private final SerialNumberGeneratorHandler serialNumberGeneratorHandler;
 
+  /**
+   * Create a new SvcLogFilter instance.
+   *
+   * @param svcInfo                      the service information.
+   * @param svcLoggingHandler            the service logging handler.
+   * @param serialNumberGeneratorHandler the serial number generator handler.
+   */
   public SvcLogFilter(SvcInfo svcInfo, SvcLoggingHandler svcLoggingHandler,
       SerialNumberGeneratorHandler serialNumberGeneratorHandler) {
     super(svcInfo);
@@ -39,10 +46,18 @@ public class SvcLogFilter extends AbstractSvcFilter {
     filterChain.doFilter(request, response);
   }
 
+  /**
+   * Pre-processing logging for service.
+   */
   private void writeSvcBegin() {
     svcLoggingHandler.writeBeginLog(svcInfo);
   }
 
+  /**
+   * Build service logging model.
+   *
+   * @return return service attribute.
+   */
   private Attribute buildSvcLogModel() {
     Attribute attribute = new Attribute();
     attribute.setAttributes(SvcAttributeName.SVC_SERIAL_NUMBER, svcInfo.getSvcSerialNum());

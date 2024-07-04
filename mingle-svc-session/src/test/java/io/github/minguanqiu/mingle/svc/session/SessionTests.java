@@ -191,7 +191,7 @@ public class SessionTests {
         .build();
     SvcSessionEntity loginSession = new SvcSessionEntity(redisKey, 600, "Login", "12345");
     HashMap<String, Object> stringObjectHashMap = new HashMap<>();
-    stringObjectHashMap.put("Hello","World");
+    stringObjectHashMap.put("Hello", "World");
     loginSession.setSessionValue(stringObjectHashMap);
     String token = sessionUtils.createSessionToken(redisKey, loginSession);
     ResultActions perform = mvc.perform(

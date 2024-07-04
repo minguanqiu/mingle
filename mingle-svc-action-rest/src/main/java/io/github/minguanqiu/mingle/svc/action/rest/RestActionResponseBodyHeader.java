@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Response body common header model determine this action success or fail for rest action
+ * Target API response body unite header determine this action success or fail for rest.
  *
  * @author Qiu Guan Ming
  */
@@ -13,10 +13,28 @@ import lombok.Setter;
 @Setter
 public class RestActionResponseBodyHeader {
 
+  /**
+   * Target API success code.
+   *
+   * @param successCode the success code from target API.
+   * @return return the success code from target API.
+   */
   private String successCode;
 
+  /**
+   * Target API response code.
+   *
+   * @param code the response code from target API.
+   * @return return the response code from target API.
+   */
   private String code;
 
+  /**
+   * Target API response message.
+   *
+   * @param msg the response message from target API.
+   * @return return the response message from target API.
+   */
   private String msg;
 
 }

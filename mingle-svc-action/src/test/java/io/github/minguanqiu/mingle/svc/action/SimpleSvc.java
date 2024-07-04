@@ -31,7 +31,7 @@ public class SimpleSvc extends AbstractService<SimpleSvcReq, SimpleSvcRes> {
 
   private SimpleActionReq simpleActionReq(SimpleSvcReq request) {
     SimpleActionReq simpleActionReq = new SimpleActionReq();
-    if(request.getAction().equals("true")) {
+    if (request.getAction().equals("true")) {
       simpleActionReq.setAutoBreak(AutoBreak.TRUE);
     }
     simpleActionReq.setText1(request.getText1());

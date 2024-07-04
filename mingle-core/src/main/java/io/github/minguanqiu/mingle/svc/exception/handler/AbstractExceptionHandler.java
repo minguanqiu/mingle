@@ -32,15 +32,23 @@ import org.springframework.http.ResponseEntity;
  */
 public abstract class AbstractExceptionHandler<E extends Exception> {
 
+  /**
+   * Service information.
+   */
   protected final SvcInfo svcInfo;
 
+  /**
+   * Exception class.
+   *
+   * @return return a class for exception.
+   */
   @Getter
   protected final Class<E> eClass;
 
   /**
-   * Constructs an AbstractExceptionHandler
+   * Create a new AbstractExceptionHandler instance.
    *
-   * @param svcInfo The service information object.
+   * @param svcInfo the service information.
    */
   @SuppressWarnings("unchecked")
   public AbstractExceptionHandler(SvcInfo svcInfo) {
@@ -52,33 +60,34 @@ public abstract class AbstractExceptionHandler<E extends Exception> {
   /**
    * Handles the given exception and returns an appropriate response entity.
    *
-   * @param ex The exception to be handled.
-   * @return ResponseEntity containing the service response body, which represents the result of
-   * handling the exception.
+   * @param ex the exception to be handled.
+   * @return containing the service response body, which represents the result of handling the
+   * exception.
    */
   public abstract ResponseEntity<SvcResponseBody> handle(E ex);
 
   /**
    * Returns a ResponseEntity for the service response.
    *
-   * @param svcResponseHeader Service response header.
-   * @return ResponseEntity containing the service response body.
+   * @param svcResponseHeader the service response header.
+   * @return containing the service response body.
    */
   protected ResponseEntity<SvcResponseBody> build(SvcResponseHeader svcResponseHeader) {
     return build(svcResponseHeader, null);
   }
 
   /**
-   * Returns a ResponseEntity for the service response.
+   * Build a ResponseEntity for the service response.
    *
-   * @param svcResponseHeader Service response header.
-   * @param svcResponseBody   Service response body.
-   * @return ResponseEntity containing the service response body.
+   * @param svcResponseHeader the service response header.
+   * @param svcResponseBody   the service response body.
+   * @return containing the service response body.
    */
   protected ResponseEntity<SvcResponseBody> build(SvcResponseHeader svcResponseHeader,
       SvcResponseBody svcResponseBody) {
     svcInfo.setSvcResponseHeader(svcResponseHeader);
     return ResponseEntity.ok(svcResponseBody);
   }
+
 }
 

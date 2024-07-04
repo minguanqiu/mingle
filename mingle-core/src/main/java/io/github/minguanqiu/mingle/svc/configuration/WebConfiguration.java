@@ -24,21 +24,38 @@ public class WebConfiguration implements WebMvcConfigurer {
   private final SvcInfo svcInfo;
   private final JacksonUtils jacksonUtils;
 
+  /**
+   * Create a new WebConfiguration instance.
+   *
+   * @param svcInfo      the service information.
+   * @param jacksonUtils the jackson utils.
+   */
   public WebConfiguration(SvcInfo svcInfo, JacksonUtils jacksonUtils) {
     this.svcInfo = svcInfo;
     this.jacksonUtils = jacksonUtils;
   }
 
+  /**
+   * Add argument resolvers
+   */
   @Override
   public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
     resolvers.add(svcRequestResponseBodyMethodProcessor());
   }
 
+  /**
+   * Add return value handlers
+   */
   @Override
   public void addReturnValueHandlers(List<HandlerMethodReturnValueHandler> handlers) {
     handlers.add(svcRequestResponseBodyMethodProcessor());
   }
 
+  /**
+   * Create a new SvcRequestResponseBodyMethodProcessor instance.
+   *
+   * @return return the service request and response body processor.
+   */
   @Bean
   public SvcRequestResponseBodyMethodProcessor svcRequestResponseBodyMethodProcessor() {
     List<HttpMessageConverter<?>> converters = new ArrayList<>();

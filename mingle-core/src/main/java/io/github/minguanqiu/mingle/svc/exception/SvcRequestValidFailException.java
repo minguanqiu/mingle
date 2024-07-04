@@ -11,10 +11,23 @@ import lombok.Getter;
 @Getter
 public class SvcRequestValidFailException extends RuntimeException {
 
+  /**
+   * ConstraintViolationException.
+   *
+   * @return return the ConstraintViolationException.
+   */
   private final ConstraintViolationException constraintViolationException;
 
+  /**
+   * Exception message constant.
+   */
   public final static String MSG = "Request valid fail";
 
+  /**
+   * Create a new SvcRequestValidFailException instance.
+   *
+   * @param constraintViolationException the validation exception.
+   */
   public SvcRequestValidFailException(ConstraintViolationException constraintViolationException) {
     super(MSG);
     this.constraintViolationException = constraintViolationException;

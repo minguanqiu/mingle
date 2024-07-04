@@ -1,5 +1,6 @@
 package io.github.minguanqiu.mingle.svc.session.filter;
 
+import io.github.minguanqiu.mingle.svc.register.SvcDefinition;
 import io.github.minguanqiu.mingle.svc.register.SvcRegister;
 import io.github.minguanqiu.mingle.svc.session.SessionHeader;
 import io.github.minguanqiu.mingle.svc.session.configuration.properties.SvcSessionProperties;
@@ -24,7 +25,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
- * Check and decryption token after create authentication
+ * Check and decryption token after create authentication.
  *
  * @author Qiu Guan Ming
  */
@@ -36,6 +37,15 @@ public class SvcAuthenticationFilter extends OncePerRequestFilter {
   private final SessionTokenHandler sessionTokenHandler;
   private final JacksonUtils jacksonUtils;
 
+  /**
+   * Create a new SvcAuthenticationFilter instance.
+   *
+   * @param svcRegister          the service register.
+   * @param svcSessionProperties the service session properties.
+   * @param svcSessionDao        the service session DAO.
+   * @param sessionTokenHandler  the session token handler.
+   * @param jacksonUtils         the jackson utils.
+   */
   public SvcAuthenticationFilter(SvcRegister svcRegister, SvcSessionProperties svcSessionProperties,
       SvcSessionDao svcSessionDao, SessionTokenHandler sessionTokenHandler,
       JacksonUtils jacksonUtils) {
@@ -67,7 +77,7 @@ public class SvcAuthenticationFilter extends OncePerRequestFilter {
       throw new SessionNotExistException();
     }
     sessionEntity.setTimeToLive(Long.parseLong(sessionHeader.timeToLive()));
-    SvcRegister.SvcDefinition svcDefinition = svcRegister.getSvcDefinition(request).get();
+    SvcDefinition svcDefinition = svcRegister.getSvcDefinition(request).get();
     SvcSessionFeature svcSessionFeature = svcDefinition.getFeature(SvcSessionFeature.class).get();
     String[] types = svcSessionFeature.types();
     if (!checkType(types, sessionEntity.getType())) {

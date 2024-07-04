@@ -5,7 +5,7 @@ import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 
 /**
- * {@link AbstractAuthenticationToken} for session
+ * {@link AbstractAuthenticationToken} for session.
  *
  * @author Qiu Guan Ming
  */
@@ -16,6 +16,13 @@ public class SessionAuthentication extends AbstractAuthenticationToken {
 
   private final Object credentials;
 
+  /**
+   * Create a new SessionAuthentication instance.
+   *
+   * @param principal   the principal.
+   * @param credentials the credentials.
+   * @param authorities the authorities.
+   */
   public SessionAuthentication(Object principal, Object credentials,
       Collection<? extends GrantedAuthority> authorities) {
     super(authorities);

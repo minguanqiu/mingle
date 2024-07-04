@@ -3,7 +3,7 @@ package io.github.minguanqiu.mingle.svc.action;
 import java.util.List;
 
 /**
- * Interceptor chain for action
+ * Interceptor chain for action.
  *
  * @author Qiu Guan Ming
  */
@@ -16,7 +16,15 @@ public class ActionChain implements ActionInterceptor.Chain {
   private final int index;
   private int callTimes;
 
-
+  /**
+   * Create a new ActionChain instance.
+   *
+   * @param actionInterceptors the list of action interceptors.
+   * @param action             the action object.
+   * @param actionRequest      the action request.
+   * @param actionInfo         the action information.
+   * @param index              the interceptors index.
+   */
   public ActionChain(List<ActionInterceptor> actionInterceptors,
       AbstractAction<? extends ActionRequest, ? extends ActionResponseBody> action,
       ActionRequest actionRequest,

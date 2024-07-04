@@ -10,7 +10,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
 
 /**
- * {@inheritDoc} Default impl for {@link SessionTokenHandler}
+ * Default implementations for {@link SessionTokenHandler}.
  *
  * @author Qiu Guan Ming
  */
@@ -18,10 +18,15 @@ public class SessionTokenHandlerDefaultImpl implements SessionTokenHandler {
 
   private final TokenKeyHandler tokenKeyHandler;
   private static final SecureRandom secureRandom = new SecureRandom();
-  public static final String TRANSFORMATION = "AES/GCM/NoPadding";
-  public static final int TAG_LENGTH = 128;
-  public static final int IV_LENGTH = 12;
+  private static final String TRANSFORMATION = "AES/GCM/NoPadding";
+  private static final int TAG_LENGTH = 128;
+  private static final int IV_LENGTH = 12;
 
+  /**
+   * Create a new SessionTokenHandlerDefaultImpl instance.
+   *
+   * @param tokenKeyHandler the token key handler.
+   */
   public SessionTokenHandlerDefaultImpl(TokenKeyHandler tokenKeyHandler) {
     this.tokenKeyHandler = tokenKeyHandler;
   }

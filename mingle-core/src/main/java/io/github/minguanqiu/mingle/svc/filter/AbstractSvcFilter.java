@@ -10,8 +10,16 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 public abstract class AbstractSvcFilter extends OncePerRequestFilter {
 
+  /**
+   * Service information.
+   */
   protected final SvcInfo svcInfo;
 
+  /**
+   * Create a new AbstractSvcFilter instance.
+   *
+   * @param svcInfo the service information.
+   */
   public AbstractSvcFilter(SvcInfo svcInfo) {
     this.svcInfo = svcInfo;
   }

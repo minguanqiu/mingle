@@ -9,7 +9,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
 
 /**
- * Default handler will catch {@link Exception} or unknown exception
+ * Default handler will catch {@link Exception} level exception
  *
  * @author Qiu Guan Ming
  */
@@ -17,10 +17,18 @@ import org.springframework.http.ResponseEntity;
 @Order(Integer.MIN_VALUE)
 public class AllExceptionHandler extends AbstractExceptionHandler<Exception> {
 
+  /**
+   * Create a new AllExceptionHandler instance.
+   *
+   * @param svcInfo the service information.
+   */
   public AllExceptionHandler(SvcInfo svcInfo) {
     super(svcInfo);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public ResponseEntity<SvcResponseBody> handle(Exception e) {
     AllExceptionModel model = new AllExceptionModel();

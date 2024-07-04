@@ -9,7 +9,9 @@ package io.github.minguanqiu.mingle.svc.exception;
 public class MingleRuntimeException extends RuntimeException {
 
   /**
-   * @param msg exception msg
+   * Create a new IPAuthenticationFailException instance.
+   *
+   * @param msg exception message.
    */
   public MingleRuntimeException(String msg) {
     super(msg);

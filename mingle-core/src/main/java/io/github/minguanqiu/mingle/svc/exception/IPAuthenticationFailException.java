@@ -7,8 +7,14 @@ package io.github.minguanqiu.mingle.svc.exception;
  */
 public class IPAuthenticationFailException extends RuntimeException {
 
+  /**
+   * Exception message constant.
+   */
   public static final String MSG = "IP authentication fail";
 
+  /**
+   * Create a new IPAuthenticationFailException instance.
+   */
   public IPAuthenticationFailException() {
     super(MSG);
   }

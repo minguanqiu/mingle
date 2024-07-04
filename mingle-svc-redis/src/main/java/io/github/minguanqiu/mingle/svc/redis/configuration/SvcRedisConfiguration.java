@@ -19,9 +19,9 @@ import io.github.minguanqiu.mingle.svc.redis.converter.RedisKeyToStringConverter
 import io.github.minguanqiu.mingle.svc.redis.converter.StringToRedisKeyConverter;
 import io.github.minguanqiu.mingle.svc.redis.handler.RedisLogHandler;
 import io.github.minguanqiu.mingle.svc.redis.handler.impl.RedisLogHandlerDefaultImpl;
-import io.github.minguanqiu.mingle.svc.redis.serializer.RedisKeyJsonDeserializer;
-import io.github.minguanqiu.mingle.svc.redis.serializer.RedisKeyJsonSerializer;
-import io.github.minguanqiu.mingle.svc.redis.serializer.RedisKeySerializer;
+import io.github.minguanqiu.mingle.svc.redis.json.RedisKeyJsonDeserializer;
+import io.github.minguanqiu.mingle.svc.redis.json.RedisKeyJsonSerializer;
+import io.github.minguanqiu.mingle.svc.redis.json.RedisKeySerializer;
 import io.github.minguanqiu.mingle.svc.utils.JacksonUtils;
 import java.util.Arrays;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -41,12 +41,24 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 @Configuration
 public class SvcRedisConfiguration {
 
+  /**
+   * Properties for service redis.
+   *
+   * @return return the SvcRedisProperties.
+   */
   @Bean
   @ConfigurationProperties("mingle.svc.redis")
   public SvcRedisProperties redisProperties() {
     return new SvcRedisProperties();
   }
 
+  /**
+   * Create redis key template.
+   *
+   * @param lettuceConnectionFactory the redis configuration.
+   * @param <E>                      the redis entity.
+   * @return return redis key template.
+   */
   @Bean
   public <E extends RedisEntity> RedisKeyTemplate<E> redisKeyTemplate(
       LettuceConnectionFactory lettuceConnectionFactory) {
@@ -73,6 +85,11 @@ public class SvcRedisConfiguration {
     return objectMapper.setDefaultTyping(typer);
   }
 
+  /**
+   * Custom spring redis repository key convert.
+   *
+   * @return return the RedisCustomConversions.
+   */
   @Bean
   @ConditionalOnMissingBean
   public RedisCustomConversions redisCustomConversions() {
@@ -81,6 +98,13 @@ public class SvcRedisConfiguration {
             new RedisKeyToStringConverter(), new StringToRedisKeyConverter()));
   }
 
+  /**
+   * Create redis logging aspect.
+   *
+   * @param redisLogHandler              the redis logging handler.
+   * @param serialNumberGeneratorHandler the serial number generator handler.
+   * @return return the redis logging aspect.
+   */
   @Bean
   @ConditionalOnProperty(prefix = "mingle.svc.redis", name = "logging", havingValue = "true")
   public RedisLogAspect redisLogAspect(RedisLogHandler redisLogHandler,
@@ -88,12 +112,22 @@ public class SvcRedisConfiguration {
     return new RedisLogAspect(redisLogHandler, serialNumberGeneratorHandler);
   }
 
+  /**
+   * Create redis logging handler.
+   *
+   * @return return the redis logging handler.
+   */
   @Bean
   @ConditionalOnMissingBean
   public RedisLogHandler redisLogHandler() {
     return new RedisLogHandlerDefaultImpl(redisLogJacksonUtils());
   }
 
+  /**
+   * Create jackson utils.
+   *
+   * @return return the jackson utils.
+   */
   @Bean("redisLogJacksonUtils")
   @ConditionalOnMissingBean(name = "redisLogJacksonUtils")
   public JacksonUtils redisLogJacksonUtils() {

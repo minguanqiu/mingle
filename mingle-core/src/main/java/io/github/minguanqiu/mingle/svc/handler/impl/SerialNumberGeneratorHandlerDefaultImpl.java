@@ -4,7 +4,7 @@ import io.github.minguanqiu.mingle.svc.handler.SerialNumberGeneratorHandler;
 import java.util.UUID;
 
 /**
- * {@inheritDoc} Default impl for {@link SerialNumberGeneratorHandler}
+ * Default implement for {@link SerialNumberGeneratorHandler}.
  *
  * @author Qiu Guan Ming
  */

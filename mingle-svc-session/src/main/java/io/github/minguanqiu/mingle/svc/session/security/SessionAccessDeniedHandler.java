@@ -9,7 +9,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
 /**
- * Custom spring security {@link AccessDeniedHandler}
+ * Custom spring security {@link AccessDeniedHandler}.
  *
  * @author Qiu Guan Ming
  */

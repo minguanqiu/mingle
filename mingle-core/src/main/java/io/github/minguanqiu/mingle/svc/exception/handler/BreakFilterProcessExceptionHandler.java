@@ -16,6 +16,11 @@ import org.springframework.http.ResponseEntity;
 public class BreakFilterProcessExceptionHandler extends
     AbstractExceptionHandler<BreakFilterProcessException> {
 
+  /**
+   * Create a new BreakFilterProcessExceptionHandler instance.
+   *
+   * @param svcInfo the service information.
+   */
   public BreakFilterProcessExceptionHandler(SvcInfo svcInfo) {
     super(svcInfo);
   }

@@ -14,7 +14,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 
 /**
- * {@link RedisLogHandler} impl
+ * Default implementations for {@link RedisLogHandler}.
  *
  * @author Qiu Guan Ming
  */
@@ -24,6 +24,11 @@ public class RedisLogHandlerDefaultImpl implements RedisLogHandler {
 
   private final JacksonUtils jacksonUtils;
 
+  /**
+   * Create a new RedisLogHandlerDefaultImpl instance.
+   *
+   * @param jacksonUtils the jackson utils.
+   */
   public RedisLogHandlerDefaultImpl(JacksonUtils jacksonUtils) {
     this.jacksonUtils = jacksonUtils;
   }
@@ -35,7 +40,8 @@ public class RedisLogHandlerDefaultImpl implements RedisLogHandler {
     objectNode.put("svcSerialNum", svcSerialNum);
     objectNode.put("actSerialNum", actSerialNum);
     objectNode.put("name",
-        joinPoint.getTarget().getClass().getSimpleName() + "." +joinPoint.getSignature().getName());
+        joinPoint.getTarget().getClass().getSimpleName() + "." + joinPoint.getSignature()
+            .getName());
     objectNode.put("startTime", DateUtils.dateTimeFormat(startTime, "yyyy/MM/dd HH:mm:ss").get());
     objectNode.set("reqBody", jacksonUtils.readTree(buildParameter(joinPoint)).orElse(null));
     objectNode.put("type", "redis");
@@ -62,7 +68,9 @@ public class RedisLogHandlerDefaultImpl implements RedisLogHandler {
     LocalDateTime endTime = LocalDateTime.now();
     objectNode.put("svcSerialNum", svcSerialNum);
     objectNode.put("actSerialNum", actSerialNum);
-    objectNode.put("name", joinPoint.getTarget().getClass().getSimpleName() + "." +joinPoint.getSignature().getName());
+    objectNode.put("name",
+        joinPoint.getTarget().getClass().getSimpleName() + "." + joinPoint.getSignature()
+            .getName());
     objectNode.put("startTime", DateUtils.dateTimeFormat(startTime, "yyyy/MM/dd HH:mm:ss").get());
     objectNode.put("endTime", DateUtils.dateTimeFormat(endTime, "yyyy/MM/dd HH:mm:ss").get());
     objectNode.put("exception", throwable.toString());

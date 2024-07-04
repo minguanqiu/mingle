@@ -5,7 +5,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
 /**
- * Session authentication provider
+ * Session authentication provider.
  *
  * @author Qiu Guan Ming
  */

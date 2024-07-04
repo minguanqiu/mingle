@@ -6,11 +6,10 @@ import org.springframework.boot.autoconfigure.AutoConfigurationPackage;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
- * {@link AutoConfiguration} for action
+ * {@link AutoConfiguration} for action.
  *
  * @author Qiu Guan Ming
  */
-
 @AutoConfiguration
 @AutoConfigurationPackage(basePackageClasses = ActionAutoConfiguration.class)
 @ComponentScan(basePackageClasses = SvcAutoConfiguration.class)

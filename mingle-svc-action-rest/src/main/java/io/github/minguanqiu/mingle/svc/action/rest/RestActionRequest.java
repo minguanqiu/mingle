@@ -6,7 +6,7 @@ import lombok.Setter;
 import okhttp3.OkHttpClient;
 
 /**
- * {@inheritDoc} Action request for rest type
+ * Action request for rest feature.
  *
  * @author Qiu Guan Ming
  */
@@ -15,6 +15,12 @@ import okhttp3.OkHttpClient;
 @Setter
 public class RestActionRequest extends ActionRequest {
 
+  /**
+   * Custom okhttp builder.
+   *
+   * @param okHttpClientBuilder the custom okhttp builder.
+   * @return return the custom okhttp builder.
+   */
   private OkHttpClient.Builder okHttpClientBuilder;
 
 }

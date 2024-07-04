@@ -11,6 +11,8 @@ import java.time.temporal.ChronoUnit;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * Default implement for {@link ActionLoggingHandler}.
+ *
  * @author Qiu Gaun Ming
  */
 @Slf4j
@@ -18,6 +20,11 @@ public class ActionLoggingDefaultHandlerImpl implements ActionLoggingHandler {
 
   private final JacksonUtils jacksonUtils;
 
+  /**
+   * Create a new ActionLoggingDefaultHandlerImpl instance.
+   *
+   * @param jacksonUtils the jackson utils.
+   */
   public ActionLoggingDefaultHandlerImpl(JacksonUtils jacksonUtils) {
     this.jacksonUtils = jacksonUtils;
   }

@@ -6,6 +6,8 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
 
 /**
+ * This class for spring redis repository key redisKey object to byte converter.
+ *
  * @author Qiu Guan Ming
  */
 @WritingConverter

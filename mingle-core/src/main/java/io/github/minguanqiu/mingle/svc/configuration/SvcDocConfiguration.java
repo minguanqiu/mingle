@@ -3,6 +3,7 @@ package io.github.minguanqiu.mingle.svc.configuration;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.github.minguanqiu.mingle.svc.handler.SvcResponseHandler;
+import io.github.minguanqiu.mingle.svc.register.SvcDefinition;
 import io.github.minguanqiu.mingle.svc.register.SvcRegister;
 import io.swagger.v3.core.converter.ModelConverters;
 import io.swagger.v3.core.converter.ResolvedSchema;
@@ -26,7 +27,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Configuration for service spring doc.
+ * Configuration spring doc for service.
  *
  * @author Qiu Guan Ming
  */
@@ -38,12 +39,23 @@ public class SvcDocConfiguration {
   private String responseBodyFiledName;
   private final ModelConverters instance = ModelConverters.getInstance();
 
+  /**
+   * Create a new SvcDocConfiguration instance.
+   *
+   * @param svcRegister        the service register.
+   * @param svcResponseHandler the service response handler.
+   */
   public SvcDocConfiguration(SvcRegister svcRegister, SvcResponseHandler svcResponseHandler) {
     this.svcRegister = svcRegister;
     this.svcResponseHandler = svcResponseHandler;
     init();
   }
 
+  /**
+   * Create a new GroupedOpenApi instance.
+   *
+   * @return return the GroupedOpenApi.
+   */
   @Bean
   public GroupedOpenApi svcGroupedOpenApi() {
     return GroupedOpenApi.builder()
@@ -52,6 +64,11 @@ public class SvcDocConfiguration {
         .build();
   }
 
+  /**
+   * Create a new OpenApiCustomizer instance.
+   *
+   * @return return the OpenApiCustomizer.
+   */
   @Bean
   public OpenApiCustomizer svcOpenApiCustomizer() {
     return openApi -> {
@@ -84,8 +101,11 @@ public class SvcDocConfiguration {
     };
   }
 
+  /**
+   * Build all service for spring documents
+   */
   private void buildPathItem(ModelConverters instance, OpenAPI openApi, Operation operation,
-      SvcRegister.SvcDefinition v) {
+      SvcDefinition v) {
     operation.operationId(v.getSvcPath());
     operation.setTags(Arrays.asList(v.getSvc().tags()));
     operation.setSummary(v.getSvc().summary());
@@ -113,10 +133,16 @@ public class SvcDocConfiguration {
     buildSchema(openApi, responseSchema.referencedSchemas);
   }
 
+  /**
+   * Build service schema
+   */
   private void buildSchema(OpenAPI openapi, Map<String, Schema> schemaMap) {
     schemaMap.forEach(openapi::schema);
   }
 
+  /**
+   * Build service response schema
+   */
   private ResolvedSchema buildMainSvcResSchema(ModelConverters instance,
       ResolvedSchema resModelSchema) {
     ResolvedSchema mainSvcResModel = instance.readAllAsResolvedSchema(
@@ -125,6 +151,9 @@ public class SvcDocConfiguration {
     return mainSvcResModel;
   }
 
+  /**
+   * Build service default response
+   */
   private ApiResponses buildResponse(ResolvedSchema resolvedSchema) {
     return new ApiResponses()
         .addApiResponse("200", new ApiResponse()
@@ -133,6 +162,9 @@ public class SvcDocConfiguration {
                 .addMediaType("application/json", new MediaType().schema(resolvedSchema.schema))));
   }
 
+  /**
+   * Initialized when the object is created
+   */
   private void init() {
     ArrayList<Class<?>> classes = new ArrayList<>();
     svcRegister.getSvcDefinitionMap().forEach((k, v) -> {

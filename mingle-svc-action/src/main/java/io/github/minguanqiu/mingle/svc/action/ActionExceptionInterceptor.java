@@ -4,12 +4,19 @@ import io.github.minguanqiu.mingle.svc.action.exception.handler.model.ActionExce
 import io.github.minguanqiu.mingle.svc.action.exception.resolver.ActionExceptionHandlerResolver;
 
 /**
+ * Interceptor for action exception handler.
+ *
  * @author Qiu Gaun Ming
  */
 public class ActionExceptionInterceptor implements ActionInterceptor {
 
   private final ActionExceptionHandlerResolver actionExceptionHandlerResolver;
 
+  /**
+   * Create a new ActionExceptionInterceptor instance.
+   *
+   * @param actionExceptionHandlerResolver the action exception handler resolver.
+   */
   public ActionExceptionInterceptor(ActionExceptionHandlerResolver actionExceptionHandlerResolver) {
     this.actionExceptionHandlerResolver = actionExceptionHandlerResolver;
   }

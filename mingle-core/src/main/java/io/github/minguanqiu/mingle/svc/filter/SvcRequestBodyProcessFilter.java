@@ -25,6 +25,13 @@ public class SvcRequestBodyProcessFilter extends AbstractSvcFilter {
 
   private final JacksonUtils jacksonUtils;
 
+  /**
+   * Create a new SvcRequestBodyProcessFilter instance.
+   *
+   * @param svcInfo                      the service information.
+   * @param svcRequestBodyProcessHandler the service request body process handler.
+   * @param jacksonUtils                 the jackson utils.
+   */
   public SvcRequestBodyProcessFilter(SvcInfo svcInfo,
       SvcRequestBodyProcessHandler svcRequestBodyProcessHandler, JacksonUtils jacksonUtils) {
     super(svcInfo);
@@ -39,6 +46,11 @@ public class SvcRequestBodyProcessFilter extends AbstractSvcFilter {
     filterChain.doFilter(request, response);
   }
 
+  /**
+   * Pre-processing request body.
+   *
+   * @throws IOException when process input stream error.
+   */
   private void processRequestBody() throws IOException {
     String body = getBody((ContentCachingRequestWrapper) svcInfo.getHttpServletRequest());
     String payLoadBody =
@@ -51,6 +63,12 @@ public class SvcRequestBodyProcessFilter extends AbstractSvcFilter {
     svcInfo.setRequestBody(payLoadBody);
   }
 
+  /**
+   * Get request body from request wrapper.
+   *
+   * @param reqWrapper the request wrapper.
+   * @throws IOException when process input stream error.
+   */
   private String getBody(ContentCachingRequestWrapper reqWrapper) throws IOException {
     String body;
     try (BufferedReader bufReader = new BufferedReader(

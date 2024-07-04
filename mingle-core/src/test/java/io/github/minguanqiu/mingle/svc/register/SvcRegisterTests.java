@@ -56,7 +56,7 @@ public class SvcRegisterTests {
 
   @Test
   void testRegister() {
-    SvcRegister.SvcDefinition svcDefinition = svcRegister.getSvcDefinitionMap()
+    SvcDefinition svcDefinition = svcRegister.getSvcDefinitionMap()
         .get(svcPathHandler.getPath(SimpleSvc.class));
     assertThat(svcDefinition).isNotNull();
     RequestMappingHandlerMapping requestMappingHandlerMapping = (RequestMappingHandlerMapping) applicationContext.getBean(

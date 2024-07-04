@@ -4,7 +4,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigurationPackage;
 
 /**
- * {@link AutoConfiguration} for restful action module
+ * {@link AutoConfiguration} for restful action module.
  *
  * @author Qiu Guan Ming
  */
