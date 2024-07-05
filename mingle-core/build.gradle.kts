@@ -14,9 +14,12 @@ dependencies {
 
 mavenPublishing {
     pom {
+        name.set("Mingle Core")
         description.set("The core module based on the spring web functionality, responsible for receiving and responding to client messages.")
+        url.set("https://github.com/minguanqiu/mingle-core")
     }
 }
+
 
 
 

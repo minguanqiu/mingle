@@ -11,6 +11,8 @@ dependencies {
 
 mavenPublishing {
     pom {
+        name.set("Mingle Service Redis")
         description.set("Based on spring data redis, it provides redis architecture.")
+        url.set("https://github.com/minguanqiu/mingle-svc-redis")
     }
 }

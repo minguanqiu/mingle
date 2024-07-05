@@ -10,21 +10,21 @@ plugins {
 
 allprojects {
     group = "io.github.minguanqiu"
-    version = "2.0.0-SNAPSHOT"
+    version = "2.0.0"
 }
 
 subprojects {
     plugins.apply(rootProject.libs.plugins.mavenPublish.get().pluginId)
     repositories {
-        mavenLocal()
         mavenCentral()
     }
     mavenPublishing {
         publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
         coordinates(group.toString(), project.name, version.toString())
-//        signAllPublications()
+        signAllPublications()
         pom {
-            name.set("mingle")
+            name.set("Mingle")
+            description.set("Infrastructure for java web application")
             url.set("https://github.com/minguanqiu/mingle")
             licenses {
                 license {
@@ -80,12 +80,6 @@ subprojects {
             dependencies {
                 testImplementation(rootProject.libs.springBootTest)
             }
-        }
-    }
-
-    publishing {
-        publications.create<MavenPublication>("maven") {
-            from(project.components["java"])
         }
     }
 

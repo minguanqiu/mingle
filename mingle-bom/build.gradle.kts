@@ -16,9 +16,12 @@ dependencies {
         }
     }
 }
-publishing {
-    publications.create<MavenPublication>("maven") {
-        from(project.components["javaPlatform"])
+
+mavenPublishing {
+    pom {
+        name.set("Mingle BOM")
+        description.set("Mingle BOM")
+        url.set("https://github.com/minguanqiu/mingle-bom")
     }
 }
 

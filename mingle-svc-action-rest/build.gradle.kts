@@ -10,6 +10,8 @@ dependencies {
 
 mavenPublishing {
     pom {
+        name.set("Mingle Service Action For RESTful")
         description.set("One of the implementations of action, providing RESTful client functions.")
+        url.set("https://github.com/minguanqiu/mingle-svc-action-rest")
     }
 }

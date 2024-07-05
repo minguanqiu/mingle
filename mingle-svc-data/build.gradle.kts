@@ -12,6 +12,8 @@ dependencies {
 
 mavenPublishing {
     pom {
+        name.set("Mingle Service Data")
         description.set("Based on spring data jpa, it provides DAO architecture.")
+        url.set("https://github.com/minguanqiu/mingle-svc-data")
     }
 }
