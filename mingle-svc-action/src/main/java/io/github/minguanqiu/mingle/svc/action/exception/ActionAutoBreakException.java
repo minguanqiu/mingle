@@ -14,7 +14,7 @@ import lombok.Getter;
 public class ActionAutoBreakException extends RuntimeException {
 
   /**
-   * Action response
+   * Action response.
    *
    * @return return an action response.
    */

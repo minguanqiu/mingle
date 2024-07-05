@@ -13,7 +13,7 @@ import lombok.Getter;
 public abstract class AbstractActionExceptionHandler<E extends Exception> {
 
   /**
-   * Exception class
+   * Exception class.
    *
    * @return return the exception class.
    */

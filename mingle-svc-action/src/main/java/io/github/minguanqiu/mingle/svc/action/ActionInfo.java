@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * This class provide when execute action process logic can controller result
+ * This class provide when execute action process logic can controller result.
  *
  * @author Qiu Guan Ming
  */

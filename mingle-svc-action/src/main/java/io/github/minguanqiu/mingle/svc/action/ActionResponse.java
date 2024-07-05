@@ -9,12 +9,13 @@ import lombok.Setter;
 /**
  * This class provide action response result successful or fail.
  *
+ * @param <R1> the action response body.
  * @author Qiu Guan Ming
  */
 
 @Getter
 @Setter(AccessLevel.PACKAGE)
-public class ActionResponse<ResB extends ActionResponseBody> {
+public class ActionResponse<R1 extends ActionResponseBody> {
 
   /**
    * Action successful or fail.
@@ -49,7 +50,7 @@ public class ActionResponse<ResB extends ActionResponseBody> {
    *
    * @return return the action response body.
    */
-  private ResB responseBody;
+  private R1 responseBody;
 
   /**
    * Action response message type.
@@ -63,7 +64,7 @@ public class ActionResponse<ResB extends ActionResponseBody> {
    *
    * @return return the optional of response body.
    */
-  public Optional<ResB> getResponseBody() {
+  public Optional<R1> getResponseBody() {
     return Optional.ofNullable(responseBody);
   }
 }

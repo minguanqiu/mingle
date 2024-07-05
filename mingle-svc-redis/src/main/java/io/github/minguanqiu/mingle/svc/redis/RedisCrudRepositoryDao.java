@@ -10,8 +10,8 @@ import org.springframework.data.repository.CrudRepository;
  * @param <T> the redis entity.
  * @author Qiu Guan Ming
  */
-public class RedisCrudRepositoryDao<R extends CrudRepository<T, RedisKey>, T extends RedisEntity> extends
-    RedisRepositoryDao<R> {
+public class RedisCrudRepositoryDao<R extends CrudRepository<T, RedisKey>, T extends RedisEntity>
+    extends RedisRepositoryDao<R> {
 
   /**
    * Create a new RedisCrudRepositoryDao instance.

@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Configuration for action rest bean
+ * Configuration for action rest bean.
  *
  * @author Qiu Guan Ming
  */

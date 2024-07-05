@@ -39,7 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
- * <p> Action for restful feature.
+ * <p>Action for restful feature.
  * <pre>
  * Feature :
  * Request serialize and response deserialize using jackson.
@@ -133,8 +133,8 @@ public abstract class AbstractRestAction<R1 extends RestActionRequest, R2 extend
    * @return return the response data.
    */
   private ResponseData processMockCall() {
-    RestActionProperties.RestProperties.MockProperties mockProperties = restActionProperties.getRest()
-        .getMock().get(getMockName());
+    RestActionProperties.RestProperties.MockProperties mockProperties =
+        restActionProperties.getRest().getMock().get(getMockName());
     Response.Builder responseBuilder = new Response.Builder();
     responseBuilder.code(mockProperties.getCode());
     mockProperties.getHeader().forEach(responseBuilder::addHeader);
@@ -253,7 +253,7 @@ public abstract class AbstractRestAction<R1 extends RestActionRequest, R2 extend
   }
 
   /**
-   * Post-processing action response body
+   * Post-processing action response body.
    *
    * @param responseBody the action response body.
    */
@@ -293,8 +293,8 @@ public abstract class AbstractRestAction<R1 extends RestActionRequest, R2 extend
     if (!restActionProperties.getRest().getServer().containsKey(getServerName())) {
       throw new ServerNotExistException("Server not exist with name: " + getServerName());
     }
-    RestActionProperties.RestProperties.ServerProperties serverProperties = restActionProperties.getRest()
-        .getServer().get(getServerName());
+    RestActionProperties.RestProperties.ServerProperties serverProperties =
+        restActionProperties.getRest().getServer().get(getServerName());
     List<String> restPaths = buildRestPath(request);
     HttpUrl.Builder builder = new HttpUrl.Builder().scheme(serverProperties.getScheme())
         .host(serverProperties.getHost()).port(serverProperties.getPort());

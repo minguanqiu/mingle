@@ -42,7 +42,7 @@ public class ActionExceptionHandlerResolver {
   }
 
   /**
-   * Initialized when the object is created
+   * Initialized when the object is created.
    */
   @SuppressWarnings("unchecked")
   private void init() {

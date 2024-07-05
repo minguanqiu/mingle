@@ -114,6 +114,7 @@ public abstract non-sealed class AbstractAction<R1 extends ActionRequest,
           break;
         case TRUE:
           throw new ActionAutoBreakException(actionResponse);
+        default:
       }
     } else {
       actionResponse.setSuccess(true);
