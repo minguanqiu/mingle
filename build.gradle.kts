@@ -10,7 +10,7 @@ plugins {
 
 allprojects {
     group = "io.github.minguanqiu"
-    version = "2.0.0"
+    version = "2.0.1"
 }
 
 subprojects {
