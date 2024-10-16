@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.MediaType;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -135,7 +136,7 @@ public class SvcRegister {
     HashMap<String, ArrayList<String>> svcMissingMap = new HashMap<>();
     services.forEach(service -> {
       var abstractService = (AbstractService<?, ?>) service;
-      Class<?> serviceClass = abstractService.getClass();
+      Class<?> serviceClass = ClassUtils.getUserClass(abstractService.getClass());
       SvcDefinition svcDefinition = new SvcDefinition();
       ArrayList<String> svcErrorMsgList = new ArrayList<>();
       Svc svc = AnnotatedElementUtils.findMergedAnnotation(serviceClass, Svc.class);
