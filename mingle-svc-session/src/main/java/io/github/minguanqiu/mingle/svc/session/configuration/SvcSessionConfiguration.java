@@ -3,9 +3,11 @@ package io.github.minguanqiu.mingle.svc.session.configuration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.minguanqiu.mingle.svc.session.configuration.properties.SvcSessionProperties;
 import io.github.minguanqiu.mingle.svc.session.dao.SvcSessionDao;
+import io.github.minguanqiu.mingle.svc.session.handler.SessionHandler;
 import io.github.minguanqiu.mingle.svc.session.handler.SessionTokenHandler;
 import io.github.minguanqiu.mingle.svc.session.handler.SvcSessionFeatureHandler;
 import io.github.minguanqiu.mingle.svc.session.handler.TokenKeyHandler;
+import io.github.minguanqiu.mingle.svc.session.handler.impl.SessionHandlerDefaultImpl;
 import io.github.minguanqiu.mingle.svc.session.handler.impl.SessionTokenHandlerDefaultImpl;
 import io.github.minguanqiu.mingle.svc.session.handler.impl.SvcSessionFeatureDefaultImpl;
 import io.github.minguanqiu.mingle.svc.session.handler.impl.TokenKeyHandlerImpl;
@@ -45,6 +47,12 @@ public class SvcSessionConfiguration {
   @ConditionalOnMissingBean
   public SvcSessionFeatureHandler sessionFeatureHandler() {
     return new SvcSessionFeatureDefaultImpl();
+  }
+
+  @Bean
+  @ConditionalOnMissingBean
+  public SessionHandler sessionHandler(SvcSessionDao svcSessionDao) {
+    return new SessionHandlerDefaultImpl(svcSessionDao, sessionJacksonUtils());
   }
 
   @Bean

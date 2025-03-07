@@ -6,6 +6,7 @@ import io.github.minguanqiu.mingle.svc.register.SvcRegister;
 import io.github.minguanqiu.mingle.svc.session.configuration.properties.SvcSessionProperties;
 import io.github.minguanqiu.mingle.svc.session.dao.SvcSessionDao;
 import io.github.minguanqiu.mingle.svc.session.filter.SvcAuthenticationFilter;
+import io.github.minguanqiu.mingle.svc.session.handler.SessionHandler;
 import io.github.minguanqiu.mingle.svc.session.handler.SessionTokenHandler;
 import io.github.minguanqiu.mingle.svc.session.handler.model.SvcSessionFeature;
 import io.github.minguanqiu.mingle.svc.session.security.SessionAccessDeniedHandler;
@@ -136,9 +137,11 @@ public class SessionSecurityConfiguration {
   @Bean
   public SvcAuthenticationFilter svcAuthenticationFilter(SvcRegister svcRegister,
       SvcSessionProperties svcSessionProperties, SvcSessionDao svcSessionDao,
+      SessionHandler sessionHandler,
       SessionTokenHandler sessionTokenHandler,
       @Qualifier("sessionJacksonUtils") JacksonUtils jacksonUtils) {
     return new SvcAuthenticationFilter(svcRegister, svcSessionProperties, svcSessionDao,
+        sessionHandler,
         sessionTokenHandler, jacksonUtils);
   }
 
