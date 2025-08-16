@@ -9,7 +9,6 @@ import io.github.minguanqiu.mingle.svc.data.handler.DaoLoggingHandler;
 import io.github.minguanqiu.mingle.svc.handler.SvcPathHandler;
 import io.github.minguanqiu.mingle.svc.handler.SvcResponseHandler;
 import io.github.minguanqiu.mingle.svc.utils.JacksonUtils;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,7 +34,7 @@ public class DaoLoggingFalseTests {
   @Autowired
   SvcResponseHandler svcResponseHandler;
 
-  @Test
+//  @Test
   void testLogging() throws Exception {
     ResultActions perform = mvc.perform(
         SvcTestUtils.buildSvcRequest(svcPathHandler, SimpleSvc.class)

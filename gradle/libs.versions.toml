@@ -1,7 +1,7 @@
 [versions]
-spring-boot = "3.3.1"
+spring-boot = "3.5.4"
 guava = "33.2.0-jre"
-springdoc = "2.5.0"
+springdoc = "2.8.9"
 checkStyle = "10.16.0"
 
 [libraries]

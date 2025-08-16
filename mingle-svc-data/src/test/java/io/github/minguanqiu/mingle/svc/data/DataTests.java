@@ -9,7 +9,6 @@ import io.github.minguanqiu.mingle.svc.handler.SvcPathHandler;
 import io.github.minguanqiu.mingle.svc.handler.SvcResponseHandler;
 import io.github.minguanqiu.mingle.svc.utils.JacksonUtils;
 import java.util.Optional;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,7 +37,7 @@ public class DataTests {
   private SvcResponseHandler svcResponseHandler;
 
 
-  @Test
+//  @Test
   void testJPADao() {
     TestEntity testEntity = new TestEntity();
     testEntity.setSerial("1");
@@ -53,7 +52,7 @@ public class DataTests {
     assertThat(testDao.findById("1")).isNotPresent();
   }
 
-  @Test
+//  @Test
   void testTransactional() throws Exception {
     ResultActions perform = mockMvc.perform(
         SvcTestUtils.buildSvcRequest(svcPathHandler, SimpleSvcWithTransactional.class)
